@@ -1,0 +1,14 @@
+<div class="layout-container" [class.layout-static]="containerClass['layout-static']" [class.layout-mobile-active]="containerClass['layout-mobile-active']"
+  [class.layout-static-inactive]="containerClass['layout-static-inactive']" [class.layout-light]="containerClass['layout-light']"
+  [class.layout-primary]="containerClass['layout-primary']">
+  <app-topbar />
+  <app-sidebar />
+  <div class="layout-content-wrapper">
+    <div class="layout-content">
+      <div class="layout-content-inner">
+        <router-outlet />
+        <app-footer />
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,25 @@
+.seed-login-card {
+  width: min(92vw, 28rem);
+  border-radius: 1rem;
+  padding: 3rem 2rem;
+  box-shadow: 0 28px 60px rgb(76 29 149 / 0.18);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.seed-error-panel {
+  border: 1px solid rgb(248 113 113 / 0.4);
+  background: rgb(254 242 242);
+  color: rgb(153 27 27);
+  border-radius: 0.75rem;
+  padding: 0.75rem;
+}
+
+.seed-hint-panel {
+  border: 1px dashed rgb(196 181 253);
+  background: rgb(245 243 255);
+  color: rgb(76 29 149);
+  border-radius: 0.75rem;
+  padding: 0.75rem;
+}

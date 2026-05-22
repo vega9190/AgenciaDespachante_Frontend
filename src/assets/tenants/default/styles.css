@@ -1,0 +1,13 @@
+:root {
+  --tenant-accent-soft: #f3e8ff;
+  --tenant-accent-strong: #6d28d9;
+}
+
+.p-button.p-button-primary,
+.p-button:not(.p-button-secondary):not(.p-button-success):not(.p-button-info):not(.p-button-warning):not(.p-button-help):not(.p-button-danger):not(.p-button-contrast) {
+  box-shadow: 0 14px 28px rgb(109 40 217 / 0.22);
+}
+
+.p-card .p-card-subtitle {
+  color: var(--tenant-accent-strong);
+}

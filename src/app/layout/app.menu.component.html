@@ -1,0 +1,11 @@
+<ul class="layout-menu">
+  @for (item of menuItems; track item.label) {
+    <li>
+      <a [routerLink]="item.routerLink" routerLinkActive="active-route" [pTooltip]="item.label" tooltipPosition="right"
+        [tooltipDisabled]="!layoutService.isDesktop()">
+        <i [class]="item.icon + ' layout-menuitem-icon'"></i>
+        <span class="layout-menuitem-text">{{ item.label }}</span>
+      </a>
+    </li>
+  }
+</ul>
