@@ -13,44 +13,39 @@
         <p-inputgroup-addon>
           <i class="pi pi-user"></i>
         </p-inputgroup-addon>
-        <input pInputText formControlName="user" class="w-full" placeholder="User" autocomplete="username" />
+        <input pInputText formControlName="user" class="w-full" placeholder="Usuario" autocomplete="username" />
       </p-inputgroup>
 
       <div class="flex items-center gap-2">
         <p-checkbox [binary]="true" inputId="rememberUserId" formControlName="rememberUserId" />
-        <label for="rememberUserId" class="text-muted-color">Keep session</label>
+        <label for="rememberUserId" class="text-muted-color">Mantener sesion</label>
       </div>
 
       <p-inputgroup>
         <p-inputgroup-addon>
           <i class="pi pi-key"></i>
         </p-inputgroup-addon>
-        <input pInputText type="password" formControlName="password" class="w-full" placeholder="Password" autocomplete="current-password" />
+        <input pInputText type="password" formControlName="password" class="w-full" placeholder="Contrasena" autocomplete="current-password" />
       </p-inputgroup>
 
-      <button pButton type="submit" label="Sign In" class="my-3 w-full" [disabled]="isSubmitting()"></button>
+      <button pButton type="submit" label="Iniciar sesion" class="my-3 w-full" [disabled]="isSubmitting()"></button>
 
       @if (shouldShowValidationErrors()) {
         <div class="seed-error-panel">
           @if (loginForm.get('user')?.hasError('required')) {
-            <div>Username is required.</div>
+            <div>El usuario es obligatorio.</div>
           }
           @if (loginForm.get('password')?.hasError('required')) {
-            <div>Password is required.</div>
+            <div>La contraseña es obligatoria.</div>
           }
         </div>
       }
 
       @if (isUnauthorized()) {
         <div class="seed-error-panel">
-          <div>Invalid username or password.</div>
+          <div>Usuario o contraseña inválidos.</div>
         </div>
       }
-
-      <div class="seed-hint-panel">
-        <div><strong>User:</strong> admin</div>
-        <div><strong>Password:</strong> 123</div>
-      </div>
     </div>
   </div>
 </form>

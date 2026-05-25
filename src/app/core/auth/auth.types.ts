@@ -1,7 +1,12 @@
 export interface SessionIdentityDto {
+  accessToken: string;
+  expiresAtUtc: string;
   userName: string;
-  role: 'Admin';
+  firstName: string;
+  lastName: string;
   fullName: string;
+  role: string;
+  initials: string;
 }
 
 export interface LoginRequest {

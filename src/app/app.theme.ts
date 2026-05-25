@@ -61,10 +61,11 @@ const theme: ThemeType = {
         }
       },
       focusRing: {
-        width: '2px',
-        style: 'solid',
-        color: '{primary.400}',
-        offset: '2px'
+        width: '0',
+        style: 'none',
+        color: 'transparent',
+        offset: '0',
+        shadow: 'none'
       }
     }
   }),

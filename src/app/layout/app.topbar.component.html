@@ -10,12 +10,23 @@
 
   <div class="topbar-profile">
     <div class="topbar-profile-button">
-      <span class="user-avatar">A</span>
+      <span class="user-avatar">{{ authService.currentUser()?.initials }}</span>
       <span class="profile-details">
         <span class="profile-name">{{ authService.currentUser()?.fullName }}</span>
         <span class="profile-job">{{ authService.currentUser()?.role }}</span>
       </span>
-      <a pButton severity="contrast" size="small" label="Logout" routerLink="/login" (click)="onLogout()"></a>
+      <button
+        pButton
+        type="button"
+        severity="contrast"
+        text
+        rounded
+        class="topbar-profile-menu-button"
+        icon="pi pi-chevron-down"
+        aria-label="Open profile menu"
+        (click)="profileMenu.toggle($event)"
+      ></button>
+      <p-menu #profileMenu [model]="profileMenuItems" [popup]="true" appendTo="body"></p-menu>
     </div>
   </div>
 </div>

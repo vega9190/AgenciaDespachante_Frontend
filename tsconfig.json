@@ -18,7 +18,9 @@
     "paths": {
       "@core/*": ["src/app/core/*"],
       "@layout/*": ["src/app/layout/*"],
-      "@pages/*": ["src/app/pages/*"]
+      "@pages/*": ["src/app/pages/*"],
+      "@services/*": ["src/app/services/*"],
+      "@models/*": ["src/app/models/*"]
     },
     "useDefineForClassFields": false
   },

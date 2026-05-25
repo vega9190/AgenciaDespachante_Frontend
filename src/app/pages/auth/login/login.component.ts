@@ -43,7 +43,7 @@ export class LoginComponent {
     }
   }
 
-  onLoginSubmit(): void {
+  async onLoginSubmit(): Promise<void> {
     this.isSubmitting.set(true);
 
     if (this.loginForm.invalid) {
@@ -52,7 +52,7 @@ export class LoginComponent {
     }
 
     const { user, password } = this.loginForm.getRawValue();
-    const isValid = this.authService.login({ user: user ?? '', password: password ?? '' });
+    const isValid = await this.authService.login({ user: user ?? '', password: password ?? '' });
 
     if (!isValid) {
       this.isUnauthorized.set(true);
@@ -61,7 +61,7 @@ export class LoginComponent {
     }
 
     this.isUnauthorized.set(false);
-    this.router.navigate(['/dashboard']);
+    await this.router.navigate(['/dashboard']);
     this.isSubmitting.set(false);
   }
 }

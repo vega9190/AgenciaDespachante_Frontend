@@ -1,4 +1,9 @@
-import { computed, Injectable, signal } from '@angular/core';
+import { computed, Injectable, inject, signal } from '@angular/core';
+import { firstValueFrom } from 'rxjs';
+
+import { ApiResultOf } from '@models/api.types';
+import { AuthApiService } from '@services/auth/auth-api.service';
+import { LoginResponseDto } from '@services/auth/auth-api.types';
 
 import { LoginRequest, SessionIdentityDto } from './auth.types';
 
@@ -6,27 +11,27 @@ import { LoginRequest, SessionIdentityDto } from './auth.types';
   providedIn: 'root'
 })
 export class AuthService {
-  private readonly storageKey = 'frontend-seed-session';
+  private readonly authApiService = inject(AuthApiService);
+  private readonly storageKey = 'agencia-despachante-session';
   private readonly _currentUser = signal<SessionIdentityDto | null>(this.loadSession());
 
   readonly currentUser = this._currentUser.asReadonly();
-  readonly isAuthenticated = computed(() => this._currentUser() !== null);
+  readonly isAuthenticated = computed(() => !!this._currentUser()?.accessToken);
 
-  login(request: LoginRequest): boolean {
-    const isValidUser = request.user === 'admin' && request.password === '123';
+  async login(request: LoginRequest): Promise<boolean> {
+    let response: ApiResultOf<LoginResponseDto>;
 
-    if (!isValidUser) {
+    try {
+      response = await firstValueFrom(this.authApiService.login({ username: request.user, password: request.password }));
+    } catch {
       return false;
     }
 
-    const session: SessionIdentityDto = {
-      userName: 'admin',
-      role: 'Admin',
-      fullName: 'System Admin'
-    };
+    if (!response.isValid || !response.data) {
+      return false;
+    }
 
-    localStorage.setItem(this.storageKey, JSON.stringify(session));
-    this._currentUser.set(session);
+    this.persistSession(this.mapLoginResponseToSession(response));
 
     return true;
   }
@@ -34,6 +39,15 @@ export class AuthService {
   logout(): void {
     localStorage.removeItem(this.storageKey);
     this._currentUser.set(null);
+  }
+
+  getAccessToken(): string | null {
+    return this._currentUser()?.accessToken ?? null;
+  }
+
+  private persistSession(session: SessionIdentityDto): void {
+    localStorage.setItem(this.storageKey, JSON.stringify(session));
+    this._currentUser.set(session);
   }
 
   private loadSession(): SessionIdentityDto | null {
@@ -44,10 +58,43 @@ export class AuthService {
     }
 
     try {
-      return JSON.parse(rawValue) as SessionIdentityDto;
+      const session = JSON.parse(rawValue) as SessionIdentityDto;
+
+      if (!session.accessToken) {
+        localStorage.removeItem(this.storageKey);
+        return null;
+      }
+
+      return session;
     } catch {
       localStorage.removeItem(this.storageKey);
       return null;
     }
   }
+
+  private mapLoginResponseToSession(response: ApiResultOf<LoginResponseDto>): SessionIdentityDto {
+    const loginData = response.data as LoginResponseDto;
+    const fullName = [loginData.firstName, loginData.lastName].filter(Boolean).join(' ').trim();
+
+    return {
+      accessToken: loginData.accessToken,
+      expiresAtUtc: loginData.expiresAtUtc,
+      userName: loginData.username,
+      firstName: loginData.firstName,
+      lastName: loginData.lastName,
+      fullName: fullName || loginData.username,
+      role: loginData.role,
+      initials: buildInitials(loginData.firstName, loginData.lastName, loginData.username)
+    };
+  }
+}
+
+function buildInitials(firstName: string, lastName: string, username: string): string {
+  const names = [firstName, lastName].filter((value) => !!value.trim());
+
+  if (names.length > 0) {
+    return names.slice(0, 2).map((value) => value.trim().charAt(0).toUpperCase()).join('');
+  }
+
+  return username.trim().slice(0, 2).toUpperCase();
 }

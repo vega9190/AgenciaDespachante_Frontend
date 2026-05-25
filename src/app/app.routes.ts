@@ -21,6 +21,10 @@ export const routes: Routes = [
       {
         path: 'dashboard',
         loadComponent: () => import('@pages/dashboard/dashboard.component').then((m) => m.DashboardComponent)
+      },
+      {
+        path: 'clients',
+        loadComponent: () => import('@pages/clients/list/clients-list.component').then((m) => m.ClientsListComponent)
       }
     ]
   },

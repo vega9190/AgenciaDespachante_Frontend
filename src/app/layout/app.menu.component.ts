@@ -23,6 +23,11 @@ export class AppMenuComponent {
       label: 'Dashboard',
       icon: 'pi pi-home',
       routerLink: ['/dashboard']
+    },
+    {
+      label: 'Clientes',
+      icon: 'pi pi-users',
+      routerLink: ['/clients']
     }
   ];
 }
