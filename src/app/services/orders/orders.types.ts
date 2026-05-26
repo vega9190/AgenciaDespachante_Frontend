@@ -3,11 +3,35 @@ export interface OrdersListQuery {
   pageSize?: number;
   orderNumber?: string;
   containerNumber?: string;
-  clientName?: string;
-  clientTaxId?: string;
+  clientId?: string;
   statusId?: string;
   sortBy?: string;
   sortDirection?: string;
+}
+
+export interface OrderListItemDto {
+  id: string;
+  orderNumber: number;
+  containerNumber: string;
+  clientFullName: string;
+  clientTaxId?: string | null;
+  statusId: string;
+  statusName: string;
+  createdUtc: string;
+  totalPaymentsAmount: number;
+}
+
+export interface OrderStatusOptionDto {
+  id: string;
+  name: string;
+}
+
+export interface PagedResult<T> {
+  items: T[];
+  page: number;
+  pageSize: number;
+  totalItems: number;
+  totalPages: number;
 }
 
 export interface CreateOrderRequest {

@@ -1,11 +1,16 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 
+import { ApiResultOf } from '@models/api.types';
+
 import { environment } from '../../../environments/environment';
 
 import {
   CreateOrderRequest,
+  OrderListItemDto,
+  OrderStatusOptionDto,
   OrdersListQuery,
+  PagedResult,
   SaveOrderDocumentRequest,
   SaveOrderPaymentRequest,
   UpdateOrderRequest,
@@ -32,7 +37,7 @@ export class OrdersService {
   }
 
   getList(query: OrdersListQuery = {}) {
-    return this.httpClient.get(this.ordersUrl, {
+    return this.httpClient.get<ApiResultOf<PagedResult<OrderListItemDto>>>(this.ordersUrl, {
       params: buildHttpParams(query)
     });
   }
@@ -42,7 +47,7 @@ export class OrdersService {
   }
 
   getStatusOptions() {
-    return this.httpClient.get(`${this.ordersUrl}/status-options`);
+    return this.httpClient.get<ApiResultOf<OrderStatusOptionDto[]>>(`${this.ordersUrl}/status-options`);
   }
 
   getDocumentTypeOptions(category?: number) {

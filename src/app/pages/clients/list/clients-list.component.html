@@ -93,7 +93,7 @@
           <td>
             <p-tag [value]="getStatusLabel(client.isActive)" [severity]="getStatusSeverity(client.isActive)" />
           </td>
-          <td>{{ client.createdUtc | date: 'dd/MM/yyyy HH:mm' }}</td>
+          <td>{{ client.createdUtc | date: 'dd/MM/yyyy' }}</td>
           <td class="text-center">
             <button
               type="button"

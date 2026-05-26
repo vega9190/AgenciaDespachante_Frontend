@@ -28,6 +28,11 @@ export class AppMenuComponent {
       label: 'Clientes',
       icon: 'pi pi-users',
       routerLink: ['/clients']
+    },
+    {
+      label: 'Pedidos',
+      icon: 'pi pi-clipboard',
+      routerLink: ['/orders']
     }
   ];
 }

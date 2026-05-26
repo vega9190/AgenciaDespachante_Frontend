@@ -38,6 +38,15 @@ export const routes: Routes = [
             loadComponent: () => import('@pages/clients/form/client-form.component').then((m) => m.ClientFormComponent)
           }
         ]
+      },
+      {
+        path: 'orders',
+        children: [
+          {
+            path: '',
+            loadComponent: () => import('@pages/orders/list/orders-list.component').then((m) => m.OrdersListComponent)
+          }
+        ]
       }
     ]
   },
