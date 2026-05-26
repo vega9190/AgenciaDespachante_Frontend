@@ -11,4 +11,13 @@
       </div>
     </div>
   </div>
+
+  @if (uiBlockService.isBlocked() > 0) {
+    <div class="app-ui-blocker">
+      <div class="app-ui-blocker__panel">
+        <i class="pi pi-spin pi-spinner"></i>
+        <span>Procesando...</span>
+      </div>
+    </div>
+  }
 </div>

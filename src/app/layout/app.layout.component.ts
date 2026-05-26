@@ -6,6 +6,7 @@ import { AppFooterComponent } from './app.footer.component';
 import { AppSidebarComponent } from './app.sidebar.component';
 import { AppTopbarComponent } from './app.topbar.component';
 import { LayoutService } from './service/app.layout.service';
+import { UiBlockService } from '@services/common/ui-block.service';
 
 @Component({
   selector: 'app-layout',
@@ -14,6 +15,7 @@ import { LayoutService } from './service/app.layout.service';
 })
 export class AppLayoutComponent implements OnDestroy {
   readonly layoutService = inject(LayoutService);
+  readonly uiBlockService = inject(UiBlockService);
   private readonly rendererFactory = inject(RendererFactory2);
   private readonly router = inject(Router);
   private readonly renderer: Renderer2;

@@ -1,6 +1,7 @@
 import { DatePipe } from '@angular/common';
 import { Component, computed, inject, signal } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { finalize } from 'rxjs';
 
 import { ButtonModule } from 'primeng/button';
@@ -14,10 +15,9 @@ import { ClientsService } from '@services/clients/clients.service';
 import { ClientListItemDto, ClientsListQuery } from '@services/clients/clients.types';
 
 interface ClientFiltersForm {
-  firstName: FormControl<string>;
-  lastName: FormControl<string>;
+  name: FormControl<string>;
   taxId: FormControl<string>;
-  phone: FormControl<string>;
+  contactPhone: FormControl<string>;
   isActive: FormControl<boolean | null>;
 }
 
@@ -35,6 +35,7 @@ interface ClientStatusOption {
 export class ClientsListComponent {
   private readonly formBuilder = inject(FormBuilder);
   private readonly clientsService = inject(ClientsService);
+  private readonly router = inject(Router);
 
   readonly pageSizeOptions = [10, 20, 50];
   readonly statusOptions: ClientStatusOption[] = [
@@ -51,10 +52,9 @@ export class ClientsListComponent {
   readonly first = computed(() => (this.page() - 1) * this.pageSize());
 
   readonly filtersForm: FormGroup<ClientFiltersForm> = this.formBuilder.group({
-    firstName: this.formBuilder.nonNullable.control(''),
-    lastName: this.formBuilder.nonNullable.control(''),
+    name: this.formBuilder.nonNullable.control(''),
     taxId: this.formBuilder.nonNullable.control(''),
-    phone: this.formBuilder.nonNullable.control(''),
+    contactPhone: this.formBuilder.nonNullable.control(''),
     isActive: this.formBuilder.control<boolean | null>(null)
   });
 
@@ -69,10 +69,9 @@ export class ClientsListComponent {
 
   onClear(): void {
     this.filtersForm.reset({
-      firstName: '',
-      lastName: '',
+      name: '',
       taxId: '',
-      phone: '',
+      contactPhone: '',
       isActive: null
     });
 
@@ -89,7 +88,7 @@ export class ClientsListComponent {
       input.value = sanitizedValue;
     }
 
-    this.filtersForm.controls.phone.setValue(sanitizedValue);
+    this.filtersForm.controls.contactPhone.setValue(sanitizedValue);
   }
 
   onPageChange(event: TableLazyLoadEvent): void {
@@ -102,11 +101,11 @@ export class ClientsListComponent {
   }
 
   onEdit(client: ClientListItemDto): void {
-    console.log('Editar cliente', client);
+    void this.router.navigate(['/clients', client.id]);
   }
 
   onCreate(): void {
-    console.log('Nuevo cliente');
+    void this.router.navigate(['/clients/create']);
   }
 
   getStatusLabel(isActive: boolean): string {
@@ -135,10 +134,9 @@ export class ClientsListComponent {
     return {
       page: this.page(),
       pageSize: this.pageSize(),
-      firstName: formValue.firstName,
-      lastName: formValue.lastName,
+      name: formValue.name,
       taxId: formValue.taxId,
-      phone: formValue.phone,
+      contactPhone: formValue.contactPhone,
       isActive: formValue.isActive ?? undefined,
       sortBy: 'createdUtc',
       sortDirection: 'desc'

@@ -275,6 +275,28 @@ body a {
   gap: 2rem;
 }
 
+.app-ui-blocker {
+  position: fixed;
+  inset: 0;
+  z-index: 1400;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgb(15 23 42 / 0.32);
+}
+
+.app-ui-blocker__panel {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  border: 1px solid rgb(139 92 246 / 0.14);
+  border-radius: 1rem;
+  background: var(--set-surface-overlay);
+  padding: 1rem 1.25rem;
+  box-shadow: 0 18px 40px rgb(15 23 42 / 0.14);
+  font-weight: 600;
+}
+
 .layout-footer {
   margin-top: auto;
   display: flex;

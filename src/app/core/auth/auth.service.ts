@@ -16,7 +16,7 @@ export class AuthService {
   private readonly _currentUser = signal<SessionIdentityDto | null>(this.loadSession());
 
   readonly currentUser = this._currentUser.asReadonly();
-  readonly isAuthenticated = computed(() => !!this._currentUser()?.accessToken);
+  readonly isAuthenticated = computed(() => this.getValidSession() !== null);
 
   async login(request: LoginRequest): Promise<boolean> {
     let response: ApiResultOf<LoginResponseDto>;
@@ -42,7 +42,7 @@ export class AuthService {
   }
 
   getAccessToken(): string | null {
-    return this._currentUser()?.accessToken ?? null;
+    return this.getValidSession()?.accessToken ?? null;
   }
 
   private persistSession(session: SessionIdentityDto): void {
@@ -60,7 +60,7 @@ export class AuthService {
     try {
       const session = JSON.parse(rawValue) as SessionIdentityDto;
 
-      if (!session.accessToken) {
+      if (!session.accessToken || this.isSessionExpired(session)) {
         localStorage.removeItem(this.storageKey);
         return null;
       }
@@ -70,6 +70,31 @@ export class AuthService {
       localStorage.removeItem(this.storageKey);
       return null;
     }
+  }
+
+  private getValidSession(): SessionIdentityDto | null {
+    const session = this._currentUser();
+
+    if (!session) {
+      return null;
+    }
+
+    if (this.isSessionExpired(session)) {
+      this.logout();
+      return null;
+    }
+
+    return session;
+  }
+
+  private isSessionExpired(session: SessionIdentityDto): boolean {
+    const expiresAt = Date.parse(session.expiresAtUtc);
+
+    if (Number.isNaN(expiresAt)) {
+      return true;
+    }
+
+    return expiresAt <= Date.now();
   }
 
   private mapLoginResponseToSession(response: ApiResultOf<LoginResponseDto>): SessionIdentityDto {

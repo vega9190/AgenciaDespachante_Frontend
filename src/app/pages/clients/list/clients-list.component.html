@@ -4,18 +4,11 @@
   </div>
 
   <p-card>
-    <ng-template #title>Filtros</ng-template>
-
     <div class="filters-layout filters-content">
       <form [formGroup]="filtersForm" class="filters-grid">
         <div class="flex flex-col gap-2">
-          <label for="firstName" class="font-semibold">Nombre</label>
-          <input id="firstName" type="text" pInputText formControlName="firstName" placeholder="Buscar por nombre" />
-        </div>
-
-        <div class="flex flex-col gap-2">
-          <label for="lastName" class="font-semibold">Apellido</label>
-          <input id="lastName" type="text" pInputText formControlName="lastName" placeholder="Buscar por apellido" />
+          <label for="name" class="font-semibold">Nombre</label>
+          <input id="name" type="text" pInputText formControlName="name" placeholder="Buscar por nombre" />
         </div>
 
         <div class="flex flex-col gap-2">
@@ -24,12 +17,12 @@
         </div>
 
         <div class="flex flex-col gap-2">
-          <label for="phone" class="font-semibold">Teléfono</label>
+          <label for="contactPhone" class="font-semibold">Teléfono</label>
           <input
-            id="phone"
+            id="contactPhone"
             type="text"
             pInputText
-            formControlName="phone"
+            formControlName="contactPhone"
             placeholder="Buscar por teléfono"
             inputmode="numeric"
             maxlength="20"
@@ -80,7 +73,8 @@
       <ng-template #header>
         <tr>
           <th>Nro. Cliente</th>
-          <th>Nombre completo</th>
+          <th>Empresa</th>
+          <th>Contacto</th>
           <th>Teléfono</th>
           <th>NIT</th>
           <th>Estado</th>
@@ -92,8 +86,9 @@
       <ng-template #body let-client>
         <tr>
           <td>{{ client.clientNumber }}</td>
-          <td>{{ client.fullName }}</td>
-          <td>{{ client.phone || '-' }}</td>
+          <td>{{ client.companyName }}</td>
+          <td>{{ client.contactName }}</td>
+          <td>{{ client.contactPhone || '-' }}</td>
           <td>{{ client.taxId || '-' }}</td>
           <td>
             <p-tag [value]="getStatusLabel(client.isActive)" [severity]="getStatusSeverity(client.isActive)" />
@@ -116,7 +111,7 @@
 
       <ng-template #emptymessage>
         <tr>
-          <td colspan="7" class="py-6 text-center text-surface-500">No se encontraron clientes.</td>
+          <td colspan="8" class="py-6 text-center text-surface-500">No se encontraron clientes.</td>
         </tr>
       </ng-template>
     </p-table>

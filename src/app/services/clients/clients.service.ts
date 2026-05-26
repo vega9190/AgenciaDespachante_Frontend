@@ -5,7 +5,16 @@ import { ApiResultOf } from '@models/api.types';
 
 import { environment } from '../../../environments/environment';
 
-import { ClientListItemDto, ClientOptionDto, ClientRequest, ClientsListQuery, PagedResult } from './clients.types';
+import {
+  ClientCreateRequest,
+  ClientCreateResponse,
+  ClientDetailDto,
+  ClientListItemDto,
+  ClientOptionDto,
+  ClientsListQuery,
+  ClientUpdateRequest,
+  PagedResult
+} from './clients.types';
 
 @Injectable({
   providedIn: 'root'
@@ -14,16 +23,16 @@ export class ClientsService {
   private readonly httpClient = inject(HttpClient);
   private readonly clientsUrl = `${environment.apiUrl}/api/Clients`;
 
-  create(request: ClientRequest) {
-    return this.httpClient.post(this.clientsUrl, request);
+  create(request: ClientCreateRequest) {
+    return this.httpClient.post<ApiResultOf<ClientCreateResponse>>(this.clientsUrl, request);
   }
 
-  update(id: string, request: ClientRequest) {
-    return this.httpClient.put(`${this.clientsUrl}/${id}`, request);
+  update(id: string, request: ClientUpdateRequest) {
+    return this.httpClient.put<ApiResultOf<null>>(`${this.clientsUrl}/${id}`, request);
   }
 
   getById(id: string) {
-    return this.httpClient.get(`${this.clientsUrl}/${id}`);
+    return this.httpClient.get<ApiResultOf<ClientDetailDto>>(`${this.clientsUrl}/${id}`);
   }
 
   getList(query: ClientsListQuery = {}) {

@@ -1,0 +1,113 @@
+<div class="client-form-page flex flex-col gap-12">
+  <div>
+    <div>
+      <h1 class="page-title">{{ pageTitle() }}</h1>
+    </div>
+  </div>
+
+  @if (client(); as currentClient) {
+    <div class="client-summary-grid">
+      <div class="client-summary-card">
+        <div class="client-summary-card__icon client-summary-card__icon--number">
+          <i class="pi pi-hashtag"></i>
+        </div>
+        <div class="client-summary-card__content">
+          <span class="client-summary-card__label">NRO. CLIENTE</span>
+          <strong class="client-summary-card__value">{{ currentClient.clientNumber }}</strong>
+        </div>
+      </div>
+
+      <div class="client-summary-card">
+        <div class="client-summary-card__icon client-summary-card__icon--date">
+          <i class="pi pi-calendar"></i>
+        </div>
+        <div class="client-summary-card__content">
+          <span class="client-summary-card__label">CLIENTE DESDE</span>
+          <strong class="client-summary-card__value">{{ currentClient.createdUtc | date: 'dd/MM/yyyy' }}</strong>
+        </div>
+      </div>
+
+      <div class="client-summary-card client-summary-card--status">
+        <div class="client-summary-card__icon client-summary-card__icon--status">
+          <i class="pi pi-shield"></i>
+        </div>
+        <div class="client-summary-card__content client-summary-card__content--status">
+          <span class="client-summary-card__label">CLIENTE ACTIVO</span>
+          <strong class="client-summary-card__value">{{ clientForm.controls.isActive.value ? 'Activo' : 'Inactivo' }}</strong>
+          <span class="client-summary-card__help">Permitir que este cliente realice nuevas transacciones.</span>
+        </div>
+        <p-toggleswitch inputId="isActive" [formControl]="clientForm.controls.isActive" />
+      </div>
+    </div>
+  }
+
+  <p-card class="client-form-card">
+    <div class="form-grid" [formGroup]="clientForm">
+      <div class="flex flex-col gap-2">
+        <label for="companyName" class="font-semibold">Nombre de la Empresa</label>
+        <input id="companyName" type="text" pInputText formControlName="companyName" maxlength="150" />
+        @if (getFieldError('companyName')) {
+          <small class="field-error">{{ getFieldError('companyName') }}</small>
+        }
+      </div>
+
+      <div class="flex flex-col gap-2">
+        <label for="taxId" class="font-semibold">NIT</label>
+        <input id="taxId" type="text" pInputText formControlName="taxId" maxlength="20" />
+        @if (getFieldError('taxId')) {
+          <small class="field-error">{{ getFieldError('taxId') }}</small>
+        }
+      </div>
+
+      <div class="flex flex-col gap-2">
+        <label for="contactName" class="font-semibold">Nombre de Contacto</label>
+        <input id="contactName" type="text" pInputText formControlName="contactName" maxlength="100" />
+        @if (getFieldError('contactName')) {
+          <small class="field-error">{{ getFieldError('contactName') }}</small>
+        }
+      </div>
+
+      <div class="flex flex-col gap-2">
+        <label for="contactPhone" class="font-semibold">Teléfono de Contacto</label>
+        <input
+          id="contactPhone"
+          type="text"
+          pInputText
+          formControlName="contactPhone"
+          inputmode="numeric"
+          maxlength="9"
+          placeholder="123-45678"
+          (input)="onPhoneInput($event)"
+        />
+        @if (getFieldError('contactPhone')) {
+          <small class="field-error">{{ getFieldError('contactPhone') }}</small>
+        }
+      </div>
+
+      <div class="flex flex-col gap-2 form-grid__full">
+        <label for="address" class="font-semibold">Dirección</label>
+        <input id="address" type="text" pInputText formControlName="address" maxlength="255" />
+        @if (getFieldError('address')) {
+          <small class="field-error">{{ getFieldError('address') }}</small>
+        }
+      </div>
+    </div>
+
+    @if (isLoading()) {
+      <div class="form-loading">Cargando cliente...</div>
+    }
+
+    <div class="form-actions">
+      <button type="button" pButton label="Volver" severity="secondary" styleClass="flat-button" (click)="onCancel()"></button>
+      <button
+        type="button"
+        pButton
+        label="Guardar"
+        icon="pi pi-save"
+        styleClass="flat-button"
+        [disabled]="isLoading() || isSaving()"
+        (click)="onSubmit()"
+      ></button>
+    </div>
+  </p-card>
+</div>

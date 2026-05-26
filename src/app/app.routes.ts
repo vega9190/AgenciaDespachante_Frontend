@@ -24,7 +24,20 @@ export const routes: Routes = [
       },
       {
         path: 'clients',
-        loadComponent: () => import('@pages/clients/list/clients-list.component').then((m) => m.ClientsListComponent)
+        children: [
+          {
+            path: '',
+            loadComponent: () => import('@pages/clients/list/clients-list.component').then((m) => m.ClientsListComponent)
+          },
+          {
+            path: 'create',
+            loadComponent: () => import('@pages/clients/form/client-form.component').then((m) => m.ClientFormComponent)
+          },
+          {
+            path: ':id',
+            loadComponent: () => import('@pages/clients/form/client-form.component').then((m) => m.ClientFormComponent)
+          }
+        ]
       }
     ]
   },
