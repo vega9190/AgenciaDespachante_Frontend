@@ -12,22 +12,22 @@ type ToastSeverity = 'info' | 'warn' | 'success' | 'error';
 export class AppToastService {
   private readonly messageService = inject(MessageService);
 
-  showApiMessages(result: ApiResult | null | undefined): void {
+  showApiMessages(result: ApiResult | null | undefined, interval = 3000): void {
     if (!result?.messageList?.length) {
       return;
     }
 
-    this.showMessages(result.messageList);
+    this.showMessages(result.messageList, interval);
   }
 
-  showMessages(messages: MessageResult[]): void {
+  showMessages(messages: MessageResult[], interval = 3000): void {
     const toastMessages = messages
       .filter((message) => !!message.description?.trim())
       .map((message) => ({
         severity: this.mapSeverity(message.type),
         summary: this.mapSummary(message.type),
         detail: message.description.trim(),
-        life: 3000
+        life: interval
       }));
 
     if (toastMessages.length === 0) {
@@ -42,7 +42,7 @@ export class AppToastService {
       severity: 'error',
       summary: 'Error',
       detail: message,
-      life: 3000
+      life: 5000
     });
   }
 

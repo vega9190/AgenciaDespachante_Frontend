@@ -1,7 +1,7 @@
 import { DatePipe } from '@angular/common';
 import { Component, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { finalize } from 'rxjs';
 
@@ -12,6 +12,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
 import { Tab, TabList, TabPanel, TabPanels, Tabs } from 'primeng/tabs';
 
+import { FileSelectorComponent } from '../../../common-components/file-selector/file-selector.component';
 import { ApiResult, ApiResultOf } from '@models/api.types';
 import { ClientsService } from '@services/clients/clients.service';
 import { ClientOptionDto } from '@services/clients/clients.types';
@@ -22,6 +23,7 @@ import {
   CONTAINER_TYPE_OPTIONS,
   ContainerTypeOption,
   CreateOrderRequest,
+  OrderDocumentTypeOptionDto,
   OrderDetailDto,
   UpdateOrderRequest
 } from '@services/orders/orders.types';
@@ -35,7 +37,7 @@ interface OrderFormModel {
 
 @Component({
   selector: 'app-order-form',
-  imports: [ReactiveFormsModule, DatePipe, AutoCompleteModule, ButtonModule, CardModule, InputTextModule, SelectModule, Tabs, TabList, Tab, TabPanels, TabPanel],
+  imports: [ReactiveFormsModule, FormsModule, DatePipe, AutoCompleteModule, ButtonModule, CardModule, InputTextModule, SelectModule, Tabs, TabList, Tab, TabPanels, TabPanel, FileSelectorComponent],
   templateUrl: './order-form.component.html',
   styleUrl: './order-form.component.css'
 })
@@ -51,14 +53,22 @@ export class OrderFormComponent {
   readonly isLoading = signal(false);
   readonly isSaving = signal(false);
   readonly isLoadingClients = signal(false);
+  readonly isLoadingDocumentTypes = signal(false);
+  readonly isSavingDocument = signal(false);
   readonly order = signal<OrderDetailDto | null>(null);
   readonly orderId = signal<string | null>(null);
   readonly clientSuggestions = signal<ClientOptionDto[]>([]);
+  readonly documentTypeOptions = signal<OrderDocumentTypeOptionDto[]>([]);
+  readonly selectedDocumentTypeId = signal<string | null>(null);
+  readonly selectedDocumentFile = signal<File | null>(null);
   readonly containerTypeOptions = CONTAINER_TYPE_OPTIONS;
   readonly orderTimelineSteps = ORDER_TIMELINE_STEPS;
   readonly activeEditTab = signal('details');
   readonly isEditMode = computed(() => this.orderId() !== null);
   readonly pageTitle = computed(() => (this.isEditMode() ? 'Editar Pedido' : 'Crear Pedido'));
+  readonly canSaveDocument = computed(
+    () => !!this.orderId() && !!this.selectedDocumentTypeId() && !!this.selectedDocumentFile() && !this.isSavingDocument() && !this.isLoadingDocumentTypes()
+  );
 
   readonly orderForm: FormGroup<OrderFormModel> = this.formBuilder.group({
     client: this.formBuilder.control<ClientOptionDto | null>(null, [Validators.required]),
@@ -72,11 +82,15 @@ export class OrderFormComponent {
       this.orderId.set(id);
 
       if (id) {
+        this.resetDocumentForm();
         this.loadOrder(id);
+        this.loadDocumentTypeOptions(id);
         return;
       }
 
       this.order.set(null);
+      this.documentTypeOptions.set([]);
+      this.resetDocumentForm();
       this.orderForm.reset({
         client: null,
         containerNumber: '',
@@ -116,6 +130,58 @@ export class OrderFormComponent {
 
   onClientDropdownClick(): void {
     this.loadClientSuggestions();
+  }
+
+  onDocumentTypeChange(documentTypeId: string | null): void {
+    this.selectedDocumentTypeId.set(documentTypeId);
+  }
+
+  onDocumentFileSelected(file: File): void {
+    this.selectedDocumentFile.set(file);
+  }
+
+  onDocumentFileCleared(): void {
+    this.selectedDocumentFile.set(null);
+  }
+
+  onDocumentCancel(): void {
+    this.resetDocumentForm();
+  }
+
+  onDocumentSave(): void {
+    const id = this.orderId();
+    const orderDocumentTypeId = this.selectedDocumentTypeId();
+    const file = this.selectedDocumentFile();
+
+    if (!id || !orderDocumentTypeId || !file || this.isSavingDocument()) {
+      return;
+    }
+
+    this.isSavingDocument.set(true);
+    this.uiBlockService.block();
+
+    this.ordersService
+      .saveDocument(id, { orderDocumentTypeId, file })
+      .pipe(
+        finalize(() => {
+          this.isSavingDocument.set(false);
+          this.uiBlockService.unblock();
+        })
+      )
+      .subscribe((response) => {
+        this.appToastService.showApiMessages(response);
+
+        if (!this.isSuccessfulResponse(response)) {
+          return;
+        }
+
+        this.resetDocumentForm();
+
+        if (response.data?.isStatusUpdated) {
+          this.loadOrder(id);
+          this.loadDocumentTypeOptions(id);
+        }
+      });
   }
 
   getFieldError(controlName: keyof OrderFormModel): string {
@@ -183,6 +249,17 @@ export class OrderFormComponent {
           containerNumber: order.containerNumber,
           containerType: order.containerType
         });
+      });
+  }
+
+  private loadDocumentTypeOptions(id: string): void {
+    this.isLoadingDocumentTypes.set(true);
+
+    this.ordersService
+      .getDocumentTypeOptionsByOrderId(id)
+      .pipe(finalize(() => this.isLoadingDocumentTypes.set(false)))
+      .subscribe((response) => {        
+        this.documentTypeOptions.set(response.data ?? []);
       });
   }
 
@@ -308,6 +385,11 @@ export class OrderFormComponent {
     }
 
     return [selectedClient, ...options];
+  }
+
+  private resetDocumentForm(): void {
+    this.selectedDocumentTypeId.set(null);
+    this.selectedDocumentFile.set(null);
   }
 
   private isSuccessfulResponse<T>(response: ApiResultOf<T> | ApiResult | null | undefined): response is ApiResult {

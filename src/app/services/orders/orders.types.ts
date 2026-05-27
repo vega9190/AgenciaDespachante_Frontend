@@ -32,12 +32,55 @@ export interface OrderDetailDto {
   statusId: string;
   statusName: string;
   createdUtc: string;
-  updatedUtc?: string | null;
+  documents: OrderDocumentDto[];
+  orderDocumentTypeRequireds: OrderDocumentTypeRequiredDto[];
+  payments: OrderPaymentDto[];
+  orderLogs: OrderLogDto[];
+}
+
+export interface OrderDocumentDto {
+  id: string;
+  orderDocumentTypeId: string;
+  orderDocumentTypeName: string;
+  originalName: string;
+}
+
+export interface OrderDocumentTypeRequiredDto {
+  orderDocumentTypeId: string;
+  orderDocumentTypeName: string;
+  isRequired: boolean;
+  status: number;
+}
+
+export interface OrderPaymentDto {
+  id: string;
+  amount: number;
+  paymentDate: string;
+  type: number;
+  createdById: string;
+  createdByUsername: string;
+  orderDocumentId?: string | null;
+  notes?: string | null;
+  createdUtc: string;
+}
+
+export interface OrderLogDto {
+  id: string;
+  action: number;
+  message: string;
+  actorUserName: string;
+  occurredAt: string;
 }
 
 export interface OrderStatusOptionDto {
   id: string;
   name: string;
+}
+
+export interface OrderDocumentTypeOptionDto {
+  id: string;
+  name: string;
+  category: number;
 }
 
 export interface PagedResult<T> {
@@ -67,6 +110,15 @@ export interface UpdateOrderStatusRequest {
 export interface SaveOrderDocumentRequest {
   orderDocumentTypeId: string;
   file: File;
+}
+
+export interface SaveOrderDocumentResponse {
+  id: string;
+  isStatusUpdated: boolean;
+}
+
+export interface ApproveOrderDocumentTypeResponse {
+  isStatusUpdated: boolean;
 }
 
 export interface SaveOrderPaymentRequest {

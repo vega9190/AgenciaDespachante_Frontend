@@ -181,7 +181,68 @@
 
         <p-tabpanel value="documents">
           <p-card class="order-form-card order-tab-panel-card">
-            <div class="order-tab-panel-empty">Sin contenido por el momento.</div>
+            <div class="documents-layout">
+              <section class="documents-panel documents-panel--form">
+                <div class="documents-panel__header">
+                  <h2 class="documents-panel__title">Nuevo documento</h2>
+                </div>
+
+                <div class="documents-panel__content">
+                  <div class="flex flex-col gap-2">
+                    <label for="documentType" class="font-semibold">Tipo de documento *</label>
+                    <p-select
+                      inputId="documentType"
+                      [options]="documentTypeOptions()"
+                      [ngModel]="selectedDocumentTypeId()"
+                      (ngModelChange)="onDocumentTypeChange($event)"
+                      optionLabel="name"
+                      optionValue="id"
+                      placeholder="Seleccionar"
+                      [disabled]="isLoadingDocumentTypes() || isSavingDocument()"
+                    />
+                  </div>
+
+                  <div class="flex flex-col gap-2">
+                    <label class="font-semibold">Archivo(s)</label>
+                    <app-file-selector
+                      [selectedFile]="selectedDocumentFile()"
+                      [disabled]="isSavingDocument()"
+                      (fileSelected)="onDocumentFileSelected($event)"
+                      (fileCleared)="onDocumentFileCleared()"
+                    />
+                  </div>
+
+                  @if (isLoadingDocumentTypes()) {
+                    <div class="form-loading">Cargando tipos de documento...</div>
+                  }
+                </div>
+
+                <div class="form-actions documents-panel__actions">
+                  <button
+                    type="button"
+                    pButton
+                    label="Cancelar"
+                    severity="secondary"
+                    styleClass="flat-button"
+                    [disabled]="isSavingDocument()"
+                    (click)="onDocumentCancel()"
+                  ></button>
+                  <button
+                    type="button"
+                    pButton
+                    label="Guardar"
+                    icon="pi pi-save"
+                    styleClass="flat-button"
+                    [disabled]="!canSaveDocument()"
+                    (click)="onDocumentSave()"
+                  ></button>
+                </div>
+              </section>
+
+              <section class="documents-panel documents-panel--next">
+                <div class="documents-panel__placeholder">Proximo</div>
+              </section>
+            </div>
           </p-card>
         </p-tabpanel>
 

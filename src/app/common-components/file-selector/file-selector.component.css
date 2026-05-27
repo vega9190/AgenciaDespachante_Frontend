@@ -1,0 +1,115 @@
+.file-selector {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.file-selector__input {
+  display: none;
+}
+
+.file-selector__dropzone {
+  display: flex;
+  border: 1px dashed color-mix(in srgb, var(--p-primary-color) 30%, var(--p-content-border-color));
+  border-radius: 0.95rem;
+  background: color-mix(in srgb, var(--p-primary-color) 4%, var(--p-surface-0));
+  padding: 0.75rem;
+  transition:
+    border-color 0.2s ease,
+    background-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.file-selector__dropzone--drag-active {
+  border-color: var(--p-primary-color);
+  background: color-mix(in srgb, var(--p-primary-color) 8%, var(--p-surface-0));
+  box-shadow: 0 0 0 0.2rem color-mix(in srgb, var(--p-primary-color) 12%, transparent);
+}
+
+.file-selector__dropzone--disabled {
+  opacity: 0.7;
+}
+
+.file-selector__dropzone-content {
+  flex: 1;
+  min-height: 5.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  padding: 0.5rem;
+  cursor: pointer;
+  text-align: center;
+}
+
+.file-selector__dropzone-icon {
+  color: var(--p-primary-color);
+  font-size: 1.35rem;
+}
+
+.file-selector__dropzone-text {
+  color: var(--p-text-secondary-color);
+  font-size: 0.95rem;
+  font-weight: 500;
+  line-height: 1.35;
+}
+
+.file-selector__selected-file {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  border: 1px solid color-mix(in srgb, var(--p-primary-color) 18%, var(--p-content-border-color));
+  border-radius: 9999px;
+  background: color-mix(in srgb, var(--p-primary-color) 6%, var(--p-surface-0));
+  padding: 0.35rem 0.5rem 0.35rem 0.75rem;
+}
+
+.file-selector__selected-file-main {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.file-selector__selected-file-icon {
+  color: var(--p-primary-color);
+}
+
+.file-selector__selected-file-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 600;
+}
+
+.file-selector__selected-file-size {
+  color: var(--p-text-secondary-color);
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+
+.file-selector__remove-button {
+  flex-shrink: 0;
+}
+
+.file-selector__helper-text {
+  color: var(--p-text-secondary-color);
+  line-height: 1.4;
+}
+
+.file-selector__error {
+  color: var(--p-red-500);
+  line-height: 1.4;
+}
+
+@media screen and (max-width: 767px) {
+  .file-selector__selected-file {
+    border-radius: 1rem;
+  }
+
+  .file-selector__selected-file-main {
+    flex-wrap: wrap;
+  }
+}

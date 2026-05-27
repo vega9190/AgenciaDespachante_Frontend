@@ -41,7 +41,7 @@ export const authInterceptor: HttpInterceptorFn = (request, next) => {
           const apiResult = readApiResult(error);
 
           if (apiResult?.messageList?.length) {
-            appToastService.showApiMessages(apiResult);
+            appToastService.showApiMessages(apiResult, 5000);
           } else {
             appToastService.showServerError();
           }

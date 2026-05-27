@@ -1,19 +1,22 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 
-import { ApiResultOf } from '@models/api.types';
+import { ApiResult, ApiResultOf } from '@models/api.types';
 
 import { environment } from '../../../environments/environment';
 
 import {
+  ApproveOrderDocumentTypeResponse,
   ContainerTypeOption,
   CreateOrderRequest,
+  OrderDocumentTypeOptionDto,
   OrderDetailDto,
   OrderListItemDto,
   OrderStatusOptionDto,
   OrdersListQuery,
   PagedResult,
   SaveOrderDocumentRequest,
+  SaveOrderDocumentResponse,
   SaveOrderPaymentRequest,
   UpdateOrderRequest,
   UpdateOrderStatusRequest
@@ -53,13 +56,13 @@ export class OrdersService {
   }
 
   getDocumentTypeOptions(category?: number) {
-    return this.httpClient.get(`${this.ordersUrl}/documents/type-options`, {
+    return this.httpClient.get<ApiResultOf<OrderDocumentTypeOptionDto[]>>(`${this.ordersUrl}/documents/type-options`, {
       params: buildHttpParams({ category })
     });
   }
 
   getDocumentTypeOptionsByOrderId(id: string) {
-    return this.httpClient.get(`${this.ordersUrl}/${id}/documents/type-options`);
+    return this.httpClient.get<ApiResultOf<OrderDocumentTypeOptionDto[]>>(`${this.ordersUrl}/${id}/documents/type-options`);
   }
 
   saveDocument(id: string, request: SaveOrderDocumentRequest) {
@@ -67,11 +70,11 @@ export class OrdersService {
     formData.set('orderDocumentTypeId', request.orderDocumentTypeId);
     formData.set('file', request.file);
 
-    return this.httpClient.post(`${this.ordersUrl}/${id}/documents`, formData);
+    return this.httpClient.post<ApiResultOf<SaveOrderDocumentResponse>>(`${this.ordersUrl}/${id}/documents`, formData);
   }
 
   approveDocumentType(id: string, orderDocumentTypeId: string) {
-    return this.httpClient.put(`${this.ordersUrl}/${id}/documents/type/${orderDocumentTypeId}/approve`, null);
+    return this.httpClient.put<ApiResultOf<ApproveOrderDocumentTypeResponse>>(`${this.ordersUrl}/${id}/documents/type/${orderDocumentTypeId}/approve`, null);
   }
 
   savePayment(id: string, request: SaveOrderPaymentRequest) {

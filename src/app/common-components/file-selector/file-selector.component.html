@@ -1,0 +1,35 @@
+<div class="file-selector">
+  <input #fileInput type="file" class="file-selector__input" [accept]="accept()" [disabled]="disabled()" (change)="onFileInputChange($event)" />
+
+  <div
+    class="file-selector__dropzone"
+    [class.file-selector__dropzone--drag-active]="isDragActive()"
+    [class.file-selector__dropzone--disabled]="disabled()"
+    (dragover)="onDragOver($event)"
+    (dragleave)="onDragLeave($event)"
+    (drop)="onDrop($event)"
+  >
+    <div class="file-selector__dropzone-content" (click)="openFileDialog()">
+      <i class="pi pi-cloud-upload file-selector__dropzone-icon"></i>
+      <span class="file-selector__dropzone-text">Arrastra un archivo aqui o selecciona uno desde tu equipo.</span>
+    </div>
+  </div>
+
+  @if (selectedFile(); as file) {
+    <div class="file-selector__selected-file">
+      <div class="file-selector__selected-file-main">
+        <i class="pi pi-file file-selector__selected-file-icon"></i>
+        <span class="file-selector__selected-file-name">{{ file.name }}</span>
+        <span class="file-selector__selected-file-size">{{ (file.size / 1024 / 1024).toFixed(2) }} MB</span>
+      </div>
+
+      <button type="button" pButton severity="secondary" [text]="true" icon="pi pi-times" class="file-selector__remove-button" [disabled]="disabled()" (click)="clearSelectedFile()"></button>
+    </div>
+  }
+
+  <small class="file-selector__helper-text">{{ helperText() }}</small>
+
+  @if (validationMessage()) {
+    <small class="file-selector__error">{{ validationMessage() }}</small>
+  }
+</div>
