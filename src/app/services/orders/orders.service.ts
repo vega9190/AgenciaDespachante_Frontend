@@ -6,7 +6,9 @@ import { ApiResultOf } from '@models/api.types';
 import { environment } from '../../../environments/environment';
 
 import {
+  ContainerTypeOption,
   CreateOrderRequest,
+  OrderDetailDto,
   OrderListItemDto,
   OrderStatusOptionDto,
   OrdersListQuery,
@@ -25,11 +27,11 @@ export class OrdersService {
   private readonly ordersUrl = `${environment.apiUrl}/api/Orders`;
 
   create(request: CreateOrderRequest) {
-    return this.httpClient.post(this.ordersUrl, request);
+    return this.httpClient.post<ApiResultOf<string>>(this.ordersUrl, request);
   }
 
   update(id: string, request: UpdateOrderRequest) {
-    return this.httpClient.put(`${this.ordersUrl}/${id}`, request);
+    return this.httpClient.put<ApiResultOf<null>>(`${this.ordersUrl}/${id}`, request);
   }
 
   updateStatus(id: string, request: UpdateOrderStatusRequest) {
@@ -43,7 +45,7 @@ export class OrdersService {
   }
 
   getById(id: string) {
-    return this.httpClient.get(`${this.ordersUrl}/${id}`);
+    return this.httpClient.get<ApiResultOf<OrderDetailDto>>(`${this.ordersUrl}/${id}`);
   }
 
   getStatusOptions() {

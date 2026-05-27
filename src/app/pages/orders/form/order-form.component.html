@@ -1,0 +1,260 @@
+<div class="order-form-page flex flex-col gap-12">
+  <div>
+    <div>
+      <h1 class="page-title">{{ pageTitle() }}</h1>
+    </div>
+  </div>
+
+  @if (order(); as currentOrder) {
+    @let currentTimelineStepIndex = getCurrentTimelineStepIndex(currentOrder.statusId);
+
+    <div class="order-summary-grid">
+      <div class="order-summary-card">
+        <div class="order-summary-card__icon order-summary-card__icon--number">
+          <i class="pi pi-hashtag"></i>
+        </div>
+        <div class="order-summary-card__content">
+          <span class="order-summary-card__label">NRO. PEDIDO</span>
+          <strong class="order-summary-card__value">{{ currentOrder.orderNumber }}</strong>
+        </div>
+      </div>
+
+      <div class="order-summary-card">
+        <div class="order-summary-card__icon order-summary-card__icon--client">
+          <i class="pi pi-user"></i>
+        </div>
+        <div class="order-summary-card__content">
+          <span class="order-summary-card__label">CLIENTE</span>
+          <strong class="order-summary-card__value">{{ currentOrder.clientFullName }}</strong>
+        </div>
+      </div>
+
+      <div class="order-summary-card">
+        <div class="order-summary-card__icon order-summary-card__icon--date">
+          <i class="pi pi-calendar"></i>
+        </div>
+        <div class="order-summary-card__content">
+          <span class="order-summary-card__label">FECHA ALTA</span>
+          <strong class="order-summary-card__value">{{ currentOrder.createdUtc | date: 'dd/MM/yyyy' }}</strong>
+        </div>
+      </div>
+
+      <div class="order-summary-card">
+        <div class="order-summary-card__icon order-summary-card__icon--status">
+          <i class="pi pi-briefcase"></i>
+        </div>
+        <div class="order-summary-card__content">
+          <span class="order-summary-card__label">ESTADO</span>
+          <strong class="order-summary-card__value">{{ currentOrder.statusName }}</strong>
+        </div>
+      </div>
+    </div>
+
+    <div class="order-timeline-card">
+      <!-- <div class="order-timeline-card__title">PROGRESO DEL PEDIDO</div> -->
+
+      <div class="order-timeline">
+        @for (step of orderTimelineSteps; track step.statusId; let stepIndex = $index) {
+          <div class="order-timeline__item">
+            <div
+              class="order-timeline__marker"
+              [class.order-timeline__marker--completed]="isCompletedTimelineStep(stepIndex, currentTimelineStepIndex)"
+              [class.order-timeline__marker--current]="isCurrentTimelineStep(stepIndex, currentTimelineStepIndex)"
+            >
+              @if (stepIndex === orderTimelineSteps.length - 1) {
+                <i class="pi pi-flag"></i>
+              } @else if (isCompletedTimelineStep(stepIndex, currentTimelineStepIndex)) {
+                <i class="pi pi-check"></i>
+              } @else {
+                <span>{{ stepIndex + 1 }}</span>
+              }
+            </div>
+
+            @if (stepIndex < orderTimelineSteps.length - 1) {
+              <div
+                class="order-timeline__connector"
+                [class.order-timeline__connector--completed]="getTimelineConnectorState(stepIndex, currentTimelineStepIndex) === 'completed'"
+              ></div>
+            }
+
+            <span
+              class="order-timeline__label"
+              [class.order-timeline__label--active]="
+                isCompletedTimelineStep(stepIndex, currentTimelineStepIndex) || isCurrentTimelineStep(stepIndex, currentTimelineStepIndex)
+              "
+            >
+              {{ step.label }}
+            </span>
+          </div>
+        }
+      </div>
+
+      <!-- <p class="order-timeline-card__message">Faltan documentos requeridos para avanzar al siguiente estado.</p> -->
+    </div>
+
+    <p-tabs class="order-tabs" [value]="activeEditTab()">
+      <p-tablist>
+        <p-tab value="details">
+          <span class="order-tab-label">
+            <i class="pi pi-file-edit"></i>
+            <span>Detalles del Pedido</span>
+          </span>
+        </p-tab>
+        <p-tab value="documents">
+          <span class="order-tab-label">
+            <i class="pi pi-folder-open"></i>
+            <span>Gestión de Documentos</span>
+          </span>
+        </p-tab>
+        <p-tab value="payments">
+          <span class="order-tab-label">
+            <i class="pi pi-wallet"></i>
+            <span>Registro de Pagos</span>
+          </span>
+        </p-tab>
+      </p-tablist>
+
+      <p-tabpanels>
+        <p-tabpanel value="details">
+          <p-card class="order-form-card">
+            <div class="form-grid" [formGroup]="orderForm">
+              <div class="flex flex-col gap-2">
+                <label for="client" class="font-semibold">Cliente</label>
+                <p-autocomplete
+                  inputId="client"
+                  formControlName="client"
+                  [suggestions]="clientSuggestions()"
+                  optionLabel="name"
+                  [dropdown]="true"
+                  [forceSelection]="true"
+                  placeholder="Buscar cliente"
+                  (completeMethod)="onClientSearch($event)"
+                  (onDropdownClick)="onClientDropdownClick()"
+                />
+                @if (getFieldError('client')) {
+                  <small class="field-error">{{ getFieldError('client') }}</small>
+                }
+              </div>
+
+              <div class="flex flex-col gap-2">
+                <label for="containerNumber" class="font-semibold">Nro. Contenedor</label>
+                <input id="containerNumber" type="text" pInputText formControlName="containerNumber" maxlength="50" />
+                @if (getFieldError('containerNumber')) {
+                  <small class="field-error">{{ getFieldError('containerNumber') }}</small>
+                }
+              </div>
+
+              <div class="flex flex-col gap-2">
+                <label for="containerType" class="font-semibold">Tipo Contenedor</label>
+                <p-select
+                  inputId="containerType"
+                  formControlName="containerType"
+                  [options]="containerTypeOptions"
+                  optionLabel="label"
+                  optionValue="value"
+                  placeholder="Seleccionar"
+                />
+                @if (getFieldError('containerType')) {
+                  <small class="field-error">{{ getFieldError('containerType') }}</small>
+                }
+              </div>
+            </div>
+
+            @if (isLoading()) {
+              <div class="form-loading">Cargando pedido...</div>
+            }
+
+            <div class="form-actions">
+              <button type="button" pButton label="Volver" severity="secondary" styleClass="flat-button" (click)="onCancel()"></button>
+              <button
+                type="button"
+                pButton
+                label="Guardar"
+                icon="pi pi-save"
+                styleClass="flat-button"
+                [disabled]="isLoading() || isSaving()"
+                (click)="onSubmit()"
+              ></button>
+            </div>
+          </p-card>
+        </p-tabpanel>
+
+        <p-tabpanel value="documents">
+          <p-card class="order-form-card order-tab-panel-card">
+            <div class="order-tab-panel-empty">Sin contenido por el momento.</div>
+          </p-card>
+        </p-tabpanel>
+
+        <p-tabpanel value="payments">
+          <p-card class="order-form-card order-tab-panel-card">
+            <div class="order-tab-panel-empty">Sin contenido por el momento.</div>
+          </p-card>
+        </p-tabpanel>
+      </p-tabpanels>
+    </p-tabs>
+  }
+
+  @if (!isEditMode()) {
+    <p-card class="order-form-card">
+      <div class="form-grid" [formGroup]="orderForm">
+        <div class="flex flex-col gap-2">
+          <label for="client" class="font-semibold">Cliente</label>
+          <p-autocomplete
+            inputId="client"
+            formControlName="client"
+            [suggestions]="clientSuggestions()"
+            optionLabel="name"
+            [dropdown]="true"
+            [forceSelection]="true"
+            placeholder="Buscar cliente"
+            (completeMethod)="onClientSearch($event)"
+            (onDropdownClick)="onClientDropdownClick()"
+          />
+          @if (getFieldError('client')) {
+            <small class="field-error">{{ getFieldError('client') }}</small>
+          }
+        </div>
+
+        <div class="flex flex-col gap-2">
+          <label for="containerNumber" class="font-semibold">Nro. Contenedor</label>
+          <input id="containerNumber" type="text" pInputText formControlName="containerNumber" maxlength="50" />
+          @if (getFieldError('containerNumber')) {
+            <small class="field-error">{{ getFieldError('containerNumber') }}</small>
+          }
+        </div>
+
+        <div class="flex flex-col gap-2">
+          <label for="containerType" class="font-semibold">Tipo Contenedor</label>
+          <p-select
+            inputId="containerType"
+            formControlName="containerType"
+            [options]="containerTypeOptions"
+            optionLabel="label"
+            optionValue="value"
+            placeholder="Seleccionar"
+          />
+          @if (getFieldError('containerType')) {
+            <small class="field-error">{{ getFieldError('containerType') }}</small>
+          }
+        </div>
+      </div>
+
+      @if (isLoading()) {
+        <div class="form-loading">Cargando pedido...</div>
+      }
+
+      <div class="form-actions">
+        <button type="button" pButton label="Volver" severity="secondary" styleClass="flat-button" (click)="onCancel()"></button>
+        <button
+          type="button"
+          pButton
+          label="Guardar"
+          icon="pi pi-save"
+          styleClass="flat-button"
+          [disabled]="isLoading() || isSaving()"
+          (click)="onSubmit()"
+        ></button>
+      </div>
+    </p-card>
+  }
+</div>

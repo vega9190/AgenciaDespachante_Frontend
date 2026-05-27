@@ -21,6 +21,20 @@ export interface OrderListItemDto {
   totalPaymentsAmount: number;
 }
 
+export interface OrderDetailDto {
+  id: string;
+  orderNumber: number;
+  containerNumber: string;
+  containerType: number;
+  clientId: string;
+  clientFullName: string;
+  clientTaxId?: string | null;
+  statusId: string;
+  statusName: string;
+  createdUtc: string;
+  updatedUtc?: string | null;
+}
+
 export interface OrderStatusOptionDto {
   id: string;
   name: string;
@@ -63,3 +77,13 @@ export interface SaveOrderPaymentRequest {
   orderDocumentTypeId?: string;
   document?: File;
 }
+
+export interface ContainerTypeOption {
+  label: string;
+  value: number;
+}
+
+export const CONTAINER_TYPE_OPTIONS: ContainerTypeOption[] = [
+  { label: '20ft', value: 1 },
+  { label: '40ft', value: 2 }
+];

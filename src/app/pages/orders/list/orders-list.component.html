@@ -23,15 +23,17 @@
         </div>
 
         <div class="flex flex-col gap-2">
-          <label for="clientId" class="font-semibold">Cliente</label>
-          <p-select
-            inputId="clientId"
-            formControlName="clientId"
-            [options]="clientOptions()"
-            optionLabel="label"
-            optionValue="value"
-            placeholder="Seleccionar"
-            [loading]="isLoadingFilters()"
+          <label for="client" class="font-semibold">Cliente</label>
+          <p-autocomplete
+            inputId="client"
+            formControlName="client"
+            [suggestions]="clientSuggestions()"
+            optionLabel="name"
+            [dropdown]="true"
+            [forceSelection]="true"
+            placeholder="Buscar cliente"
+            (completeMethod)="onClientSearch($event)"
+            (onDropdownClick)="onClientDropdownClick()"
           />
         </div>
 

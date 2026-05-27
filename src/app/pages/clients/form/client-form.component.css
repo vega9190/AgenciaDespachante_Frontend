@@ -37,13 +37,13 @@
 }
 
 .client-summary-card__icon--number {
-  background: #dbeafe;
-  color: #335f91;
+  background: color-mix(in srgb, var(--p-primary-color) 14%, white);
+  color: var(--p-primary-color);
 }
 
 .client-summary-card__icon--date {
-  background: #1d4ed8;
-  color: white;
+  background: color-mix(in srgb, var(--p-primary-color) 20%, white);
+  color: var(--p-primary-color);
 }
 
 .client-summary-card__icon--status {
