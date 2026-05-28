@@ -43,6 +43,8 @@ export interface OrderDocumentDto {
   orderDocumentTypeId: string;
   orderDocumentTypeName: string;
   originalName: string;
+  filesize: number;
+  createdUtc: string;
 }
 
 export interface OrderDocumentTypeRequiredDto {
@@ -50,6 +52,7 @@ export interface OrderDocumentTypeRequiredDto {
   orderDocumentTypeName: string;
   isRequired: boolean;
   status: number;
+  sortOrder: number;
 }
 
 export interface OrderPaymentDto {
@@ -115,6 +118,11 @@ export interface SaveOrderDocumentRequest {
 export interface SaveOrderDocumentResponse {
   id: string;
   isStatusUpdated: boolean;
+  requiredDocumentStatus?: number | null;
+}
+
+export interface DeleteOrderDocumentResponse {
+  requiredDocumentStatus?: number | null;
 }
 
 export interface ApproveOrderDocumentTypeResponse {

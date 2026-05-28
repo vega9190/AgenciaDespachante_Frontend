@@ -5,14 +5,6 @@
   line-height: 1.2;
 }
 
-.order-form-card {
-  width: 100%;
-}
-
-.order-tabs {
-  display: block;
-}
-
 .order-tab-label {
   display: inline-flex;
   align-items: center;
@@ -21,7 +13,7 @@
 }
 
 .order-tab-panel-card {
-  margin-top: 1rem;
+  margin-top: 1rem
 }
 
 .documents-layout {
@@ -40,14 +32,6 @@
 .documents-panel--form {
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
-}
-
-.documents-panel__header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.75rem;
 }
 
 .documents-panel__title {
@@ -57,23 +41,59 @@
   font-weight: 700;
 }
 
-.documents-panel__content {
-  display: flex;
-  flex-direction: column;
-  gap: 1.25rem;
+:host ::ng-deep .documents-accordion .p-accordionpanel {
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--p-content-border-color) 72%, white);
+  border-radius: 1rem;
+  background: var(--p-surface-0);
 }
 
-.documents-panel__actions {
-  margin-top: auto;
+:host ::ng-deep .documents-accordion .p-accordionpanel + .p-accordionpanel {
+  margin-top: 0.9rem;
+}
+
+:host ::ng-deep .documents-accordion .p-accordionheader {
+  border-radius: 1rem;
+}
+
+:host ::ng-deep .documents-accordion .p-accordionheader .p-accordionheader-toggle-icon {
+  order: 2;
+  color: var(--p-text-secondary-color);
+}
+
+:host ::ng-deep .documents-accordion .p-accordionheader-link,
+:host ::ng-deep .documents-accordion .p-accordionheader-button {
+  padding: 1rem 1.1rem;
+  align-items: center;
+  gap: 1rem;
+  background: color-mix(in srgb, var(--p-primary-color) 3%, var(--p-surface-0));
+}
+
+:host ::ng-deep .documents-accordion .p-accordioncontent-content {
+  padding: 0 1.1rem 1rem;
+}
+
+:host ::ng-deep .documents-accordion .p-disabled {
+  opacity: 0.72;
+}
+
+:host ::ng-deep .documents-accordion .p-disabled .p-accordionheader-link,
+:host ::ng-deep .documents-accordion .p-disabled .p-accordionheader-button {
+  cursor: not-allowed;
+  background: color-mix(in srgb, var(--p-surface-200) 28%, var(--p-surface-0));
+}
+
+:host ::ng-deep .documents-accordion .p-disabled .pi,
+:host ::ng-deep .documents-accordion .p-disabled .font-bold,
+:host ::ng-deep .documents-accordion .p-disabled .text-sm {
+  color: var(--p-text-muted-color, var(--p-text-secondary-color));
 }
 
 .documents-panel__placeholder {
   min-height: 14rem;
   display: flex;
   align-items: center;
-  justify-content: center;
   color: var(--p-text-secondary-color);
-  font-size: 1.1rem;
   font-weight: 600;
   text-align: center;
 }

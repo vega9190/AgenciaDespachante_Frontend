@@ -1,4 +1,6 @@
 <div class="order-form-page flex flex-col gap-12">
+  <p-confirmdialog />
+
   <div>
     <div>
       <h1 class="page-title">{{ pageTitle() }}</h1>
@@ -183,11 +185,11 @@
           <p-card class="order-form-card order-tab-panel-card">
             <div class="documents-layout">
               <section class="documents-panel documents-panel--form">
-                <div class="documents-panel__header">
+                <div class="flex items-center justify-between gap-3">
                   <h2 class="documents-panel__title">Nuevo documento</h2>
                 </div>
 
-                <div class="documents-panel__content">
+                <div class="flex flex-col gap-5">
                   <div class="flex flex-col gap-2">
                     <label for="documentType" class="font-semibold">Tipo de documento *</label>
                     <p-select
@@ -203,7 +205,7 @@
                   </div>
 
                   <div class="flex flex-col gap-2">
-                    <label class="font-semibold">Archivo(s)</label>
+                    <label class="font-semibold">Archivo</label>
                     <app-file-selector
                       [selectedFile]="selectedDocumentFile()"
                       [disabled]="isSavingDocument()"
@@ -217,7 +219,7 @@
                   }
                 </div>
 
-                <div class="form-actions documents-panel__actions">
+                <div class="form-actions mt-auto">
                   <button
                     type="button"
                     pButton
@@ -240,7 +242,85 @@
               </section>
 
               <section class="documents-panel documents-panel--next">
-                <div class="documents-panel__placeholder">Proximo</div>
+                <div class="mb-4 flex items-center justify-between gap-3">
+                  <h2 class="documents-panel__title">Documentos</h2>
+                </div>
+
+                @if (documentSections().length > 0) {
+                  <p-accordion class="documents-accordion" [value]="documentSectionActiveValue()">
+                    @for (section of documentSections(); track trackByDocumentSection($index, section)) {
+                      <p-accordion-panel [value]="section.orderDocumentTypeId" [disabled]="section.isDisabled">
+                        <p-accordion-header>
+                          <div class="w-full flex items-start md:items-center justify-between gap-4 pr-3">
+                            <div class="min-w-0 flex-1">
+                              <div class="flex min-w-0 flex-wrap items-center gap-3">
+                                <i class="pi" [class.pi-folder]="!section.isDisabled" [class.pi-info-circle]="section.isDisabled"></i>
+                                <span class="font-bold">{{ section.title }}</span>
+
+                                @if (!section.isDisabled) {
+                                  <span class="rounded-full border px-2 py-0.5 text-xs font-semibold text-color-secondary">{{ section.documentsCountLabel }}</span>
+                                }
+
+                                @if (section.showRequiredText) {
+                                  <span class="text-sm text-color-secondary">requerido</span>
+                                }
+                              </div>
+                            </div>
+
+                            @if (section.showStatus) {
+                              <p-tag [value]="section.statusLabel" [severity]="section.statusSeverity" [icon]="section.statusIcon" />
+                            }
+                          </div>
+                        </p-accordion-header>
+
+                        <p-accordion-content>
+                          <div class="flex flex-col">
+                            @for (document of section.documents; track trackByDocumentItem($index, document)) {
+                              <div class="grid grid-cols-1 gap-2 border-t py-4 first:border-t-0 first:pt-0 last:pb-0 md:grid-cols-[minmax(0,1fr)_auto_auto] md:items-center md:gap-4">
+                                <div class="flex min-w-0 items-center gap-3 font-semibold">
+                                  <i [class]="document.icon"></i>
+                                  <span class="min-w-0 overflow-hidden text-ellipsis whitespace-nowrap">{{ document.name }}</span>
+                                </div>
+
+                                <div class="flex items-center justify-between gap-4 whitespace-nowrap text-sm text-color-secondary md:justify-start">
+                                  <span>{{ document.sizeLabel }}</span>
+                                  <span>{{ document.uploadedAtLabel }}</span>
+                                </div>
+
+                                <div class="flex items-center justify-end gap-1">
+                                  <button
+                                    type="button"
+                                    pButton
+                                    [text]="true"
+                                    rounded="true"
+                                    icon="pi pi-download"
+                                    [pTooltip]="'Descargar'"
+                                    tooltipPosition="top"
+                                    aria-label="Descargar documento"
+                                    (click)="onDocumentDownload(document)"
+                                  ></button>
+                                  <button
+                                    type="button"
+                                    pButton
+                                    [text]="true"
+                                    rounded="true"
+                                    icon="pi pi-trash"
+                                    [pTooltip]="'Eliminar'"
+                                    tooltipPosition="top"
+                                    aria-label="Eliminar documento"
+                                    (click)="onDocumentDelete(document)"
+                                  ></button>
+                                </div>
+                              </div>
+                            }
+                          </div>
+                        </p-accordion-content>
+                      </p-accordion-panel>
+                    }
+                  </p-accordion>
+                } @else {
+                  <div class="documents-panel__placeholder">No hay tipos de documento configurados.</div>
+                }
               </section>
             </div>
           </p-card>

@@ -9,6 +9,8 @@ import {
   ApproveOrderDocumentTypeResponse,
   ContainerTypeOption,
   CreateOrderRequest,
+  DeleteOrderDocumentResponse,
+  OrderDocumentDto,
   OrderDocumentTypeOptionDto,
   OrderDetailDto,
   OrderListItemDto,
@@ -49,6 +51,10 @@ export class OrdersService {
 
   getById(id: string) {
     return this.httpClient.get<ApiResultOf<OrderDetailDto>>(`${this.ordersUrl}/${id}`);
+  }
+
+  getDocuments(id: string) {
+    return this.httpClient.get<ApiResultOf<OrderDocumentDto[]>>(`${this.ordersUrl}/${id}/documents`);
   }
 
   getStatusOptions() {
@@ -105,7 +111,7 @@ export class OrdersService {
   }
 
   deleteDocument(documentId: string) {
-    return this.httpClient.delete(`${this.ordersUrl}/documents/${documentId}`);
+    return this.httpClient.delete<ApiResultOf<DeleteOrderDocumentResponse>>(`${this.ordersUrl}/documents/${documentId}`);
   }
 
   deletePayment(paymentId: string) {

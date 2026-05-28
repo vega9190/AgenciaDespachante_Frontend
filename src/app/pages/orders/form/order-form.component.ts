@@ -5,12 +5,17 @@ import { FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, 
 import { ActivatedRoute, Router } from '@angular/router';
 import { finalize } from 'rxjs';
 
+import { AccordionModule } from 'primeng/accordion';
 import { AutoCompleteCompleteEvent, AutoCompleteModule } from 'primeng/autocomplete';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { InputTextModule } from 'primeng/inputtext';
+import { ConfirmationService } from 'primeng/api';
 import { SelectModule } from 'primeng/select';
+import { TagModule } from 'primeng/tag';
 import { Tab, TabList, TabPanel, TabPanels, Tabs } from 'primeng/tabs';
+import { TooltipModule } from 'primeng/tooltip';
 
 import { FileSelectorComponent } from '../../../common-components/file-selector/file-selector.component';
 import { ApiResult, ApiResultOf } from '@models/api.types';
@@ -29,6 +34,36 @@ import {
 } from '@services/orders/orders.types';
 import { OrdersService } from '@services/orders/orders.service';
 
+interface DocumentSectionItem {
+  id: string;
+  name: string;
+  icon: string;
+  orderDocumentTypeId: string;
+  sizeLabel: string;
+  uploadedAtLabel: string;
+}
+
+interface DocumentSectionVm {
+  orderDocumentTypeId: string;
+  title: string;
+  status: number;
+  statusLabel: string;
+  statusSeverity: 'success' | 'warn' | 'danger' | 'secondary';
+  statusIcon: string;
+  documentsCount: number;
+  documentsCountLabel: string;
+  documents: DocumentSectionItem[];
+  isDisabled: boolean;
+  showRequiredText: boolean;
+  showStatus: boolean;
+}
+
+const DOCUMENT_STATUS = {
+  aprobado: 1,
+  enRevision: 2,
+  faltante: 3
+} as const;
+
 interface OrderFormModel {
   client: FormControl<ClientOptionDto | null>;
   containerNumber: FormControl<string>;
@@ -37,7 +72,7 @@ interface OrderFormModel {
 
 @Component({
   selector: 'app-order-form',
-  imports: [ReactiveFormsModule, FormsModule, DatePipe, AutoCompleteModule, ButtonModule, CardModule, InputTextModule, SelectModule, Tabs, TabList, Tab, TabPanels, TabPanel, FileSelectorComponent],
+  imports: [ReactiveFormsModule, FormsModule, DatePipe, AccordionModule, AutoCompleteModule, ButtonModule, CardModule, ConfirmDialogModule, InputTextModule, SelectModule, TagModule, Tabs, TabList, Tab, TabPanels, TabPanel, TooltipModule, FileSelectorComponent],
   templateUrl: './order-form.component.html',
   styleUrl: './order-form.component.css'
 })
@@ -47,6 +82,7 @@ export class OrderFormComponent {
   private readonly clientsService = inject(ClientsService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
+  private readonly confirmationService = inject(ConfirmationService);
   private readonly appToastService = inject(AppToastService);
   private readonly uiBlockService = inject(UiBlockService);
 
@@ -69,6 +105,49 @@ export class OrderFormComponent {
   readonly canSaveDocument = computed(
     () => !!this.orderId() && !!this.selectedDocumentTypeId() && !!this.selectedDocumentFile() && !this.isSavingDocument() && !this.isLoadingDocumentTypes()
   );
+  readonly documentSections = computed<DocumentSectionVm[]>(() => {
+    const currentOrder = this.order();
+
+    if (!currentOrder) {
+      return [];
+    }
+
+    return this.getSortedRequiredDocumentTypes(currentOrder.orderDocumentTypeRequireds)
+      .map((required) => {
+        const documents = currentOrder.documents
+          .filter((document) => document.orderDocumentTypeId === required.orderDocumentTypeId)
+          .map((document, documentIndex) => ({
+            id: document.id,
+            name: document.originalName,
+            icon: this.getDocumentFileIcon(document.originalName),
+            orderDocumentTypeId: document.orderDocumentTypeId,
+            sizeLabel: this.getDocumentSizeLabel(document.filesize),
+            uploadedAtLabel: this.getDocumentDateLabel(document.createdUtc)
+          }));
+
+        const documentsCount = documents.length;
+
+        return {
+          orderDocumentTypeId: required.orderDocumentTypeId,
+          title: required.orderDocumentTypeName,
+          status: required.status,
+          statusLabel: this.getDocumentStatusLabel(required.status),
+          statusSeverity: this.getDocumentStatusSeverity(required.status),
+          statusIcon: this.getDocumentStatusIcon(required.status),
+          documentsCount,
+          documentsCountLabel: this.getDocumentCountLabel(documentsCount),
+          documents,
+          isDisabled: documentsCount === 0,
+          showRequiredText: required.isRequired && documentsCount === 0,
+          showStatus: required.status !== DOCUMENT_STATUS.faltante || required.isRequired
+        };
+      });
+  });
+  readonly documentSectionActiveValue = computed(() => {
+    const sections = this.documentSections();
+    const firstEnabledSection = sections.find((section) => !section.isDisabled);
+    return firstEnabledSection?.orderDocumentTypeId ?? sections[0]?.orderDocumentTypeId ?? null;
+  });
 
   readonly orderForm: FormGroup<OrderFormModel> = this.formBuilder.group({
     client: this.formBuilder.control<ClientOptionDto | null>(null, [Validators.required]),
@@ -84,6 +163,7 @@ export class OrderFormComponent {
       if (id) {
         this.resetDocumentForm();
         this.loadOrder(id);
+        this.loadDocuments(id);
         this.loadDocumentTypeOptions(id);
         return;
       }
@@ -177,10 +257,68 @@ export class OrderFormComponent {
 
         this.resetDocumentForm();
 
+        this.loadDocuments(id);
+        this.loadDocumentTypeOptions(id);
+        this.updateRequiredDocumentStatus(orderDocumentTypeId, response.data?.requiredDocumentStatus ?? null);
+
         if (response.data?.isStatusUpdated) {
           this.loadOrder(id);
-          this.loadDocumentTypeOptions(id);
         }
+      });
+  }
+
+  onDocumentDownload(document: DocumentSectionItem): void {
+    this.ordersService.downloadDocument(document.id).subscribe({
+      next: (file) => {
+        const objectUrl = URL.createObjectURL(file);
+        const link = globalThis.document.createElement('a');
+
+        link.href = objectUrl;
+        link.download = document.name;
+        link.click();
+
+        URL.revokeObjectURL(objectUrl);
+      },
+      error: () => {
+        this.appToastService.showServerError('No se pudo descargar el documento.');
+      }
+    });
+  }
+
+  onDocumentDelete(document: DocumentSectionItem): void {
+    const id = this.orderId();
+
+    if (!id) {
+      return;
+    }
+
+    this.confirmationService.confirm({
+      header: 'Confirmar eliminación',
+      message: `¿Está seguro de eliminar el archivo "${document.name}"?`,
+      icon: 'pi pi-exclamation-triangle',
+      acceptLabel: 'Eliminar',
+      rejectLabel: 'Cancelar',
+      acceptButtonStyleClass: 'p-button-danger',
+      accept: () => this.deleteDocument(id, document)
+    });
+  }
+
+  private deleteDocument(id: string, document: DocumentSectionItem): void {
+    this.uiBlockService.block();
+
+    this.ordersService
+      .deleteDocument(document.id)
+      .pipe(finalize(() => this.uiBlockService.unblock()))
+      .subscribe((response) => {
+        this.appToastService.showApiMessages(response);
+
+        if (!this.isSuccessfulResponse(response)) {
+          return;
+        }
+
+        this.loadDocuments(id);
+        this.loadDocumentTypeOptions(id);
+        this.updateRequiredDocumentStatus(document.orderDocumentTypeId, response.data?.requiredDocumentStatus ?? null);
       });
   }
 
@@ -217,6 +355,14 @@ export class OrderFormComponent {
 
   isCurrentTimelineStep(stepIndex: number, currentStepIndex: number): boolean {
     return currentStepIndex > -1 && stepIndex === currentStepIndex;
+  }
+
+  trackByDocumentSection(_: number, section: DocumentSectionVm): string {
+    return section.orderDocumentTypeId;
+  }
+
+  trackByDocumentItem(_: number, document: DocumentSectionItem): string {
+    return document.id;
   }
 
   getTimelineConnectorState(stepIndex: number, currentStepIndex: number): 'completed' | 'pending' {
@@ -261,6 +407,21 @@ export class OrderFormComponent {
       .subscribe((response) => {        
         this.documentTypeOptions.set(response.data ?? []);
       });
+  }
+
+  private loadDocuments(id: string): void {
+    this.ordersService.getDocuments(id).subscribe((response) => {
+      const documents = response.data ?? [];
+
+      this.order.update((current) =>
+        current
+          ? {
+              ...current,
+              documents
+            }
+          : current
+      );
+    });
   }
 
   private createOrder(): void {
@@ -390,6 +551,132 @@ export class OrderFormComponent {
   private resetDocumentForm(): void {
     this.selectedDocumentTypeId.set(null);
     this.selectedDocumentFile.set(null);
+  }
+
+  private updateRequiredDocumentStatus(orderDocumentTypeId: string, requiredDocumentStatus: number | null): void {
+    if (requiredDocumentStatus === null) {
+      return;
+    }
+
+    this.order.update((current) => {
+      if (!current) {
+        return current;
+      }
+
+      return {
+        ...current,
+        orderDocumentTypeRequireds: current.orderDocumentTypeRequireds.map((required) =>
+          required.orderDocumentTypeId === orderDocumentTypeId
+            ? {
+                ...required,
+                status: requiredDocumentStatus
+              }
+            : required
+        )
+      };
+    });
+  }
+
+  private getDocumentStatusLabel(status: number): string {
+    switch (status) {
+      case DOCUMENT_STATUS.aprobado:
+        return 'Aprobado';
+      case DOCUMENT_STATUS.enRevision:
+        return 'En revisión';
+      case DOCUMENT_STATUS.faltante:
+        return 'Faltante';
+      default:
+        return 'Sin estado';
+    }
+  }
+
+  private getDocumentStatusSeverity(status: number): 'success' | 'warn' | 'danger' | 'secondary' {
+    switch (status) {
+      case DOCUMENT_STATUS.aprobado:
+        return 'success';
+      case DOCUMENT_STATUS.enRevision:
+        return 'warn';
+      case DOCUMENT_STATUS.faltante:
+        return 'danger';
+      default:
+        return 'secondary';
+    }
+  }
+
+  private getDocumentStatusIcon(status: number): string {
+    switch (status) {
+      case DOCUMENT_STATUS.aprobado:
+        return 'pi pi-check';
+      case DOCUMENT_STATUS.enRevision:
+        return 'pi pi-clock';
+      case DOCUMENT_STATUS.faltante:
+        return 'pi pi-exclamation-circle';
+      default:
+        return 'pi pi-info-circle';
+    }
+  }
+
+  private getDocumentCountLabel(count: number): string {
+    return count === 1 ? '1 archivo' : `${count} archivos`;
+  }
+
+  private getDocumentFileIcon(fileName: string): string {
+    const extension = fileName.split('.').pop()?.trim().toLowerCase();
+
+    switch (extension) {
+      case 'pdf':
+        return 'pi pi-file-pdf';
+      case 'xls':
+      case 'xlsx':
+      case 'csv':
+        return 'pi pi-file-excel';
+      case 'jpg':
+      case 'jpeg':
+      case 'png':
+      case 'gif':
+      case 'webp':
+      case 'bmp':
+      case 'svg':
+        return 'pi pi-image';
+      default:
+        return 'pi pi-file';
+    }
+  }
+
+  private getSortedRequiredDocumentTypes(requireds: OrderDetailDto['orderDocumentTypeRequireds']): OrderDetailDto['orderDocumentTypeRequireds'] {
+    const sortBySortOrder = (left: { sortOrder: number }, right: { sortOrder: number }) => left.sortOrder - right.sortOrder;
+    const requiredDocuments = requireds.filter((required) => required.isRequired).sort(sortBySortOrder);
+    const optionalDocuments = requireds.filter((required) => !required.isRequired).sort(sortBySortOrder);
+
+    return [...requiredDocuments, ...optionalDocuments];
+  }
+
+  private getDocumentSizeLabel(filesize: number): string {
+    if (filesize < 1024) {
+      return `${filesize} B`;
+    }
+
+    const sizeInKb = filesize / 1024;
+
+    if (sizeInKb < 1024) {
+      return `${Math.round(sizeInKb)} KB`;
+    }
+
+    return `${(sizeInKb / 1024).toFixed(1)} MB`;
+  }
+
+  private getDocumentDateLabel(createdUtc: string): string {
+    const date = new Date(createdUtc);
+
+    if (Number.isNaN(date.getTime())) {
+      return '';
+    }
+
+    return new Intl.DateTimeFormat('es-AR', {
+      day: '2-digit',
+      month: '2-digit',
+      year: '2-digit'
+    }).format(date);
   }
 
   private isSuccessfulResponse<T>(response: ApiResultOf<T> | ApiResult | null | undefined): response is ApiResult {
