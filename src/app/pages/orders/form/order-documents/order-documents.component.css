@@ -1,0 +1,130 @@
+.order-tab-panel-card {
+  margin-top: 1rem;
+}
+
+.documents-layout {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.documents-panel {
+  min-height: 100%;
+  border: 1px solid color-mix(in srgb, var(--p-primary-color) 16%, var(--p-content-border-color));
+  border-radius: 1rem;
+  background: color-mix(in srgb, var(--p-primary-color) 3%, var(--p-surface-0));
+  padding: 1.25rem;
+}
+
+.documents-panel--form {
+  display: flex;
+  flex-direction: column;
+}
+
+.documents-panel__title {
+  margin: 0;
+  color: var(--p-primary-color);
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+
+.document-status-tag--clickable {
+  cursor: pointer;
+}
+
+.document-status-tag--busy {
+  pointer-events: none;
+  opacity: 0.72;
+}
+
+.documents-panel__placeholder {
+  min-height: 14rem;
+  display: flex;
+  align-items: center;
+  color: var(--p-text-secondary-color);
+  font-weight: 600;
+  text-align: center;
+}
+
+.form-loading {
+  margin-top: 1rem;
+  color: var(--p-text-secondary-color);
+  font-weight: 600;
+}
+
+.form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+.document-item-row {
+  border-top: 1px solid color-mix(in srgb, var(--p-content-border-color) 100%, transparent);
+}
+
+.document-item-row:first-child {
+  border-top-color: transparent;
+}
+
+:host ::ng-deep .documents-accordion .p-accordionpanel {
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--p-content-border-color) 72%, white);
+  border-radius: 1rem;
+  background: var(--p-surface-0);
+}
+
+:host ::ng-deep .documents-accordion .p-accordionpanel + .p-accordionpanel {
+  margin-top: 0.9rem;
+}
+
+:host ::ng-deep .documents-accordion .p-accordionheader {
+  border-radius: 1rem;
+}
+
+:host ::ng-deep .documents-accordion .p-accordionheader .p-accordionheader-toggle-icon {
+  order: 2;
+  color: var(--p-text-secondary-color);
+}
+
+:host ::ng-deep .documents-accordion .p-accordionheader-link,
+:host ::ng-deep .documents-accordion .p-accordionheader-button {
+  padding: 1rem 1.1rem;
+  align-items: center;
+  gap: 1rem;
+  background: color-mix(in srgb, var(--p-primary-color) 3%, var(--p-surface-0));
+}
+
+:host ::ng-deep .documents-accordion .p-accordioncontent-content {
+  border-top: 1px solid color-mix(in srgb, var(--p-content-border-color) 100%, transparent);
+  padding: 1rem 1.1rem 1rem;
+}
+
+:host ::ng-deep .documents-accordion .p-disabled {
+  opacity: 0.72;
+}
+
+:host ::ng-deep .documents-accordion .p-disabled .p-accordionheader-link,
+:host ::ng-deep .documents-accordion .p-disabled .p-accordionheader-button {
+  cursor: not-allowed;
+  background: color-mix(in srgb, var(--p-surface-200) 28%, var(--p-surface-0));
+}
+
+:host ::ng-deep .documents-accordion .p-disabled .pi,
+:host ::ng-deep .documents-accordion .p-disabled .font-bold,
+:host ::ng-deep .documents-accordion .p-disabled .text-sm {
+  color: var(--p-text-muted-color, var(--p-text-secondary-color));
+}
+
+@media screen and (min-width: 768px) {
+  .documents-layout {
+    grid-template-columns: minmax(0, 4fr) minmax(18rem, 8fr);
+    align-items: stretch;
+  }
+}
+
+@media screen and (max-width: 767px) {
+  .form-actions {
+    flex-direction: column;
+  }
+}

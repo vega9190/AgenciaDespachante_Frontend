@@ -1,0 +1,61 @@
+<p-card class="order-form-card">
+  <div class="form-grid" [formGroup]="orderForm">
+    <div class="flex flex-col gap-2">
+      <label for="client" class="font-semibold">Cliente</label>
+      <p-autocomplete
+        inputId="client"
+        formControlName="client"
+        [suggestions]="clientSuggestions()"
+        optionLabel="name"
+        [dropdown]="true"
+        [forceSelection]="true"
+        placeholder="Buscar cliente"
+        (completeMethod)="onClientSearch($event)"
+        (onDropdownClick)="onClientDropdownClick()"
+      />
+      @if (getFieldError('client')) {
+        <small class="field-error">{{ getFieldError('client') }}</small>
+      }
+    </div>
+
+    <div class="flex flex-col gap-2">
+      <label for="containerNumber" class="font-semibold">Nro. Contenedor</label>
+      <input id="containerNumber" type="text" pInputText formControlName="containerNumber" maxlength="50" />
+      @if (getFieldError('containerNumber')) {
+        <small class="field-error">{{ getFieldError('containerNumber') }}</small>
+      }
+    </div>
+
+    <div class="flex flex-col gap-2">
+      <label for="containerType" class="font-semibold">Tipo Contenedor</label>
+      <p-select
+        inputId="containerType"
+        formControlName="containerType"
+        [options]="containerTypeOptions()"
+        optionLabel="label"
+        optionValue="value"
+        placeholder="Seleccionar"
+      />
+      @if (getFieldError('containerType')) {
+        <small class="field-error">{{ getFieldError('containerType') }}</small>
+      }
+    </div>
+  </div>
+
+  @if (isLoadingOrder()) {
+    <div class="form-loading">Cargando pedido...</div>
+  }
+
+  <div class="form-actions">
+    <button type="button" pButton label="Volver" severity="secondary" styleClass="flat-button" (click)="onCancel()"></button>
+    <button
+      type="button"
+      pButton
+      label="Guardar"
+      icon="pi pi-save"
+      styleClass="flat-button"
+      [disabled]="isLoadingOrder() || isSaving()"
+      (click)="onSubmit()"
+    ></button>
+  </div>
+</p-card>
