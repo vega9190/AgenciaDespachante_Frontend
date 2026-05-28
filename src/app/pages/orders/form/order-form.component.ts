@@ -56,6 +56,10 @@ interface DocumentSectionVm {
   isDisabled: boolean;
   showRequiredText: boolean;
   showStatus: boolean;
+  isApproved: boolean;
+  canApprove: boolean;
+  isApproveConfirmOpen: boolean;
+  isApproving: boolean;
 }
 
 const DOCUMENT_STATUS = {
@@ -97,6 +101,8 @@ export class OrderFormComponent {
   readonly documentTypeOptions = signal<OrderDocumentTypeOptionDto[]>([]);
   readonly selectedDocumentTypeId = signal<string | null>(null);
   readonly selectedDocumentFile = signal<File | null>(null);
+  readonly approveConfirmDocumentTypeId = signal<string | null>(null);
+  readonly approvingDocumentTypeId = signal<string | null>(null);
   readonly containerTypeOptions = CONTAINER_TYPE_OPTIONS;
   readonly orderTimelineSteps = ORDER_TIMELINE_STEPS;
   readonly activeEditTab = signal('details');
@@ -107,6 +113,8 @@ export class OrderFormComponent {
   );
   readonly documentSections = computed<DocumentSectionVm[]>(() => {
     const currentOrder = this.order();
+    const approveConfirmDocumentTypeId = this.approveConfirmDocumentTypeId();
+    const approvingDocumentTypeId = this.approvingDocumentTypeId();
 
     if (!currentOrder) {
       return [];
@@ -126,6 +134,8 @@ export class OrderFormComponent {
           }));
 
         const documentsCount = documents.length;
+        const isApproved = required.status === DOCUMENT_STATUS.aprobado;
+        const canApprove = required.status === DOCUMENT_STATUS.enRevision;
 
         return {
           orderDocumentTypeId: required.orderDocumentTypeId,
@@ -139,7 +149,11 @@ export class OrderFormComponent {
           documents,
           isDisabled: documentsCount === 0,
           showRequiredText: required.isRequired && documentsCount === 0,
-          showStatus: required.status !== DOCUMENT_STATUS.faltante || required.isRequired
+          showStatus: required.status !== DOCUMENT_STATUS.faltante || required.isRequired,
+          isApproved,
+          canApprove,
+          isApproveConfirmOpen: approveConfirmDocumentTypeId === required.orderDocumentTypeId,
+          isApproving: approvingDocumentTypeId === required.orderDocumentTypeId
         };
       });
   });
@@ -301,6 +315,51 @@ export class OrderFormComponent {
       acceptButtonStyleClass: 'p-button-danger',
       accept: () => this.deleteDocument(id, document)
     });
+  }
+
+  onApproveBadgeClick(orderDocumentTypeId: string, canApprove: boolean, event: Event): void {
+    event.stopPropagation();
+
+    if (!canApprove || this.approvingDocumentTypeId()) {
+      return;
+    }
+
+    this.approveConfirmDocumentTypeId.update((current) => (current === orderDocumentTypeId ? null : orderDocumentTypeId));
+  }
+
+  onApproveConfirmNo(event: Event): void {
+    event.stopPropagation();
+    this.approveConfirmDocumentTypeId.set(null);
+  }
+
+  onApproveConfirmYes(orderDocumentTypeId: string, event: Event): void {
+    event.stopPropagation();
+
+    const id = this.orderId();
+
+    if (!id || this.approvingDocumentTypeId()) {
+      return;
+    }
+
+    this.approvingDocumentTypeId.set(orderDocumentTypeId);
+
+    this.ordersService
+      .approveDocumentType(id, orderDocumentTypeId)
+      .pipe(
+        finalize(() => {
+          this.approvingDocumentTypeId.set(null);
+          this.approveConfirmDocumentTypeId.set(null);
+        })
+      )
+      .subscribe((response) => {
+        this.appToastService.showApiMessages(response);
+        this.updateRequiredDocumentStatus(orderDocumentTypeId, DOCUMENT_STATUS.aprobado);
+
+        if (response.data?.isStatusUpdated) {
+          this.loadOrder(id);
+          this.loadDocumentTypeOptions(id);
+        }
+      });
   }
 
   private deleteDocument(id: string, document: DocumentSectionItem): void {

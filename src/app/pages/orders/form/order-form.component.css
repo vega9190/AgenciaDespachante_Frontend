@@ -41,6 +41,15 @@
   font-weight: 700;
 }
 
+.document-status-tag--clickable {
+  cursor: pointer;
+}
+
+.document-status-tag--busy {
+  pointer-events: none;
+  opacity: 0.72;
+}
+
 :host ::ng-deep .documents-accordion .p-accordionpanel {
   overflow: hidden;
   border: 1px solid color-mix(in srgb, var(--p-content-border-color) 72%, white);
@@ -253,15 +262,6 @@
 
 .order-timeline__label--active {
   color: var(--p-text-color);
-}
-
-.order-timeline-card__message {
-  margin: 1.25rem 0 0;
-  padding-top: 1rem;
-  border-top: 1px solid rgb(148 163 184 / 0.2);
-  color: var(--p-text-secondary-color);
-  font-size: 0.95rem;
-  font-weight: 500;
 }
 
 .form-grid {

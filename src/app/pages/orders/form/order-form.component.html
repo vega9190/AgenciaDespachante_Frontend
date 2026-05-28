@@ -268,7 +268,49 @@
                             </div>
 
                             @if (section.showStatus) {
-                              <p-tag [value]="section.statusLabel" [severity]="section.statusSeverity" [icon]="section.statusIcon" />
+                              <div class="flex flex-col items-end gap-3 md:flex-row md:items-center md:justify-end">
+                                @if (section.isApproveConfirmOpen) {
+                                  <div
+                                    class="w-full max-w-72 border rounded-2xl bg-white px-3 py-2 shadow-sm md:w-auto md:rounded-full md:px-3 md:py-1.5"
+                                    (click)="$event.stopPropagation()"
+                                  >
+                                    <div class="flex flex-col gap-2 md:flex-row md:items-center md:gap-3">
+                                      <span class="text-[0.82rem] font-semibold leading-tight">¿Está seguro de aprobar los documentos?</span>
+                                      <div class="inline-flex items-center justify-end gap-1">
+                                      <button
+                                        type="button"
+                                        pButton
+                                        label="Sí"
+                                        size="small"
+                                        [text]="true"
+                                        [disabled]="section.isApproving"
+                                        (click)="onApproveConfirmYes(section.orderDocumentTypeId, $event)"
+                                      ></button>
+                                      <button
+                                        type="button"
+                                        pButton
+                                        label="No"
+                                        size="small"
+                                        [text]="true"
+                                        [disabled]="section.isApproving"
+                                        (click)="onApproveConfirmNo($event)"
+                                      ></button>
+                                      </div>
+                                    </div>
+                                  </div>
+                                }
+
+                                <div
+                                  class="document-status-tag"
+                                  [class.document-status-tag--clickable]="section.canApprove"
+                                  [class.document-status-tag--busy]="section.isApproving"
+                                  [pTooltip]="section.canApprove ? 'Click para aprobar los documentos' : null"
+                                  tooltipPosition="top"
+                                  (click)="onApproveBadgeClick(section.orderDocumentTypeId, section.canApprove, $event)"
+                                >
+                                  <p-tag [value]="section.statusLabel" [severity]="section.statusSeverity" [icon]="section.statusIcon" />
+                                </div>
+                              </div>
                             }
                           </div>
                         </p-accordion-header>
@@ -287,32 +329,34 @@
                                   <span>{{ document.uploadedAtLabel }}</span>
                                 </div>
 
-                                <div class="flex items-center justify-end gap-1">
-                                  <button
-                                    type="button"
-                                    pButton
-                                    [text]="true"
+                                 <div class="flex items-center justify-end gap-1">
+                                   <button
+                                     type="button"
+                                     pButton
+                                     [text]="true"
                                     rounded="true"
                                     icon="pi pi-download"
                                     [pTooltip]="'Descargar'"
                                     tooltipPosition="top"
-                                    aria-label="Descargar documento"
-                                    (click)="onDocumentDownload(document)"
-                                  ></button>
-                                  <button
-                                    type="button"
-                                    pButton
-                                    [text]="true"
-                                    rounded="true"
-                                    icon="pi pi-trash"
-                                    [pTooltip]="'Eliminar'"
-                                    tooltipPosition="top"
-                                    aria-label="Eliminar documento"
-                                    (click)="onDocumentDelete(document)"
-                                  ></button>
-                                </div>
-                              </div>
-                            }
+                                     aria-label="Descargar documento"
+                                     (click)="onDocumentDownload(document)"
+                                   ></button>
+                                  @if (!section.isApproved) {
+                                    <button
+                                      type="button"
+                                      pButton
+                                      [text]="true"
+                                      rounded="true"
+                                      icon="pi pi-trash"
+                                      [pTooltip]="'Eliminar'"
+                                      tooltipPosition="top"
+                                      aria-label="Eliminar documento"
+                                      (click)="onDocumentDelete(document)"
+                                    ></button>
+                                  }
+                                 </div>
+                               </div>
+                             }
                           </div>
                         </p-accordion-content>
                       </p-accordion-panel>
