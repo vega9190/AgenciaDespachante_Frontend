@@ -11,9 +11,11 @@ import {
   CreateOrderRequest,
   DeleteOrderDocumentResponse,
   OrderDocumentDto,
+  OrderDocumentCategory,
   OrderDocumentTypeOptionDto,
   OrderDetailDto,
   OrderListItemDto,
+  OrderPaymentDto,
   OrderStatusOptionDto,
   OrdersListQuery,
   PagedResult,
@@ -53,8 +55,14 @@ export class OrdersService {
     return this.httpClient.get<ApiResultOf<OrderDetailDto>>(`${this.ordersUrl}/${id}`);
   }
 
-  getDocuments(id: string) {
-    return this.httpClient.get<ApiResultOf<OrderDocumentDto[]>>(`${this.ordersUrl}/${id}/documents`);
+  getDocuments(id: string, category?: OrderDocumentCategory) {
+    return this.httpClient.get<ApiResultOf<OrderDocumentDto[]>>(`${this.ordersUrl}/${id}/documents`, {
+      params: buildHttpParams({ category })
+    });
+  }
+
+  getPayments(id: string) {
+    return this.httpClient.get<ApiResultOf<OrderPaymentDto[]>>(`${this.ordersUrl}/${id}/payments`);
   }
 
   getStatusOptions() {

@@ -17,6 +17,7 @@ import {
   OrderDetailDto,
   OrderDocumentCategory,
   OrderDocumentTypeOptionDto,
+  OrderPaymentDto,
   OrderPaymentType,
   OrderPaymentTypeOption,
   SaveOrderPaymentRequest
@@ -52,6 +53,7 @@ export class OrderPaymentsComponent {
   readonly isLoadingDocumentTypeOptions = signal(false);
   readonly selectedDocumentFile = signal<File | null>(null);
   readonly documentTypeOptions = signal<OrderDocumentTypeOptionDto[]>([]);
+  readonly payments = signal<OrderPaymentDto[]>([]);
   readonly paymentTypeOptions = signal<OrderPaymentTypeOption[]>(ORDER_PAYMENT_TYPE_OPTIONS);
 
   readonly paymentForm: FormGroup<OrderPaymentsFormModel> = this.formBuilder.group({
@@ -59,15 +61,19 @@ export class OrderPaymentsComponent {
     amount: this.formBuilder.control<number | null>(null, [Validators.required, Validators.min(0.01)]),
     paymentDate: this.formBuilder.nonNullable.control(this.getTodayDateValue()),
     notes: this.formBuilder.nonNullable.control(''),
-    orderDocumentTypeId: this.formBuilder.control<string | null>(null)
+    orderDocumentTypeId: this.formBuilder.control<string | null>({ value: null, disabled: true })
   });
 
   constructor() {
     effect(() => {
       this.orderId();
-      this.order();
+      this.payments.set(this.order().payments);
       this.resetPaymentForm();
       this.loadDocumentTypeOptions();
+    });
+
+    effect(() => {
+      this.syncFormDisabledState();
     });
   }
 
@@ -124,7 +130,7 @@ export class OrderPaymentsComponent {
         }
 
         this.resetPaymentForm();
-        this.refreshOrder(id);
+        this.refreshPayments(id);
       });
   }
 
@@ -157,13 +163,13 @@ export class OrderPaymentsComponent {
       });
   }
 
-  private refreshOrder(id: string): void {
-    this.ordersService.getById(id).subscribe((response) => {
+  private refreshPayments(id: string): void {
+    this.ordersService.getPayments(id).subscribe((response) => {
       if (!response.data) {
         return;
       }
 
-      this.orderChanged.emit(response.data);
+      this.payments.set(response.data);
     });
   }
 
@@ -221,6 +227,25 @@ export class OrderPaymentsComponent {
     const documentTypeControl = this.paymentForm.controls.orderDocumentTypeId;
     documentTypeControl.removeValidators(Validators.required);
     documentTypeControl.updateValueAndValidity({ emitEvent: false });
+  }
+
+  private syncFormDisabledState(): void {
+    if (this.isSavingPayment()) {
+      this.paymentForm.disable({ emitEvent: false });
+      return;
+    }
+
+    this.paymentForm.enable({ emitEvent: false });
+
+    const documentTypeControl = this.paymentForm.controls.orderDocumentTypeId;
+    const shouldDisableDocumentType = this.isLoadingDocumentTypeOptions() || !this.selectedDocumentFile();
+
+    if (shouldDisableDocumentType) {
+      documentTypeControl.disable({ emitEvent: false });
+      return;
+    }
+
+    documentTypeControl.enable({ emitEvent: false });
   }
 
   private getTodayDateValue(): string {

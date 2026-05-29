@@ -79,8 +79,8 @@ export interface OrderPaymentDto {
   createdById: string;
   createdByUsername: string;
   orderDocumentId?: string | null;
+  orderDocumentName?: string | null;
   notes?: string | null;
-  createdUtc: string;
 }
 
 export interface OrderLogDto {

@@ -14,7 +14,7 @@ import { FileSelectorComponent } from '../../../../common-components/file-select
 import { ApiResult, ApiResultOf } from '@models/api.types';
 import { AppToastService } from '@services/common/app-toast.service';
 import { UiBlockService } from '@services/common/ui-block.service';
-import { OrderDetailDto, OrderDocumentTypeOptionDto } from '@services/orders/orders.types';
+import { OrderDetailDto, OrderDocumentCategory, OrderDocumentDto, OrderDocumentTypeOptionDto, OrderDocumentTypeRequiredDto } from '@services/orders/orders.types';
 import { OrdersService } from '@services/orders/orders.service';
 
 import { DocumentSectionItem, DocumentSectionVm } from '../order-form.types';
@@ -45,6 +45,8 @@ export class OrderDocumentsComponent {
   readonly isLoadingDocumentTypes = signal(false);
   readonly isSavingDocument = signal(false);
   readonly documentTypeOptions = signal<OrderDocumentTypeOptionDto[]>([]);
+  readonly documents = signal<OrderDocumentDto[]>([]);
+  readonly requiredDocumentTypes = signal<OrderDocumentTypeRequiredDto[]>([]);
   readonly selectedDocumentTypeId = signal<string | null>(null);
   readonly selectedDocumentFile = signal<File | null>(null);
   readonly approveConfirmDocumentTypeId = signal<string | null>(null);
@@ -54,12 +56,13 @@ export class OrderDocumentsComponent {
     () => !!this.orderId() && !!this.selectedDocumentTypeId() && !!this.selectedDocumentFile() && !this.isSavingDocument() && !this.isLoadingDocumentTypes()
   );
   readonly documentSections = computed<DocumentSectionVm[]>(() => {
-    const currentOrder = this.order();
+    const currentDocuments = this.documents();
+    const currentRequiredDocumentTypes = this.requiredDocumentTypes();
     const approveConfirmDocumentTypeId = this.approveConfirmDocumentTypeId();
     const approvingDocumentTypeId = this.approvingDocumentTypeId();
 
-    return this.getSortedRequiredDocumentTypes(currentOrder.orderDocumentTypeRequireds).map((required) => {
-      const documents = currentOrder.documents
+    return this.getSortedRequiredDocumentTypes(currentRequiredDocumentTypes).map((required) => {
+      const documents = currentDocuments
         .filter((document) => document.orderDocumentTypeId === required.orderDocumentTypeId)
         .map((document) => ({
           id: document.id,
@@ -103,6 +106,9 @@ export class OrderDocumentsComponent {
   constructor() {
     effect(() => {
       this.orderId();
+      const currentOrder = this.order();
+      this.documents.set(currentOrder.documents);
+      this.requiredDocumentTypes.set(currentOrder.orderDocumentTypeRequireds);
       this.loadDocumentTypeOptions();
       this.resetDocumentForm();
     });
@@ -152,7 +158,17 @@ export class OrderDocumentsComponent {
         }
 
         this.resetDocumentForm();
-        this.refreshOrder(id);
+
+        if (response.data?.requiredDocumentStatus !== null && response.data?.requiredDocumentStatus !== undefined) {
+          this.updateRequiredDocumentTypeStatus(orderDocumentTypeId, response.data.requiredDocumentStatus);
+        }
+
+        if (response.data?.isStatusUpdated) {
+          this.refreshOrder(id);
+          return;
+        }
+
+        this.refreshDocuments(id);
       });
   }
 
@@ -224,7 +240,12 @@ export class OrderDocumentsComponent {
           return;
         }
 
-        this.refreshOrder(id);
+        if (response.data?.isStatusUpdated) {
+          this.refreshOrder(id);
+          return;
+        }
+
+        this.updateRequiredDocumentTypeStatus(orderDocumentTypeId, DOCUMENT_STATUS.aprobado);
       });
   }
 
@@ -254,7 +275,11 @@ export class OrderDocumentsComponent {
           return;
         }
 
-        this.refreshOrder(id);
+        if (response.data?.requiredDocumentStatus !== null && response.data?.requiredDocumentStatus !== undefined) {
+          this.updateRequiredDocumentTypeStatus(document.orderDocumentTypeId, response.data.requiredDocumentStatus);
+        }
+
+        this.refreshDocuments(id);
       });
   }
 
@@ -266,6 +291,12 @@ export class OrderDocumentsComponent {
 
       this.orderChanged.emit(response.data);
       this.loadDocumentTypeOptions();
+    });
+  }
+
+  private refreshDocuments(id: string): void {
+    this.ordersService.getDocuments(id, OrderDocumentCategory.Gestion).subscribe((response) => {
+      this.documents.set(response.data ?? []);
     });
   }
 
@@ -286,6 +317,14 @@ export class OrderDocumentsComponent {
     this.selectedDocumentTypeId.set(null);
     this.selectedDocumentFile.set(null);
     this.approveConfirmDocumentTypeId.set(null);
+  }
+
+  private updateRequiredDocumentTypeStatus(orderDocumentTypeId: string, status: number): void {
+    this.requiredDocumentTypes.update((requiredDocumentTypes) =>
+      requiredDocumentTypes.map((requiredDocumentType) =>
+        requiredDocumentType.orderDocumentTypeId === orderDocumentTypeId ? { ...requiredDocumentType, status } : requiredDocumentType
+      )
+    );
   }
 
   private getDocumentStatusLabel(status: number): string {

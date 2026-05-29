@@ -16,7 +16,6 @@
               optionLabel="label"
               optionValue="value"
               placeholder="Seleccionar"
-              [disabled]="isSavingPayment()"
             />
             @if (getFieldError('type')) {
               <small class="field-error">{{ getFieldError('type') }}</small>
@@ -36,7 +35,6 @@
               [minFractionDigits]="2"
               [maxFractionDigits]="2"
               placeholder="0.00"
-              [disabled]="isSavingPayment()"
             />
             @if (getFieldError('amount')) {
               <small class="field-error">{{ getFieldError('amount') }}</small>
@@ -45,26 +43,25 @@
 
           <div class="flex flex-col gap-2">
             <label for="paymentDate" class="font-semibold">Fecha</label>
-            <input id="paymentDate" type="date" pInputText formControlName="paymentDate" [disabled]="isSavingPayment()" />
+            <input id="paymentDate" type="date" pInputText formControlName="paymentDate" />
           </div>
         </div>
 
         <div class="flex flex-col gap-2">
           <label for="paymentNotes" class="font-semibold">Notas</label>
-          <textarea id="paymentNotes" pInputText formControlName="notes" rows="3" maxlength="250" [disabled]="isSavingPayment()"></textarea>
+          <textarea id="paymentNotes" pInputText formControlName="notes" rows="3" maxlength="250"></textarea>
         </div>
 
         <div class="flex flex-col gap-2">
           <label for="paymentDocumentType" class="font-semibold">Tipo de Documento</label>
-          <p-select
-            inputId="paymentDocumentType"
-            formControlName="orderDocumentTypeId"
-            [options]="documentTypeOptions()"
-            optionLabel="name"
-            optionValue="id"
-            placeholder="Seleccionar"
-            [disabled]="isSavingPayment() || isLoadingDocumentTypeOptions() || !selectedDocumentFile()"
-          />
+            <p-select
+              inputId="paymentDocumentType"
+              formControlName="orderDocumentTypeId"
+              [options]="documentTypeOptions()"
+              optionLabel="name"
+              optionValue="id"
+              placeholder="Seleccionar"
+            />
           @if (getFieldError('orderDocumentTypeId')) {
             <small class="field-error">{{ getFieldError('orderDocumentTypeId') }}</small>
           }
