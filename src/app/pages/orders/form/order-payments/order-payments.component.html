@@ -8,7 +8,7 @@
       <div class="payments-form pt-2" [formGroup]="paymentForm">
         <div class="payments-form__primary-grid">
           <div class="flex flex-col gap-2">
-            <label for="paymentType" class="font-semibold">Tipo de Pago *</label>
+            <label class="font-semibold">Tipo de Pago *</label>
             <p-select
               inputId="paymentType"
               formControlName="type"
@@ -53,7 +53,7 @@
         </div>
 
         <div class="flex flex-col gap-2">
-          <label for="paymentDocumentType" class="font-semibold">Tipo de Documento</label>
+          <label class="font-semibold">Tipo de Documento</label>
             <p-select
               inputId="paymentDocumentType"
               formControlName="orderDocumentTypeId"
@@ -89,7 +89,77 @@
     </section>
 
     <section class="payments-panel payments-panel--next">
-      <div class="payments-panel__planning">Planning</div>
+      <div class="payments-panel__header mb-4">
+        <h2 class="payments-panel__title">Pagos</h2>
+        <div class="payments-panel__total">Total Pagado: <span>{{ formatAmount(totalPaid()) }}</span></div>
+      </div>
+
+      <p-table class="payments-table" [value]="payments()">
+        <ng-template #header>
+          <tr>
+            <th>Tipo</th>
+            <th class="payments-table__date-column">Fecha Pago</th>
+            <th class="payments-table__amount-column text-right">Monto</th>
+            <th>Notas</th>
+            <th>Tipo Doc.</th>
+            <th>Comprobante</th>
+            <th>Usuario</th>
+            <th class="payments-table__actions-column text-center">Acciones</th>
+          </tr>
+        </ng-template>
+
+        <ng-template #body let-payment>
+          <tr>
+            <td>{{ getPaymentTypeLabel(payment.type) }}</td>
+            <td>{{ formatPaymentDate(payment.paymentDate) }}</td>
+            <td class="payments-table__amount-column text-right whitespace-nowrap">{{ formatAmount(payment.amount) }}</td>
+            <td>
+              <span class="payment-text-wrap">{{ payment.notes || '-' }}</span>
+            </td>
+            <td>{{ payment.orderDocumentType || '-' }}</td>
+            <td>
+              <span class="payment-text-wrap">{{ payment.orderDocumentName || '-' }}</span>
+            </td>
+            <td>{{ payment.createdByUsername || '-' }}</td>
+            <td>
+              <div class="payments-table__actions">
+                @if (payment.orderDocumentId) {
+                  <button
+                    type="button"
+                    pButton
+                    [text]="true"
+                    rounded="true"
+                    icon="pi pi-download"
+                    [pTooltip]="'Descargar comprobante'"
+                    tooltipPosition="top"
+                    aria-label="Descargar comprobante"
+                    (click)="onPaymentDownload(payment)"
+                  ></button>
+                }
+
+                <button
+                  type="button"
+                  pButton
+                  [text]="true"
+                  rounded="true"
+                  icon="pi pi-trash"
+                  [pTooltip]="'Eliminar pago'"
+                  tooltipPosition="top"
+                  aria-label="Eliminar pago"
+                  [disabled]="deletingPaymentId() === payment.id"
+                  (click)="onPaymentDelete(payment)"
+                ></button>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+
+        <ng-template #emptymessage>
+          <tr>
+            <td colspan="8" class="py-6 text-center text-surface-500">No hay pagos registrados.</td>
+          </tr>
+        </ng-template>
+      </p-table>
     </section>
   </div>
 </p-card>

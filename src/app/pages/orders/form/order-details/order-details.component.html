@@ -1,7 +1,7 @@
 <p-card class="order-form-card">
   <div class="form-grid" [formGroup]="orderForm">
     <div class="flex flex-col gap-2">
-      <label for="client" class="font-semibold">Cliente</label>
+      <label class="font-semibold">Cliente</label>
       <p-autocomplete
         inputId="client"
         formControlName="client"
@@ -27,7 +27,7 @@
     </div>
 
     <div class="flex flex-col gap-2">
-      <label for="containerType" class="font-semibold">Tipo Contenedor</label>
+      <label class="font-semibold">Tipo Contenedor</label>
       <p-select
         inputId="containerType"
         formControlName="containerType"

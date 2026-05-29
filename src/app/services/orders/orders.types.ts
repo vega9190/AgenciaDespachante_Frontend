@@ -80,6 +80,7 @@ export interface OrderPaymentDto {
   createdByUsername: string;
   orderDocumentId?: string | null;
   orderDocumentName?: string | null;
+  orderDocumentType?: string | null;
   notes?: string | null;
 }
 

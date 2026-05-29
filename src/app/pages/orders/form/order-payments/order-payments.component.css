@@ -27,6 +27,24 @@
   font-weight: 700;
 }
 
+.payments-panel__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.payments-panel__total {
+  color: var(--p-text-color);
+  font-weight: 600;
+  text-align: right;
+}
+
+.payments-panel__total span {
+  color: var(--p-primary-color);
+  font-weight: 700;
+}
+
 .payments-form {
   display: flex;
   flex-direction: column;
@@ -38,14 +56,31 @@
   gap: 1.25rem;
 }
 
-.payments-panel__planning {
-  min-height: 14rem;
+.payments-table__actions {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--p-text-secondary-color);
-  font-weight: 600;
-  text-align: center;
+  gap: 0.25rem;
+}
+
+.payments-table__date-column {
+  width: 8rem;
+}
+
+.payments-table__amount-column {
+  width: 8rem;
+}
+
+.payments-table__actions-column {
+  width: 1%;
+  white-space: nowrap;
+}
+
+.payment-text-wrap {
+  display: inline-block;
+  min-width: 0;
+  white-space: normal;
+  word-break: break-word;
 }
 
 .field-error {
@@ -72,6 +107,33 @@
   width: 100%;
 }
 
+:host ::ng-deep .payments-table .p-datatable-table {
+  table-layout: auto;
+  width: 100%;
+}
+
+:host ::ng-deep .payments-table .p-datatable-thead > tr > th,
+:host ::ng-deep .payments-table .p-datatable-tbody > tr > td {
+  vertical-align: middle;
+}
+
+:host ::ng-deep .payments-table .p-datatable-tbody > tr > td,
+:host ::ng-deep .payments-table .p-datatable-thead > tr > th {
+  white-space: normal;
+}
+
+:host ::ng-deep .payments-table .p-datatable-tbody > tr > td:nth-child(4),
+:host ::ng-deep .payments-table .p-datatable-tbody > tr > td:nth-child(6) {
+  white-space: normal;
+}
+
+:host ::ng-deep .payments-table .p-datatable-tbody > tr > td:nth-child(3),
+:host ::ng-deep .payments-table .p-datatable-thead > tr > th:nth-child(3),
+:host ::ng-deep .payments-table .p-datatable-thead > tr > th:last-child,
+:host ::ng-deep .payments-table .p-datatable-tbody > tr > td:last-child {
+  white-space: nowrap;
+}
+
 @media screen and (min-width: 768px) {
   .payments-layout {
     grid-template-columns: minmax(0, 4fr) minmax(18rem, 8fr);
@@ -84,7 +146,20 @@
 }
 
 @media screen and (max-width: 767px) {
+  .payments-panel__header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .payments-panel__total {
+    text-align: left;
+  }
+
   .form-actions {
     flex-direction: column;
+  }
+
+  .payments-table__actions {
+    justify-content: flex-start;
   }
 }

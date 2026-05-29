@@ -123,7 +123,7 @@ export class OrdersService {
   }
 
   deletePayment(paymentId: string) {
-    return this.httpClient.delete(`${this.ordersUrl}/payments/${paymentId}`);
+    return this.httpClient.delete<ApiResultOf<null>>(`${this.ordersUrl}/payments/${paymentId}`);
   }
 
   getStatusOptionsByOrderId(id: string) {

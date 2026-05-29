@@ -1,12 +1,15 @@
-import { Component, effect, inject, input, output, signal } from '@angular/core';
+import { Component, computed, effect, inject, input, output, signal } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { finalize } from 'rxjs';
 
+import { ConfirmationService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
+import { TableModule } from 'primeng/table';
+import { TooltipModule } from 'primeng/tooltip';
 
 import { FileSelectorComponent } from '../../../../common-components/file-selector/file-selector.component';
 import { ApiResult, ApiResultOf } from '@models/api.types';
@@ -34,13 +37,24 @@ interface OrderPaymentsFormModel {
 
 @Component({
   selector: 'app-order-payments',
-  imports: [ReactiveFormsModule, ButtonModule, CardModule, FileSelectorComponent, InputNumberModule, InputTextModule, SelectModule],
+  imports: [
+    ReactiveFormsModule,
+    ButtonModule,
+    CardModule,
+    FileSelectorComponent,
+    InputNumberModule,
+    InputTextModule,
+    SelectModule,
+    TableModule,
+    TooltipModule
+  ],
   templateUrl: './order-payments.component.html',
   styleUrl: './order-payments.component.css'
 })
 export class OrderPaymentsComponent {
   private readonly formBuilder = inject(FormBuilder);
   private readonly ordersService = inject(OrdersService);
+  private readonly confirmationService = inject(ConfirmationService);
   private readonly appToastService = inject(AppToastService);
   private readonly uiBlockService = inject(UiBlockService);
 
@@ -51,10 +65,12 @@ export class OrderPaymentsComponent {
 
   readonly isSavingPayment = signal(false);
   readonly isLoadingDocumentTypeOptions = signal(false);
+  readonly deletingPaymentId = signal<string | null>(null);
   readonly selectedDocumentFile = signal<File | null>(null);
   readonly documentTypeOptions = signal<OrderDocumentTypeOptionDto[]>([]);
   readonly payments = signal<OrderPaymentDto[]>([]);
   readonly paymentTypeOptions = signal<OrderPaymentTypeOption[]>(ORDER_PAYMENT_TYPE_OPTIONS);
+  readonly totalPaid = computed(() => this.payments().reduce((sum, payment) => sum + payment.amount, 0));
 
   readonly paymentForm: FormGroup<OrderPaymentsFormModel> = this.formBuilder.group({
     type: this.formBuilder.control<OrderPaymentType | null>(null, [Validators.required]),
@@ -134,6 +150,42 @@ export class OrderPaymentsComponent {
       });
   }
 
+  onPaymentDownload(payment: OrderPaymentDto): void {
+    const orderDocumentId = payment.orderDocumentId;
+
+    if (!orderDocumentId) {
+      return;
+    }
+
+    this.ordersService.downloadDocument(orderDocumentId).subscribe({
+      next: (file) => {
+        const objectUrl = URL.createObjectURL(file);
+        const link = globalThis.document.createElement('a');
+
+        link.href = objectUrl;
+        link.download = payment.orderDocumentName?.trim() || 'comprobante';
+        link.click();
+
+        URL.revokeObjectURL(objectUrl);
+      },
+      error: () => {
+        this.appToastService.showServerError('No se pudo descargar el comprobante.');
+      }
+    });
+  }
+
+  onPaymentDelete(payment: OrderPaymentDto): void {
+    this.confirmationService.confirm({
+      header: 'Confirmar eliminación',
+      message: `¿Está seguro de eliminar el pago${payment.orderDocumentName ? ` y su comprobante "${payment.orderDocumentName}"` : ''}?`,
+      icon: 'pi pi-exclamation-triangle',
+      acceptLabel: 'Eliminar',
+      rejectLabel: 'Cancelar',
+      acceptButtonStyleClass: 'p-button-danger',
+      accept: () => this.deletePayment(payment.id)
+    });
+  }
+
   getFieldError(controlName: keyof OrderPaymentsFormModel): string {
     const control = this.paymentForm.controls[controlName];
 
@@ -150,6 +202,30 @@ export class OrderPaymentsComponent {
     }
 
     return '';
+  }
+
+  getPaymentTypeLabel(type: number): string {
+    return this.paymentTypeOptions().find((option) => option.value === type)?.label ?? 'Sin tipo';
+  }
+
+  formatAmount(amount: number): string {
+    return `Bs ${new Intl.NumberFormat('es-BO', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    }).format(amount)}`;
+  }
+
+  formatPaymentDate(value: string): string {
+    const normalizedValue = value.trim();
+    const match = normalizedValue.match(/^(\d{4})-(\d{2})-(\d{2})/);
+
+    if (!match) {
+      return '-';
+    }
+
+    const [, year, month, day] = match;
+
+    return `${day}/${month}/${year.slice(-2)}`;
   }
 
   private loadDocumentTypeOptions(): void {
@@ -170,7 +246,36 @@ export class OrderPaymentsComponent {
       }
 
       this.payments.set(response.data);
+      this.orderChanged.emit({
+        ...this.order(),
+        payments: response.data
+      });
     });
+  }
+
+  private deletePayment(paymentId: string): void {
+    const id = this.orderId();
+
+    this.deletingPaymentId.set(paymentId);
+    this.uiBlockService.block();
+
+    this.ordersService
+      .deletePayment(paymentId)
+      .pipe(
+        finalize(() => {
+          this.deletingPaymentId.set(null);
+          this.uiBlockService.unblock();
+        })
+      )
+      .subscribe((response) => {
+        this.appToastService.showApiMessages(response);
+
+        if (!this.isSuccessfulResponse(response)) {
+          return;
+        }
+
+        this.refreshPayments(id);
+      });
   }
 
   private buildSaveRequest(): SaveOrderPaymentRequest | null {
