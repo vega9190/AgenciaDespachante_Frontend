@@ -13,10 +13,11 @@ import { CONTAINER_TYPE_OPTIONS, OrderDetailDto } from '@services/orders/orders.
 import { OrdersService } from '@services/orders/orders.service';
 import { OrderDetailsComponent } from './order-details/order-details.component';
 import { OrderDocumentsComponent } from './order-documents/order-documents.component';
+import { OrderPaymentsComponent } from './order-payments/order-payments.component';
 
 @Component({
   selector: 'app-order-form',
-  imports: [DatePipe, CardModule, ConfirmDialogModule, Tabs, TabList, Tab, TabPanels, TabPanel, OrderDetailsComponent, OrderDocumentsComponent],
+  imports: [DatePipe, CardModule, ConfirmDialogModule, Tabs, TabList, Tab, TabPanels, TabPanel, OrderDetailsComponent, OrderDocumentsComponent, OrderPaymentsComponent],
   templateUrl: './order-form.component.html',
   styleUrl: './order-form.component.css'
 })

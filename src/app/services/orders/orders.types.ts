@@ -9,6 +9,22 @@ export interface OrdersListQuery {
   sortDirection?: string;
 }
 
+export enum OrderDocumentCategory {
+  Gestion = 1,
+  Pagos = 2
+}
+
+export enum OrderPaymentType {
+  Efectivo = 1,
+  Transferencia = 2,
+  QR = 3
+}
+
+export interface OrderPaymentTypeOption {
+  label: string;
+  value: OrderPaymentType;
+}
+
 export interface OrderListItemDto {
   id: string;
   orderNumber: number;
@@ -132,7 +148,7 @@ export interface ApproveOrderDocumentTypeResponse {
 export interface SaveOrderPaymentRequest {
   amount: number;
   paymentDate: string;
-  type: number;
+  type: OrderPaymentType;
   notes?: string;
   orderDocumentTypeId?: string;
   document?: File;
@@ -146,4 +162,10 @@ export interface ContainerTypeOption {
 export const CONTAINER_TYPE_OPTIONS: ContainerTypeOption[] = [
   { label: '20ft', value: 1 },
   { label: '40ft', value: 2 }
+];
+
+export const ORDER_PAYMENT_TYPE_OPTIONS: OrderPaymentTypeOption[] = [
+  { label: 'Efectivo', value: OrderPaymentType.Efectivo },
+  { label: 'Transferencia', value: OrderPaymentType.Transferencia },
+  { label: 'QR', value: OrderPaymentType.QR }
 ];

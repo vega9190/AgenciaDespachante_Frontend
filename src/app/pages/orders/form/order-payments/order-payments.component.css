@@ -1,0 +1,90 @@
+.order-tab-panel-card {
+  margin-top: 1rem;
+}
+
+.payments-layout {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.payments-panel {
+  min-height: 100%;
+  border: 1px solid color-mix(in srgb, var(--p-primary-color) 16%, var(--p-content-border-color));
+  border-radius: 1rem;
+  background: color-mix(in srgb, var(--p-primary-color) 3%, var(--p-surface-0));
+  padding: 1.25rem;
+}
+
+.payments-panel--form {
+  display: flex;
+  flex-direction: column;
+}
+
+.payments-panel__title {
+  margin: 0;
+  color: var(--p-primary-color);
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+
+.payments-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.payments-form__primary-grid {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.payments-panel__planning {
+  min-height: 14rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--p-text-secondary-color);
+  font-weight: 600;
+  text-align: center;
+}
+
+.field-error {
+  color: var(--p-red-500);
+}
+
+.form-loading {
+  color: var(--p-text-secondary-color);
+  font-weight: 600;
+}
+
+.form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+:host ::ng-deep .payments-form__primary-grid .p-inputnumber,
+:host ::ng-deep .payments-form__primary-grid .p-inputnumber-input,
+:host ::ng-deep .payments-form__primary-grid .p-select,
+:host ::ng-deep .payments-form__primary-grid .p-select-label {
+  width: 100%;
+}
+
+@media screen and (min-width: 768px) {
+  .payments-layout {
+    grid-template-columns: minmax(0, 4fr) minmax(18rem, 8fr);
+    align-items: stretch;
+  }
+
+  .payments-form__primary-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media screen and (max-width: 767px) {
+  .form-actions {
+    flex-direction: column;
+  }
+}

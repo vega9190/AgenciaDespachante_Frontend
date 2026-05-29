@@ -101,7 +101,7 @@ export class OrdersService {
       formData.set('document', request.document);
     }
 
-    return this.httpClient.post(`${this.ordersUrl}/${id}/payments`, formData);
+    return this.httpClient.post<ApiResultOf<string>>(`${this.ordersUrl}/${id}/payments`, formData);
   }
 
   downloadDocument(documentId: string) {

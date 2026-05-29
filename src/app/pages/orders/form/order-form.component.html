@@ -135,9 +135,11 @@
         </p-tabpanel>
 
         <p-tabpanel value="payments">
-          <p-card class="order-form-card order-tab-panel-card">
-            <div class="order-tab-panel-empty">Sin contenido por el momento.</div>
-          </p-card>
+          <app-order-payments
+            [orderId]="currentOrder.id"
+            [order]="currentOrder"
+            (orderChanged)="onOrderChanged($event)"
+          />
         </p-tabpanel>
       </p-tabpanels>
     </p-tabs>

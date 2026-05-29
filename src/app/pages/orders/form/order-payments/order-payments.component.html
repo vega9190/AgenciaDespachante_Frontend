@@ -1,0 +1,98 @@
+<p-card class="order-form-card order-tab-panel-card">
+  <div class="payments-layout">
+    <section class="payments-panel payments-panel--form">
+      <div class="flex items-center justify-between gap-3">
+        <h2 class="payments-panel__title">Nuevo pago</h2>
+      </div>
+
+      <div class="payments-form pt-2" [formGroup]="paymentForm">
+        <div class="payments-form__primary-grid">
+          <div class="flex flex-col gap-2">
+            <label for="paymentType" class="font-semibold">Tipo de Pago *</label>
+            <p-select
+              inputId="paymentType"
+              formControlName="type"
+              [options]="paymentTypeOptions()"
+              optionLabel="label"
+              optionValue="value"
+              placeholder="Seleccionar"
+              [disabled]="isSavingPayment()"
+            />
+            @if (getFieldError('type')) {
+              <small class="field-error">{{ getFieldError('type') }}</small>
+            }
+          </div>
+
+          <div class="flex flex-col gap-2">
+            <label for="paymentAmount" class="font-semibold">Monto *</label>
+            <p-inputnumber
+              inputId="paymentAmount"
+              formControlName="amount"
+              mode="currency"
+              currency="BOB"
+              locale="es-BO"
+              [min]="0"
+              [maxlength]="15"
+              [minFractionDigits]="2"
+              [maxFractionDigits]="2"
+              placeholder="0.00"
+              [disabled]="isSavingPayment()"
+            />
+            @if (getFieldError('amount')) {
+              <small class="field-error">{{ getFieldError('amount') }}</small>
+            }
+          </div>
+
+          <div class="flex flex-col gap-2">
+            <label for="paymentDate" class="font-semibold">Fecha</label>
+            <input id="paymentDate" type="date" pInputText formControlName="paymentDate" [disabled]="isSavingPayment()" />
+          </div>
+        </div>
+
+        <div class="flex flex-col gap-2">
+          <label for="paymentNotes" class="font-semibold">Notas</label>
+          <textarea id="paymentNotes" pInputText formControlName="notes" rows="3" maxlength="250" [disabled]="isSavingPayment()"></textarea>
+        </div>
+
+        <div class="flex flex-col gap-2">
+          <label for="paymentDocumentType" class="font-semibold">Tipo de Documento</label>
+          <p-select
+            inputId="paymentDocumentType"
+            formControlName="orderDocumentTypeId"
+            [options]="documentTypeOptions()"
+            optionLabel="name"
+            optionValue="id"
+            placeholder="Seleccionar"
+            [disabled]="isSavingPayment() || isLoadingDocumentTypeOptions() || !selectedDocumentFile()"
+          />
+          @if (getFieldError('orderDocumentTypeId')) {
+            <small class="field-error">{{ getFieldError('orderDocumentTypeId') }}</small>
+          }
+        </div>
+
+        <div class="flex flex-col gap-2">
+          <label class="font-semibold">Comprobante</label>
+          <app-file-selector
+            [selectedFile]="selectedDocumentFile()"
+            [disabled]="isSavingPayment()"
+            (fileSelected)="onDocumentFileSelected($event)"
+            (fileCleared)="onDocumentFileCleared()"
+          />
+        </div>
+
+        @if (isLoadingDocumentTypeOptions()) {
+          <div class="form-loading">Cargando tipos de documento...</div>
+        }
+      </div>
+
+      <div class="form-actions mt-auto">
+        <button type="button" pButton label="Cancelar" severity="secondary" styleClass="flat-button" [disabled]="isSavingPayment()" (click)="onCancel()"></button>
+        <button type="button" pButton label="Guardar" icon="pi pi-save" styleClass="flat-button" [disabled]="isSavingPayment()" (click)="onSave()"></button>
+      </div>
+    </section>
+
+    <section class="payments-panel payments-panel--next">
+      <div class="payments-panel__planning">Planning</div>
+    </section>
+  </div>
+</p-card>
