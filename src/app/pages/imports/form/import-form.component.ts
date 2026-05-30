@@ -8,48 +8,48 @@ import { CardModule } from 'primeng/card';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { Tab, TabList, TabPanel, TabPanels, Tabs } from 'primeng/tabs';
 
-import { ORDER_STATUS_IDS, ORDER_TIMELINE_STEPS } from '@services/orders/order-status.constants';
-import { CONTAINER_TYPE_OPTIONS, OrderDetailDto } from '@services/orders/orders.types';
-import { OrdersService } from '@services/orders/orders.service';
-import { OrderDetailsComponent } from './order-details/order-details.component';
-import { OrderDocumentsComponent } from './order-documents/order-documents.component';
-import { OrderPaymentsComponent } from './order-payments/order-payments.component';
+import { IMPORT_STATUS_IDS, IMPORT_TIMELINE_STEPS } from '@services/imports/import-status.constants';
+import { CONTAINER_TYPE_OPTIONS, ImportDetailDto } from '@services/imports/imports.types';
+import { ImportsService } from '@services/imports/imports.service';
+import { ImportDetailsComponent } from './import-details/import-details.component';
+import { ImportDocumentsComponent } from './import-documents/import-documents.component';
+import { ImportPaymentsComponent } from './import-payments/import-payments.component';
 
 @Component({
-  selector: 'app-order-form',
-  imports: [DatePipe, CardModule, ConfirmDialogModule, Tabs, TabList, Tab, TabPanels, TabPanel, OrderDetailsComponent, OrderDocumentsComponent, OrderPaymentsComponent],
-  templateUrl: './order-form.component.html',
-  styleUrl: './order-form.component.css'
+  selector: 'app-import-form',
+  imports: [DatePipe, CardModule, ConfirmDialogModule, Tabs, TabList, Tab, TabPanels, TabPanel, ImportDetailsComponent, ImportDocumentsComponent, ImportPaymentsComponent],
+  templateUrl: './import-form.component.html',
+  styleUrl: './import-form.component.css'
 })
-export class OrderFormComponent {
-  private readonly ordersService = inject(OrdersService);
+export class ImportFormComponent {
+  private readonly importsService = inject(ImportsService);
   private readonly route = inject(ActivatedRoute);
 
   readonly isLoading = signal(false);
-  readonly order = signal<OrderDetailDto | null>(null);
-  readonly orderId = signal<string | null>(null);
+  readonly importItem = signal<ImportDetailDto | null>(null);
+  readonly importId = signal<string | null>(null);
   readonly containerTypeOptions = CONTAINER_TYPE_OPTIONS;
-  readonly orderTimelineSteps = ORDER_TIMELINE_STEPS;
+  readonly importTimelineSteps = IMPORT_TIMELINE_STEPS;
   readonly activeEditTab = signal('details');
-  readonly isEditMode = computed(() => this.orderId() !== null);
-  readonly pageTitle = computed(() => (this.isEditMode() ? 'Editar Pedido' : 'Crear Pedido'));
+  readonly isEditMode = computed(() => this.importId() !== null);
+  readonly pageTitle = computed(() => (this.isEditMode() ? 'Editar Importación' : 'Crear Importación'));
 
   constructor() {
     this.route.paramMap.pipe(takeUntilDestroyed()).subscribe((params) => {
       const id = params.get('id');
-      this.orderId.set(id);
+      this.importId.set(id);
 
       if (id) {
-        this.loadOrder(id);
+        this.loadImport(id);
         return;
       }
 
-      this.order.set(null);
+      this.importItem.set(null);
     });
   }
 
-  onOrderChanged(order: OrderDetailDto): void {
-    this.order.set(order);
+  onImportChanged(importItem: ImportDetailDto): void {
+    this.importItem.set(importItem);
   }
 
   getCurrentTimelineStepIndex(statusId: string | null | undefined): number {
@@ -58,7 +58,7 @@ export class OrderFormComponent {
     }
 
     const normalizedStatusId = statusId.toLowerCase();
-    return this.orderTimelineSteps.findIndex((step) => step.statusId.toLowerCase() === normalizedStatusId);
+    return this.importTimelineSteps.findIndex((step) => step.statusId.toLowerCase() === normalizedStatusId);
   }
 
   isCompletedTimelineStep(stepIndex: number, currentStepIndex: number): boolean {
@@ -74,17 +74,17 @@ export class OrderFormComponent {
   }
 
   private isCancelledStatus(statusId: string): boolean {
-    return statusId.toLowerCase() === ORDER_STATUS_IDS.cancelado.toLowerCase();
+    return statusId.toLowerCase() === IMPORT_STATUS_IDS.cancelado.toLowerCase();
   }
 
-  private loadOrder(id: string): void {
+  private loadImport(id: string): void {
     this.isLoading.set(true);
 
-    this.ordersService
+    this.importsService
       .getById(id)
       .pipe(finalize(() => this.isLoading.set(false)))
       .subscribe((response) => {
-        this.order.set(response.data ?? null);
+        this.importItem.set(response.data ?? null);
       });
   }
 }

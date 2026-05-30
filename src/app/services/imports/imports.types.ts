@@ -1,7 +1,7 @@
-export interface OrdersListQuery {
+export interface ImportsListQuery {
   page?: number;
   pageSize?: number;
-  orderNumber?: string;
+  importNumber?: string;
   containerNumber?: string;
   clientId?: string;
   statusId?: string;
@@ -9,25 +9,25 @@ export interface OrdersListQuery {
   sortDirection?: string;
 }
 
-export enum OrderDocumentCategory {
+export enum ImportDocumentCategory {
   Gestion = 1,
   Pagos = 2
 }
 
-export enum OrderPaymentType {
+export enum ImportPaymentType {
   Efectivo = 1,
   Transferencia = 2,
   QR = 3
 }
 
-export interface OrderPaymentTypeOption {
+export interface ImportPaymentTypeOption {
   label: string;
-  value: OrderPaymentType;
+  value: ImportPaymentType;
 }
 
-export interface OrderListItemDto {
+export interface ImportListItemDto {
   id: string;
-  orderNumber: number;
+  importNumber: number;
   containerNumber: string;
   clientFullName: string;
   clientTaxId?: string | null;
@@ -37,9 +37,9 @@ export interface OrderListItemDto {
   totalPaymentsAmount: number;
 }
 
-export interface OrderDetailDto {
+export interface ImportDetailDto {
   id: string;
-  orderNumber: number;
+  importNumber: number;
   containerNumber: string;
   containerType: number;
   clientId: string;
@@ -48,43 +48,43 @@ export interface OrderDetailDto {
   statusId: string;
   statusName: string;
   createdUtc: string;
-  documents: OrderDocumentDto[];
-  orderDocumentTypeRequireds: OrderDocumentTypeRequiredDto[];
-  payments: OrderPaymentDto[];
-  orderLogs: OrderLogDto[];
+  documents: ImportDocumentDto[];
+  importDocumentTypeRequireds: ImportDocumentTypeRequiredDto[];
+  payments: ImportPaymentDto[];
+  importLogs: ImportLogDto[];
 }
 
-export interface OrderDocumentDto {
+export interface ImportDocumentDto {
   id: string;
-  orderDocumentTypeId: string;
-  orderDocumentTypeName: string;
+  importDocumentTypeId: string;
+  importDocumentTypeName: string;
   originalName: string;
   filesize: number;
   createdUtc: string;
 }
 
-export interface OrderDocumentTypeRequiredDto {
-  orderDocumentTypeId: string;
-  orderDocumentTypeName: string;
+export interface ImportDocumentTypeRequiredDto {
+  importDocumentTypeId: string;
+  importDocumentTypeName: string;
   isRequired: boolean;
   status: number;
   sortOrder: number;
 }
 
-export interface OrderPaymentDto {
+export interface ImportPaymentDto {
   id: string;
   amount: number;
   paymentDate: string;
   type: number;
   createdById: string;
   createdByUsername: string;
-  orderDocumentId?: string | null;
-  orderDocumentName?: string | null;
-  orderDocumentType?: string | null;
+  importDocumentId?: string | null;
+  importDocumentName?: string | null;
+  importDocumentType?: string | null;
   notes?: string | null;
 }
 
-export interface OrderLogDto {
+export interface ImportLogDto {
   id: string;
   action: number;
   message: string;
@@ -92,12 +92,12 @@ export interface OrderLogDto {
   occurredAt: string;
 }
 
-export interface OrderStatusOptionDto {
+export interface ImportStatusOptionDto {
   id: string;
   name: string;
 }
 
-export interface OrderDocumentTypeOptionDto {
+export interface ImportDocumentTypeOptionDto {
   id: string;
   name: string;
   category: number;
@@ -111,47 +111,47 @@ export interface PagedResult<T> {
   totalPages: number;
 }
 
-export interface CreateOrderRequest {
+export interface CreateImportRequest {
   clientId: string;
   containerNumber: string;
   containerType: number;
 }
 
-export interface UpdateOrderRequest {
+export interface UpdateImportRequest {
   clientId: string;
   containerNumber: string;
   containerType: number;
 }
 
-export interface UpdateOrderStatusRequest {
+export interface UpdateImportStatusRequest {
   statusId: string;
 }
 
-export interface SaveOrderDocumentRequest {
-  orderDocumentTypeId: string;
+export interface SaveImportDocumentRequest {
+  importDocumentTypeId: string;
   file: File;
 }
 
-export interface SaveOrderDocumentResponse {
+export interface SaveImportDocumentResponse {
   id: string;
   isStatusUpdated: boolean;
   requiredDocumentStatus?: number | null;
 }
 
-export interface DeleteOrderDocumentResponse {
+export interface DeleteImportDocumentResponse {
   requiredDocumentStatus?: number | null;
 }
 
-export interface ApproveOrderDocumentTypeResponse {
+export interface ApproveImportDocumentTypeResponse {
   isStatusUpdated: boolean;
 }
 
-export interface SaveOrderPaymentRequest {
+export interface SaveImportPaymentRequest {
   amount: number;
   paymentDate: string;
-  type: OrderPaymentType;
+  type: ImportPaymentType;
   notes?: string;
-  orderDocumentTypeId?: string;
+  importDocumentTypeId?: string;
   document?: File;
 }
 
@@ -165,8 +165,8 @@ export const CONTAINER_TYPE_OPTIONS: ContainerTypeOption[] = [
   { label: '40ft', value: 2 }
 ];
 
-export const ORDER_PAYMENT_TYPE_OPTIONS: OrderPaymentTypeOption[] = [
-  { label: 'Efectivo', value: OrderPaymentType.Efectivo },
-  { label: 'Transferencia', value: OrderPaymentType.Transferencia },
-  { label: 'QR', value: OrderPaymentType.QR }
+export const IMPORT_PAYMENT_TYPE_OPTIONS: ImportPaymentTypeOption[] = [
+  { label: 'Efectivo', value: ImportPaymentType.Efectivo },
+  { label: 'Transferencia', value: ImportPaymentType.Transferencia },
+  { label: 'QR', value: ImportPaymentType.QR }
 ];

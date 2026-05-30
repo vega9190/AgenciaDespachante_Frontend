@@ -14,41 +14,41 @@ import { ClientsService } from '@services/clients/clients.service';
 import { ClientOptionDto } from '@services/clients/clients.types';
 import { AppToastService } from '@services/common/app-toast.service';
 import { UiBlockService } from '@services/common/ui-block.service';
-import { ContainerTypeOption, CreateOrderRequest, OrderDetailDto, UpdateOrderRequest } from '@services/orders/orders.types';
-import { OrdersService } from '@services/orders/orders.service';
+import { ContainerTypeOption, CreateImportRequest, ImportDetailDto, UpdateImportRequest } from '@services/imports/imports.types';
+import { ImportsService } from '@services/imports/imports.service';
 
-interface OrderDetailsFormModel {
+interface ImportDetailsFormModel {
   client: FormControl<ClientOptionDto | null>;
   containerNumber: FormControl<string>;
   containerType: FormControl<number | null>;
 }
 
 @Component({
-  selector: 'app-order-details',
+  selector: 'app-import-details',
   imports: [ReactiveFormsModule, AutoCompleteModule, ButtonModule, CardModule, InputTextModule, SelectModule],
-  templateUrl: './order-details.component.html',
-  styleUrl: './order-details.component.css'
+  templateUrl: './import-details.component.html',
+  styleUrl: './import-details.component.css'
 })
-export class OrderDetailsComponent {
+export class ImportDetailsComponent {
   private readonly formBuilder = inject(FormBuilder);
-  private readonly ordersService = inject(OrdersService);
+  private readonly importsService = inject(ImportsService);
   private readonly clientsService = inject(ClientsService);
   private readonly router = inject(Router);
   private readonly appToastService = inject(AppToastService);
   private readonly uiBlockService = inject(UiBlockService);
 
-  readonly orderId = input<string | null>(null);
-  readonly order = input<OrderDetailDto | null>(null);
+  readonly importId = input<string | null>(null);
+  readonly importItem = input<ImportDetailDto | null>(null);
   readonly containerTypeOptions = input.required<ContainerTypeOption[]>();
-  readonly isLoadingOrder = input(false);
+  readonly isLoadingImport = input(false);
 
-  readonly orderChanged = output<OrderDetailDto>();
+  readonly importChanged = output<ImportDetailDto>();
 
   readonly isSaving = signal(false);
   readonly isLoadingClients = signal(false);
   readonly clientSuggestions = signal<ClientOptionDto[]>([]);
 
-  readonly orderForm: FormGroup<OrderDetailsFormModel> = this.formBuilder.group({
+  readonly importForm: FormGroup<ImportDetailsFormModel> = this.formBuilder.group({
     client: this.formBuilder.control<ClientOptionDto | null>(null, [Validators.required]),
     containerNumber: this.formBuilder.nonNullable.control('', [Validators.required, Validators.maxLength(50)]),
     containerType: this.formBuilder.control<number | null>(null, [Validators.required])
@@ -56,11 +56,11 @@ export class OrderDetailsComponent {
 
   constructor() {
     effect(() => {
-      const orderId = this.orderId();
-      const currentOrder = this.order();
+      const importId = this.importId();
+      const currentImport = this.importItem();
 
-      if (!orderId) {
-        this.orderForm.reset({
+      if (!importId) {
+        this.importForm.reset({
           client: null,
           containerNumber: '',
           containerType: null
@@ -69,17 +69,17 @@ export class OrderDetailsComponent {
         return;
       }
 
-      if (!currentOrder) {
+      if (!currentImport) {
         return;
       }
 
-      const selectedClient = this.mapOrderClient(currentOrder);
+      const selectedClient = this.mapImportClient(currentImport);
       this.clientSuggestions.set(this.mergeClientOption(selectedClient, this.clientSuggestions()));
 
-      this.orderForm.reset({
+      this.importForm.reset({
         client: selectedClient,
-        containerNumber: currentOrder.containerNumber,
-        containerType: currentOrder.containerType
+        containerNumber: currentImport.containerNumber,
+        containerType: currentImport.containerType
       });
     });
   }
@@ -99,25 +99,25 @@ export class OrderDetailsComponent {
   }
 
   onCancel(): void {
-    void this.router.navigate(['/orders']);
+    void this.router.navigate(['/imports']);
   }
 
   onSubmit(): void {
-    if (this.orderForm.invalid || this.isSaving()) {
-      this.orderForm.markAllAsTouched();
+    if (this.importForm.invalid || this.isSaving()) {
+      this.importForm.markAllAsTouched();
       return;
     }
 
-    if (this.orderId()) {
-      this.updateOrder();
+    if (this.importId()) {
+      this.updateImport();
       return;
     }
 
-    this.createOrder();
+    this.createImport();
   }
 
-  getFieldError(controlName: keyof OrderDetailsFormModel): string {
-    const control = this.orderForm.controls[controlName];
+  getFieldError(controlName: keyof ImportDetailsFormModel): string {
+    const control = this.importForm.controls[controlName];
 
     if (!control.touched && !control.dirty) {
       return '';
@@ -134,7 +134,7 @@ export class OrderDetailsComponent {
     return '';
   }
 
-  private createOrder(): void {
+  private createImport(): void {
     const request = this.buildCreateRequest();
 
     if (!request) {
@@ -144,7 +144,7 @@ export class OrderDetailsComponent {
     this.isSaving.set(true);
     this.uiBlockService.block();
 
-    this.ordersService
+    this.importsService
       .create(request)
       .pipe(
         finalize(() => {
@@ -159,12 +159,12 @@ export class OrderDetailsComponent {
           return;
         }
 
-        void this.router.navigate(['/orders', response.data]);
+        void this.router.navigate(['/imports', response.data]);
       });
   }
 
-  private updateOrder(): void {
-    const id = this.orderId();
+  private updateImport(): void {
+    const id = this.importId();
     const request = this.buildUpdateRequest();
 
     if (!id || !request) {
@@ -174,7 +174,7 @@ export class OrderDetailsComponent {
     this.isSaving.set(true);
     this.uiBlockService.block();
 
-    this.ordersService
+    this.importsService
       .update(id, request)
       .pipe(
         finalize(() => {
@@ -189,22 +189,22 @@ export class OrderDetailsComponent {
           return;
         }
 
-        this.refreshOrder(id);
+        this.refreshImport(id);
       });
   }
 
-  private refreshOrder(id: string): void {
-    this.ordersService.getById(id).subscribe((response) => {
+  private refreshImport(id: string): void {
+    this.importsService.getById(id).subscribe((response) => {
       if (!response.data) {
         return;
       }
 
-      this.orderChanged.emit(response.data);
+      this.importChanged.emit(response.data);
     });
   }
 
-  private buildCreateRequest(): CreateOrderRequest | null {
-    const formValue = this.orderForm.getRawValue();
+  private buildCreateRequest(): CreateImportRequest | null {
+    const formValue = this.importForm.getRawValue();
 
     if (!formValue.client || formValue.containerType === null) {
       return null;
@@ -217,7 +217,7 @@ export class OrderDetailsComponent {
     };
   }
 
-  private buildUpdateRequest(): UpdateOrderRequest | null {
+  private buildUpdateRequest(): UpdateImportRequest | null {
     return this.buildCreateRequest();
   }
 
@@ -228,16 +228,16 @@ export class OrderDetailsComponent {
       .getOptions(search)
       .pipe(finalize(() => this.isLoadingClients.set(false)))
       .subscribe((response) => {
-        const selectedClient = this.orderForm.controls.client.value;
+        const selectedClient = this.importForm.controls.client.value;
         this.clientSuggestions.set(this.mergeClientOption(selectedClient, response.data ?? []));
       });
   }
 
-  private mapOrderClient(order: OrderDetailDto): ClientOptionDto {
+  private mapImportClient(importItem: ImportDetailDto): ClientOptionDto {
     return {
-      id: order.clientId,
-      name: order.clientFullName,
-      taxId: order.clientTaxId
+      id: importItem.clientId,
+      name: importItem.clientFullName,
+      taxId: importItem.clientTaxId
     };
   }
 

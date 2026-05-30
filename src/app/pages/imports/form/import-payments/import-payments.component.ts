@@ -16,27 +16,27 @@ import { ApiResult, ApiResultOf } from '@models/api.types';
 import { AppToastService } from '@services/common/app-toast.service';
 import { UiBlockService } from '@services/common/ui-block.service';
 import {
-  ORDER_PAYMENT_TYPE_OPTIONS,
-  OrderDetailDto,
-  OrderDocumentCategory,
-  OrderDocumentTypeOptionDto,
-  OrderPaymentDto,
-  OrderPaymentType,
-  OrderPaymentTypeOption,
-  SaveOrderPaymentRequest
-} from '@services/orders/orders.types';
-import { OrdersService } from '@services/orders/orders.service';
+  IMPORT_PAYMENT_TYPE_OPTIONS,
+  ImportDetailDto,
+  ImportDocumentCategory,
+  ImportDocumentTypeOptionDto,
+  ImportPaymentDto,
+  ImportPaymentType,
+  ImportPaymentTypeOption,
+  SaveImportPaymentRequest
+} from '@services/imports/imports.types';
+import { ImportsService } from '@services/imports/imports.service';
 
-interface OrderPaymentsFormModel {
-  type: FormControl<OrderPaymentType | null>;
+interface ImportPaymentsFormModel {
+  type: FormControl<ImportPaymentType | null>;
   amount: FormControl<number | null>;
   paymentDate: FormControl<string>;
   notes: FormControl<string>;
-  orderDocumentTypeId: FormControl<string | null>;
+  importDocumentTypeId: FormControl<string | null>;
 }
 
 @Component({
-  selector: 'app-order-payments',
+  selector: 'app-import-payments',
   imports: [
     ReactiveFormsModule,
     ButtonModule,
@@ -48,42 +48,42 @@ interface OrderPaymentsFormModel {
     TableModule,
     TooltipModule
   ],
-  templateUrl: './order-payments.component.html',
-  styleUrl: './order-payments.component.css'
+  templateUrl: './import-payments.component.html',
+  styleUrl: './import-payments.component.css'
 })
-export class OrderPaymentsComponent {
+export class ImportPaymentsComponent {
   private readonly formBuilder = inject(FormBuilder);
-  private readonly ordersService = inject(OrdersService);
+  private readonly importsService = inject(ImportsService);
   private readonly confirmationService = inject(ConfirmationService);
   private readonly appToastService = inject(AppToastService);
   private readonly uiBlockService = inject(UiBlockService);
 
-  readonly orderId = input.required<string>();
-  readonly order = input.required<OrderDetailDto>();
+  readonly importId = input.required<string>();
+  readonly importItem = input.required<ImportDetailDto>();
 
-  readonly orderChanged = output<OrderDetailDto>();
+  readonly importChanged = output<ImportDetailDto>();
 
   readonly isSavingPayment = signal(false);
   readonly isLoadingDocumentTypeOptions = signal(false);
   readonly deletingPaymentId = signal<string | null>(null);
   readonly selectedDocumentFile = signal<File | null>(null);
-  readonly documentTypeOptions = signal<OrderDocumentTypeOptionDto[]>([]);
-  readonly payments = signal<OrderPaymentDto[]>([]);
-  readonly paymentTypeOptions = signal<OrderPaymentTypeOption[]>(ORDER_PAYMENT_TYPE_OPTIONS);
+  readonly documentTypeOptions = signal<ImportDocumentTypeOptionDto[]>([]);
+  readonly payments = signal<ImportPaymentDto[]>([]);
+  readonly paymentTypeOptions = signal<ImportPaymentTypeOption[]>(IMPORT_PAYMENT_TYPE_OPTIONS);
   readonly totalPaid = computed(() => this.payments().reduce((sum, payment) => sum + payment.amount, 0));
 
-  readonly paymentForm: FormGroup<OrderPaymentsFormModel> = this.formBuilder.group({
-    type: this.formBuilder.control<OrderPaymentType | null>(null, [Validators.required]),
+  readonly paymentForm: FormGroup<ImportPaymentsFormModel> = this.formBuilder.group({
+    type: this.formBuilder.control<ImportPaymentType | null>(null, [Validators.required]),
     amount: this.formBuilder.control<number | null>(null, [Validators.required, Validators.min(0.01)]),
     paymentDate: this.formBuilder.nonNullable.control(this.getTodayDateValue()),
     notes: this.formBuilder.nonNullable.control(''),
-    orderDocumentTypeId: this.formBuilder.control<string | null>({ value: null, disabled: true })
+    importDocumentTypeId: this.formBuilder.control<string | null>({ value: null, disabled: true })
   });
 
   constructor() {
     effect(() => {
-      this.orderId();
-      this.payments.set(this.order().payments);
+      this.importId();
+      this.payments.set(this.importItem().payments);
       this.resetPaymentForm();
       this.loadDocumentTypeOptions();
     });
@@ -95,13 +95,13 @@ export class OrderPaymentsComponent {
 
   onDocumentFileSelected(file: File): void {
     this.selectedDocumentFile.set(file);
-    this.paymentForm.controls.orderDocumentTypeId.updateValueAndValidity();
+    this.paymentForm.controls.importDocumentTypeId.updateValueAndValidity();
   }
 
   onDocumentFileCleared(): void {
     this.selectedDocumentFile.set(null);
-    this.paymentForm.controls.orderDocumentTypeId.setValue(null);
-    this.paymentForm.controls.orderDocumentTypeId.updateValueAndValidity();
+    this.paymentForm.controls.importDocumentTypeId.setValue(null);
+    this.paymentForm.controls.importDocumentTypeId.updateValueAndValidity();
   }
 
   onCancel(): void {
@@ -120,7 +120,7 @@ export class OrderPaymentsComponent {
       return;
     }
 
-    const id = this.orderId();
+    const id = this.importId();
     const request = this.buildSaveRequest();
 
     if (!request) {
@@ -130,7 +130,7 @@ export class OrderPaymentsComponent {
     this.isSavingPayment.set(true);
     this.uiBlockService.block();
 
-    this.ordersService
+    this.importsService
       .savePayment(id, request)
       .pipe(
         finalize(() => {
@@ -150,20 +150,20 @@ export class OrderPaymentsComponent {
       });
   }
 
-  onPaymentDownload(payment: OrderPaymentDto): void {
-    const orderDocumentId = payment.orderDocumentId;
+  onPaymentDownload(payment: ImportPaymentDto): void {
+    const importDocumentId = payment.importDocumentId;
 
-    if (!orderDocumentId) {
+    if (!importDocumentId) {
       return;
     }
 
-    this.ordersService.downloadDocument(orderDocumentId).subscribe({
+    this.importsService.downloadDocument(importDocumentId).subscribe({
       next: (file) => {
         const objectUrl = URL.createObjectURL(file);
         const link = globalThis.document.createElement('a');
 
         link.href = objectUrl;
-        link.download = payment.orderDocumentName?.trim() || 'comprobante';
+        link.download = payment.importDocumentName?.trim() || 'comprobante';
         link.click();
 
         URL.revokeObjectURL(objectUrl);
@@ -174,10 +174,10 @@ export class OrderPaymentsComponent {
     });
   }
 
-  onPaymentDelete(payment: OrderPaymentDto): void {
+  onPaymentDelete(payment: ImportPaymentDto): void {
     this.confirmationService.confirm({
       header: 'Confirmar eliminación',
-      message: `¿Está seguro de eliminar el pago${payment.orderDocumentName ? ` y su comprobante "${payment.orderDocumentName}"` : ''}?`,
+      message: `¿Está seguro de eliminar el pago${payment.importDocumentName ? ` y su comprobante "${payment.importDocumentName}"` : ''}?`,
       icon: 'pi pi-exclamation-triangle',
       acceptLabel: 'Eliminar',
       rejectLabel: 'Cancelar',
@@ -186,7 +186,7 @@ export class OrderPaymentsComponent {
     });
   }
 
-  getFieldError(controlName: keyof OrderPaymentsFormModel): string {
+  getFieldError(controlName: keyof ImportPaymentsFormModel): string {
     const control = this.paymentForm.controls[controlName];
 
     if (!control.touched && !control.dirty) {
@@ -231,8 +231,8 @@ export class OrderPaymentsComponent {
   private loadDocumentTypeOptions(): void {
     this.isLoadingDocumentTypeOptions.set(true);
 
-    this.ordersService
-      .getDocumentTypeOptions(OrderDocumentCategory.Pagos)
+    this.importsService
+      .getDocumentTypeOptions(ImportDocumentCategory.Pagos)
       .pipe(finalize(() => this.isLoadingDocumentTypeOptions.set(false)))
       .subscribe((response) => {
         this.documentTypeOptions.set(response.data ?? []);
@@ -240,26 +240,26 @@ export class OrderPaymentsComponent {
   }
 
   private refreshPayments(id: string): void {
-    this.ordersService.getPayments(id).subscribe((response) => {
+    this.importsService.getPayments(id).subscribe((response) => {
       if (!response.data) {
         return;
       }
 
       this.payments.set(response.data);
-      this.orderChanged.emit({
-        ...this.order(),
+      this.importChanged.emit({
+        ...this.importItem(),
         payments: response.data
       });
     });
   }
 
   private deletePayment(paymentId: string): void {
-    const id = this.orderId();
+    const id = this.importId();
 
     this.deletingPaymentId.set(paymentId);
     this.uiBlockService.block();
 
-    this.ordersService
+    this.importsService
       .deletePayment(paymentId)
       .pipe(
         finalize(() => {
@@ -278,26 +278,26 @@ export class OrderPaymentsComponent {
       });
   }
 
-  private buildSaveRequest(): SaveOrderPaymentRequest | null {
+  private buildSaveRequest(): SaveImportPaymentRequest | null {
     const formValue = this.paymentForm.getRawValue();
 
     if (formValue.type === null || formValue.amount === null) {
       return null;
     }
 
-    const request: SaveOrderPaymentRequest = {
+    const request: SaveImportPaymentRequest = {
       type: formValue.type,
       amount: formValue.amount,
-      paymentDate: this.toIsoDateTime(formValue.paymentDate),
+      paymentDate: formValue.paymentDate,
       notes: formValue.notes.trim() || undefined
     };
 
     const document = this.selectedDocumentFile();
-    const orderDocumentTypeId = formValue.orderDocumentTypeId;
+    const importDocumentTypeId = formValue.importDocumentTypeId;
 
-    if (document && orderDocumentTypeId) {
+    if (document && importDocumentTypeId) {
       request.document = document;
-      request.orderDocumentTypeId = orderDocumentTypeId;
+      request.importDocumentTypeId = importDocumentTypeId;
     }
 
     return request;
@@ -310,14 +310,14 @@ export class OrderPaymentsComponent {
       amount: null,
       paymentDate: this.getTodayDateValue(),
       notes: '',
-      orderDocumentTypeId: null
+      importDocumentTypeId: null
     });
 
     this.clearConditionalValidation();
   }
 
   private applyConditionalValidation(): void {
-    const documentTypeControl = this.paymentForm.controls.orderDocumentTypeId;
+    const documentTypeControl = this.paymentForm.controls.importDocumentTypeId;
 
     if (this.selectedDocumentFile()) {
       documentTypeControl.addValidators(Validators.required);
@@ -329,7 +329,7 @@ export class OrderPaymentsComponent {
   }
 
   private clearConditionalValidation(): void {
-    const documentTypeControl = this.paymentForm.controls.orderDocumentTypeId;
+    const documentTypeControl = this.paymentForm.controls.importDocumentTypeId;
     documentTypeControl.removeValidators(Validators.required);
     documentTypeControl.updateValueAndValidity({ emitEvent: false });
   }
@@ -342,7 +342,7 @@ export class OrderPaymentsComponent {
 
     this.paymentForm.enable({ emitEvent: false });
 
-    const documentTypeControl = this.paymentForm.controls.orderDocumentTypeId;
+    const documentTypeControl = this.paymentForm.controls.importDocumentTypeId;
     const shouldDisableDocumentType = this.isLoadingDocumentTypeOptions() || !this.selectedDocumentFile();
 
     if (shouldDisableDocumentType) {
@@ -360,10 +360,6 @@ export class OrderPaymentsComponent {
     const day = String(today.getDate()).padStart(2, '0');
 
     return `${year}-${month}-${day}`;
-  }
-
-  private toIsoDateTime(value: string): string {
-    return `${value}T00:00:00`;
   }
 
   private isSuccessfulResponse<T>(response: ApiResultOf<T> | ApiResult | null | undefined): response is ApiResult {

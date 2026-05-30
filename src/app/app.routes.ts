@@ -40,19 +40,19 @@ export const routes: Routes = [
         ]
       },
       {
-        path: 'orders',
+        path: 'imports',
         children: [
           {
             path: '',
-            loadComponent: () => import('@pages/orders/list/orders-list.component').then((m) => m.OrdersListComponent)
+            loadComponent: () => import('@pages/imports/list/imports-list.component').then((m) => m.ImportsListComponent)
           },
           {
             path: 'create',
-            loadComponent: () => import('@pages/orders/form/order-form.component').then((m) => m.OrderFormComponent)
+            loadComponent: () => import('@pages/imports/form/import-form.component').then((m) => m.ImportFormComponent)
           },
           {
             path: ':id',
-            loadComponent: () => import('@pages/orders/form/order-form.component').then((m) => m.OrderFormComponent)
+            loadComponent: () => import('@pages/imports/form/import-form.component').then((m) => m.ImportFormComponent)
           }
         ]
       }

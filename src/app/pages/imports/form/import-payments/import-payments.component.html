@@ -54,16 +54,16 @@
 
         <div class="flex flex-col gap-2">
           <label class="font-semibold">Tipo de Documento</label>
-            <p-select
-              inputId="paymentDocumentType"
-              formControlName="orderDocumentTypeId"
-              [options]="documentTypeOptions()"
-              optionLabel="name"
-              optionValue="id"
-              placeholder="Seleccionar"
-            />
-          @if (getFieldError('orderDocumentTypeId')) {
-            <small class="field-error">{{ getFieldError('orderDocumentTypeId') }}</small>
+          <p-select
+            inputId="paymentDocumentType"
+            formControlName="importDocumentTypeId"
+            [options]="documentTypeOptions()"
+            optionLabel="name"
+            optionValue="id"
+            placeholder="Seleccionar"
+          />
+          @if (getFieldError('importDocumentTypeId')) {
+            <small class="field-error">{{ getFieldError('importDocumentTypeId') }}</small>
           }
         </div>
 
@@ -116,14 +116,14 @@
             <td>
               <span class="payment-text-wrap">{{ payment.notes || '-' }}</span>
             </td>
-            <td>{{ payment.orderDocumentType || '-' }}</td>
+            <td>{{ payment.importDocumentType || '-' }}</td>
             <td>
-              <span class="payment-text-wrap">{{ payment.orderDocumentName || '-' }}</span>
+              <span class="payment-text-wrap">{{ payment.importDocumentName || '-' }}</span>
             </td>
             <td>{{ payment.createdByUsername || '-' }}</td>
             <td>
               <div class="payments-table__actions">
-                @if (payment.orderDocumentId) {
+                @if (payment.importDocumentId) {
                   <button
                     type="button"
                     pButton

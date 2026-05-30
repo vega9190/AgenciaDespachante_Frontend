@@ -1,0 +1,153 @@
+<p-confirmdialog />
+<div class="import-form-page flex flex-col gap-12">
+  <div>
+    <div>
+      <h1 class="page-title">{{ pageTitle() }}</h1>
+    </div>
+  </div>
+
+  @if (importItem(); as currentImport) {
+    @let currentTimelineStepIndex = getCurrentTimelineStepIndex(currentImport.statusId);
+
+    <div class="import-summary-grid">
+      <div class="import-summary-card">
+        <div class="import-summary-card__icon import-summary-card__icon--number">
+          <i class="pi pi-hashtag"></i>
+        </div>
+        <div class="import-summary-card__content">
+          <span class="import-summary-card__label">NRO. IMPORTACIÓN</span>
+          <strong class="import-summary-card__value">{{ currentImport.importNumber }}</strong>
+        </div>
+      </div>
+
+      <div class="import-summary-card">
+        <div class="import-summary-card__icon import-summary-card__icon--client">
+          <i class="pi pi-user"></i>
+        </div>
+        <div class="import-summary-card__content">
+          <span class="import-summary-card__label">CLIENTE</span>
+          <strong class="import-summary-card__value">{{ currentImport.clientFullName }}</strong>
+        </div>
+      </div>
+
+      <div class="import-summary-card">
+        <div class="import-summary-card__icon import-summary-card__icon--date">
+          <i class="pi pi-calendar"></i>
+        </div>
+        <div class="import-summary-card__content">
+          <span class="import-summary-card__label">FECHA ALTA</span>
+          <strong class="import-summary-card__value">{{ currentImport.createdUtc | date: 'dd/MM/yyyy' }}</strong>
+        </div>
+      </div>
+
+      <div class="import-summary-card">
+        <div class="import-summary-card__icon import-summary-card__icon--status">
+          <i class="pi pi-briefcase"></i>
+        </div>
+        <div class="import-summary-card__content">
+          <span class="import-summary-card__label">ESTADO</span>
+          <strong class="import-summary-card__value">{{ currentImport.statusName }}</strong>
+        </div>
+      </div>
+    </div>
+
+    <div class="import-timeline-card">
+      <div class="import-timeline">
+        @for (step of importTimelineSteps; track step.statusId; let stepIndex = $index) {
+          <div class="import-timeline__item">
+            <div
+              class="import-timeline__marker"
+              [class.import-timeline__marker--completed]="isCompletedTimelineStep(stepIndex, currentTimelineStepIndex)"
+              [class.import-timeline__marker--current]="isCurrentTimelineStep(stepIndex, currentTimelineStepIndex)"
+            >
+              @if (stepIndex === importTimelineSteps.length - 1) {
+                <i class="pi pi-flag"></i>
+              } @else if (isCompletedTimelineStep(stepIndex, currentTimelineStepIndex)) {
+                <i class="pi pi-check"></i>
+              } @else {
+                <span>{{ stepIndex + 1 }}</span>
+              }
+            </div>
+
+            @if (stepIndex < importTimelineSteps.length - 1) {
+              <div
+                class="import-timeline__connector"
+                [class.import-timeline__connector--completed]="getTimelineConnectorState(stepIndex, currentTimelineStepIndex) === 'completed'"
+              ></div>
+            }
+
+            <span
+              class="import-timeline__label"
+              [class.import-timeline__label--active]="
+                isCompletedTimelineStep(stepIndex, currentTimelineStepIndex) || isCurrentTimelineStep(stepIndex, currentTimelineStepIndex)
+              "
+            >
+              {{ step.label }}
+            </span>
+          </div>
+        }
+      </div>
+    </div>
+
+    <p-tabs class="import-tabs" [value]="activeEditTab()">
+      <p-tablist>
+        <p-tab value="details">
+          <span class="import-tab-label">
+            <i class="pi pi-file-edit"></i>
+            <span>Detalles de la Importación</span>
+          </span>
+        </p-tab>
+        <p-tab value="documents">
+          <span class="import-tab-label">
+            <i class="pi pi-folder-open"></i>
+            <span>Gestión de Documentos</span>
+          </span>
+        </p-tab>
+        <p-tab value="payments">
+          <span class="import-tab-label">
+            <i class="pi pi-wallet"></i>
+            <span>Registro de Pagos</span>
+          </span>
+        </p-tab>
+      </p-tablist>
+
+      <p-tabpanels>
+        <p-tabpanel value="details">
+          <app-import-details
+            [importId]="importId()"
+            [importItem]="importItem()"
+            [containerTypeOptions]="containerTypeOptions"
+            [isLoadingImport]="isLoading()"
+            (importChanged)="onImportChanged($event)"
+          />
+        </p-tabpanel>
+
+        <p-tabpanel value="documents">
+          <app-import-documents
+            [importId]="currentImport.id"
+            [importItem]="currentImport"
+            (importChanged)="onImportChanged($event)"
+          />
+        </p-tabpanel>
+
+        <p-tabpanel value="payments">
+          <app-import-payments
+            [importId]="currentImport.id"
+            [importItem]="currentImport"
+            (importChanged)="onImportChanged($event)"
+          />
+        </p-tabpanel>
+      </p-tabpanels>
+    </p-tabs>
+  }
+
+  @if (!isEditMode()) {
+    <app-import-details
+      [importId]="importId()"
+      [importItem]="importItem()"
+      [containerTypeOptions]="containerTypeOptions"
+      [isLoadingImport]="isLoading()"
+      (importChanged)="onImportChanged($event)"
+    />
+  }
+</div>

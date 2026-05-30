@@ -30,9 +30,9 @@ export class AppMenuComponent {
       routerLink: ['/clients']
     },
     {
-      label: 'Pedidos',
+      label: 'Importaciones',
       icon: 'pi pi-clipboard',
-      routerLink: ['/orders']
+      routerLink: ['/imports']
     }
   ];
 }

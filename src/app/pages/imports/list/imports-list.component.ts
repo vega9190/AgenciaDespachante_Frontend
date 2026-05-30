@@ -14,11 +14,11 @@ import { TagModule } from 'primeng/tag';
 
 import { ClientsService } from '@services/clients/clients.service';
 import { ClientOptionDto } from '@services/clients/clients.types';
-import { OrderListItemDto, OrdersListQuery, OrderStatusOptionDto } from '@services/orders/orders.types';
-import { OrdersService } from '@services/orders/orders.service';
+import { ImportListItemDto, ImportsListQuery, ImportStatusOptionDto } from '@services/imports/imports.types';
+import { ImportsService } from '@services/imports/imports.service';
 
-interface OrderFiltersForm {
-  orderNumber: FormControl<string>;
+interface ImportFiltersForm {
+  importNumber: FormControl<string>;
   containerNumber: FormControl<string>;
   client: FormControl<ClientOptionDto | null>;
   statusId: FormControl<string | null>;
@@ -30,14 +30,14 @@ interface SelectOption {
 }
 
 @Component({
-  selector: 'app-orders-list',
+  selector: 'app-imports-list',
   imports: [ReactiveFormsModule, DatePipe, CurrencyPipe, AutoCompleteModule, ButtonModule, CardModule, InputTextModule, SelectModule, TableModule, TagModule],
-  templateUrl: './orders-list.component.html',
-  styleUrl: './orders-list.component.css'
+  templateUrl: './imports-list.component.html',
+  styleUrl: './imports-list.component.css'
 })
-export class OrdersListComponent {
+export class ImportsListComponent {
   private readonly formBuilder = inject(FormBuilder);
-  private readonly ordersService = inject(OrdersService);
+  private readonly importsService = inject(ImportsService);
   private readonly clientsService = inject(ClientsService);
   private readonly router = inject(Router);
 
@@ -45,7 +45,7 @@ export class OrdersListComponent {
   readonly isLoading = signal(false);
   readonly isLoadingFilters = signal(false);
   readonly isLoadingClients = signal(false);
-  readonly orders = signal<OrderListItemDto[]>([]);
+  readonly imports = signal<ImportListItemDto[]>([]);
   readonly totalItems = signal(0);
   readonly page = signal(1);
   readonly pageSize = signal(10);
@@ -53,8 +53,8 @@ export class OrdersListComponent {
   readonly clientSuggestions = signal<ClientOptionDto[]>([]);
   readonly statusOptions = signal<SelectOption[]>([{ label: 'Todos', value: null }]);
 
-  readonly filtersForm: FormGroup<OrderFiltersForm> = this.formBuilder.group({
-    orderNumber: this.formBuilder.nonNullable.control(''),
+  readonly filtersForm: FormGroup<ImportFiltersForm> = this.formBuilder.group({
+    importNumber: this.formBuilder.nonNullable.control(''),
     containerNumber: this.formBuilder.nonNullable.control(''),
     client: this.formBuilder.control<ClientOptionDto | null>(null),
     statusId: this.formBuilder.control<string | null>(null)
@@ -62,17 +62,17 @@ export class OrdersListComponent {
 
   constructor() {
     this.loadFilterOptions();
-    this.loadOrders();
+    this.loadImports();
   }
 
   onSearch(): void {
     this.page.set(1);
-    this.loadOrders();
+    this.loadImports();
   }
 
   onClear(): void {
     this.filtersForm.reset({
-      orderNumber: '',
+      importNumber: '',
       containerNumber: '',
       client: null,
       statusId: null
@@ -80,7 +80,7 @@ export class OrdersListComponent {
 
     this.page.set(1);
     this.pageSize.set(10);
-    this.loadOrders();
+    this.loadImports();
   }
 
   onPageChange(event: TableLazyLoadEvent): void {
@@ -89,15 +89,15 @@ export class OrdersListComponent {
 
     this.pageSize.set(rows);
     this.page.set(Math.floor(first / rows) + 1);
-    this.loadOrders();
+    this.loadImports();
   }
 
-  onEdit(order: OrderListItemDto): void {
-    void this.router.navigate(['/orders', order.id]);
+  onEdit(importItem: ImportListItemDto): void {
+    void this.router.navigate(['/imports', importItem.id]);
   }
 
   onCreate(): void {
-    void this.router.navigate(['/orders/create']);
+    void this.router.navigate(['/imports/create']);
   }
 
   onClientSearch(event: AutoCompleteCompleteEvent): void {
@@ -139,7 +139,7 @@ export class OrdersListComponent {
   private loadFilterOptions(): void {
     this.isLoadingFilters.set(true);
 
-    this.ordersService
+    this.importsService
       .getStatusOptions()
       .pipe(finalize(() => this.isLoadingFilters.set(false)))
       .subscribe((response) => {
@@ -147,25 +147,25 @@ export class OrdersListComponent {
       });
   }
 
-  private loadOrders(): void {
+  private loadImports(): void {
     this.isLoading.set(true);
 
-    this.ordersService
+    this.importsService
       .getList(this.buildQuery())
       .pipe(finalize(() => this.isLoading.set(false)))
       .subscribe((response) => {
-        this.orders.set(response.data?.items ?? []);
+        this.imports.set(response.data?.items ?? []);
         this.totalItems.set(response.data?.totalItems ?? 0);
       });
   }
 
-  private buildQuery(): OrdersListQuery {
+  private buildQuery(): ImportsListQuery {
     const formValue = this.filtersForm.getRawValue();
 
     return {
       page: this.page(),
       pageSize: this.pageSize(),
-      orderNumber: formValue.orderNumber,
+      importNumber: formValue.importNumber,
       containerNumber: formValue.containerNumber,
       clientId: formValue.client?.id ?? undefined,
       statusId: formValue.statusId ?? undefined,
@@ -186,7 +186,7 @@ export class OrdersListComponent {
       });
   }
 
-  private mapStatusOptions(options: OrderStatusOptionDto[]): SelectOption[] {
+  private mapStatusOptions(options: ImportStatusOptionDto[]): SelectOption[] {
     return [{ label: 'Todos', value: null }, ...options.map((option) => ({ label: option.name, value: option.id }))];
   }
 

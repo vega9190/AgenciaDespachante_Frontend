@@ -2,13 +2,13 @@ export interface DocumentSectionItem {
   id: string;
   name: string;
   icon: string;
-  orderDocumentTypeId: string;
+  importDocumentTypeId: string;
   sizeLabel: string;
   uploadedAtLabel: string;
 }
 
 export interface DocumentSectionVm {
-  orderDocumentTypeId: string;
+  importDocumentTypeId: string;
   title: string;
   status: number;
   statusLabel: string;

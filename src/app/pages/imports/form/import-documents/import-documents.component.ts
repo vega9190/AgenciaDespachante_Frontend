@@ -14,10 +14,16 @@ import { FileSelectorComponent } from '../../../../common-components/file-select
 import { ApiResult, ApiResultOf } from '@models/api.types';
 import { AppToastService } from '@services/common/app-toast.service';
 import { UiBlockService } from '@services/common/ui-block.service';
-import { OrderDetailDto, OrderDocumentCategory, OrderDocumentDto, OrderDocumentTypeOptionDto, OrderDocumentTypeRequiredDto } from '@services/orders/orders.types';
-import { OrdersService } from '@services/orders/orders.service';
+import {
+  ImportDetailDto,
+  ImportDocumentCategory,
+  ImportDocumentDto,
+  ImportDocumentTypeOptionDto,
+  ImportDocumentTypeRequiredDto
+} from '@services/imports/imports.types';
+import { ImportsService } from '@services/imports/imports.service';
 
-import { DocumentSectionItem, DocumentSectionVm } from '../order-form.types';
+import { DocumentSectionItem, DocumentSectionVm } from '../import-form.types';
 
 const DOCUMENT_STATUS = {
   aprobado: 1,
@@ -26,34 +32,34 @@ const DOCUMENT_STATUS = {
 } as const;
 
 @Component({
-  selector: 'app-order-documents',
+  selector: 'app-import-documents',
   imports: [FormsModule, AccordionModule, ButtonModule, CardModule, SelectModule, TagModule, TooltipModule, FileSelectorComponent],
-  templateUrl: './order-documents.component.html',
-  styleUrl: './order-documents.component.css'
+  templateUrl: './import-documents.component.html',
+  styleUrl: './import-documents.component.css'
 })
-export class OrderDocumentsComponent {
-  private readonly ordersService = inject(OrdersService);
+export class ImportDocumentsComponent {
+  private readonly importsService = inject(ImportsService);
   private readonly confirmationService = inject(ConfirmationService);
   private readonly appToastService = inject(AppToastService);
   private readonly uiBlockService = inject(UiBlockService);
 
-  readonly orderId = input.required<string>();
-  readonly order = input.required<OrderDetailDto>();
+  readonly importId = input.required<string>();
+  readonly importItem = input.required<ImportDetailDto>();
 
-  readonly orderChanged = output<OrderDetailDto>();
+  readonly importChanged = output<ImportDetailDto>();
 
   readonly isLoadingDocumentTypes = signal(false);
   readonly isSavingDocument = signal(false);
-  readonly documentTypeOptions = signal<OrderDocumentTypeOptionDto[]>([]);
-  readonly documents = signal<OrderDocumentDto[]>([]);
-  readonly requiredDocumentTypes = signal<OrderDocumentTypeRequiredDto[]>([]);
+  readonly documentTypeOptions = signal<ImportDocumentTypeOptionDto[]>([]);
+  readonly documents = signal<ImportDocumentDto[]>([]);
+  readonly requiredDocumentTypes = signal<ImportDocumentTypeRequiredDto[]>([]);
   readonly selectedDocumentTypeId = signal<string | null>(null);
   readonly selectedDocumentFile = signal<File | null>(null);
   readonly approveConfirmDocumentTypeId = signal<string | null>(null);
   readonly approvingDocumentTypeId = signal<string | null>(null);
 
   readonly canSaveDocument = computed(
-    () => !!this.orderId() && !!this.selectedDocumentTypeId() && !!this.selectedDocumentFile() && !this.isSavingDocument() && !this.isLoadingDocumentTypes()
+    () => !!this.importId() && !!this.selectedDocumentTypeId() && !!this.selectedDocumentFile() && !this.isSavingDocument() && !this.isLoadingDocumentTypes()
   );
   readonly documentSections = computed<DocumentSectionVm[]>(() => {
     const currentDocuments = this.documents();
@@ -63,12 +69,12 @@ export class OrderDocumentsComponent {
 
     return this.getSortedRequiredDocumentTypes(currentRequiredDocumentTypes).map((required) => {
       const documents = currentDocuments
-        .filter((document) => document.orderDocumentTypeId === required.orderDocumentTypeId)
+        .filter((document) => document.importDocumentTypeId === required.importDocumentTypeId)
         .map((document) => ({
           id: document.id,
           name: document.originalName,
           icon: this.getDocumentFileIcon(document.originalName),
-          orderDocumentTypeId: document.orderDocumentTypeId,
+          importDocumentTypeId: document.importDocumentTypeId,
           sizeLabel: this.getDocumentSizeLabel(document.filesize),
           uploadedAtLabel: this.getDocumentDateLabel(document.createdUtc)
         }));
@@ -78,8 +84,8 @@ export class OrderDocumentsComponent {
       const canApprove = required.status === DOCUMENT_STATUS.enRevision;
 
       return {
-        orderDocumentTypeId: required.orderDocumentTypeId,
-        title: required.orderDocumentTypeName,
+        importDocumentTypeId: required.importDocumentTypeId,
+        title: required.importDocumentTypeName,
         status: required.status,
         statusLabel: this.getDocumentStatusLabel(required.status),
         statusSeverity: this.getDocumentStatusSeverity(required.status),
@@ -92,23 +98,23 @@ export class OrderDocumentsComponent {
         showStatus: required.status !== DOCUMENT_STATUS.faltante || required.isRequired,
         isApproved,
         canApprove,
-        isApproveConfirmOpen: approveConfirmDocumentTypeId === required.orderDocumentTypeId,
-        isApproving: approvingDocumentTypeId === required.orderDocumentTypeId
+        isApproveConfirmOpen: approveConfirmDocumentTypeId === required.importDocumentTypeId,
+        isApproving: approvingDocumentTypeId === required.importDocumentTypeId
       };
     });
   });
   readonly documentSectionActiveValue = computed(() => {
     const sections = this.documentSections();
     const firstEnabledSection = sections.find((section) => !section.isDisabled);
-    return firstEnabledSection?.orderDocumentTypeId ?? sections[0]?.orderDocumentTypeId ?? null;
+    return firstEnabledSection?.importDocumentTypeId ?? sections[0]?.importDocumentTypeId ?? null;
   });
 
   constructor() {
     effect(() => {
-      this.orderId();
-      const currentOrder = this.order();
-      this.documents.set(currentOrder.documents);
-      this.requiredDocumentTypes.set(currentOrder.orderDocumentTypeRequireds);
+      this.importId();
+      const currentImport = this.importItem();
+      this.documents.set(currentImport.documents);
+      this.requiredDocumentTypes.set(currentImport.importDocumentTypeRequireds);
       this.loadDocumentTypeOptions();
       this.resetDocumentForm();
     });
@@ -131,19 +137,19 @@ export class OrderDocumentsComponent {
   }
 
   onDocumentSave(): void {
-    const id = this.orderId();
-    const orderDocumentTypeId = this.selectedDocumentTypeId();
+    const id = this.importId();
+    const importDocumentTypeId = this.selectedDocumentTypeId();
     const file = this.selectedDocumentFile();
 
-    if (!orderDocumentTypeId || !file || this.isSavingDocument()) {
+    if (!importDocumentTypeId || !file || this.isSavingDocument()) {
       return;
     }
 
     this.isSavingDocument.set(true);
     this.uiBlockService.block();
 
-    this.ordersService
-      .saveDocument(id, { orderDocumentTypeId, file })
+    this.importsService
+      .saveDocument(id, { importDocumentTypeId, file })
       .pipe(
         finalize(() => {
           this.isSavingDocument.set(false);
@@ -160,11 +166,11 @@ export class OrderDocumentsComponent {
         this.resetDocumentForm();
 
         if (response.data?.requiredDocumentStatus !== null && response.data?.requiredDocumentStatus !== undefined) {
-          this.updateRequiredDocumentTypeStatus(orderDocumentTypeId, response.data.requiredDocumentStatus);
+          this.updateRequiredDocumentTypeStatus(importDocumentTypeId, response.data.requiredDocumentStatus);
         }
 
         if (response.data?.isStatusUpdated) {
-          this.refreshOrder(id);
+          this.refreshImport(id);
           return;
         }
 
@@ -173,7 +179,7 @@ export class OrderDocumentsComponent {
   }
 
   onDocumentDownload(document: DocumentSectionItem): void {
-    this.ordersService.downloadDocument(document.id).subscribe({
+    this.importsService.downloadDocument(document.id).subscribe({
       next: (file) => {
         const objectUrl = URL.createObjectURL(file);
         const link = globalThis.document.createElement('a');
@@ -191,7 +197,7 @@ export class OrderDocumentsComponent {
   }
 
   onDocumentDelete(document: DocumentSectionItem): void {
-    const id = this.orderId();
+    const id = this.importId();
 
     this.confirmationService.confirm({
       header: 'Confirmar eliminación',
@@ -204,29 +210,29 @@ export class OrderDocumentsComponent {
     });
   }
 
-  onApproveBadgeClick(orderDocumentTypeId: string, canApprove: boolean, event: Event): void {
+  onApproveBadgeClick(importDocumentTypeId: string, canApprove: boolean, event: Event): void {
     event.stopPropagation();
 
     if (!canApprove || this.approvingDocumentTypeId()) {
       return;
     }
 
-    this.approveConfirmDocumentTypeId.update((current) => (current === orderDocumentTypeId ? null : orderDocumentTypeId));
+    this.approveConfirmDocumentTypeId.update((current) => (current === importDocumentTypeId ? null : importDocumentTypeId));
   }
 
-  onApproveConfirmYes(orderDocumentTypeId: string, event: Event): void {
+  onApproveConfirmYes(importDocumentTypeId: string, event: Event): void {
     event.stopPropagation();
 
-    const id = this.orderId();
+    const id = this.importId();
 
     if (this.approvingDocumentTypeId()) {
       return;
     }
 
-    this.approvingDocumentTypeId.set(orderDocumentTypeId);
+    this.approvingDocumentTypeId.set(importDocumentTypeId);
 
-    this.ordersService
-      .approveDocumentType(id, orderDocumentTypeId)
+    this.importsService
+      .approveDocumentType(id, importDocumentTypeId)
       .pipe(
         finalize(() => {
           this.approvingDocumentTypeId.set(null);
@@ -241,11 +247,11 @@ export class OrderDocumentsComponent {
         }
 
         if (response.data?.isStatusUpdated) {
-          this.refreshOrder(id);
+          this.refreshImport(id);
           return;
         }
 
-        this.updateRequiredDocumentTypeStatus(orderDocumentTypeId, DOCUMENT_STATUS.aprobado);
+        this.updateRequiredDocumentTypeStatus(importDocumentTypeId, DOCUMENT_STATUS.aprobado);
       });
   }
 
@@ -255,7 +261,7 @@ export class OrderDocumentsComponent {
   }
 
   trackByDocumentSection(_: number, section: DocumentSectionVm): string {
-    return section.orderDocumentTypeId;
+    return section.importDocumentTypeId;
   }
 
   trackByDocumentItem(_: number, document: DocumentSectionItem): string {
@@ -265,7 +271,7 @@ export class OrderDocumentsComponent {
   private deleteDocument(id: string, document: DocumentSectionItem): void {
     this.uiBlockService.block();
 
-    this.ordersService
+    this.importsService
       .deleteDocument(document.id)
       .pipe(finalize(() => this.uiBlockService.unblock()))
       .subscribe((response) => {
@@ -276,37 +282,37 @@ export class OrderDocumentsComponent {
         }
 
         if (response.data?.requiredDocumentStatus !== null && response.data?.requiredDocumentStatus !== undefined) {
-          this.updateRequiredDocumentTypeStatus(document.orderDocumentTypeId, response.data.requiredDocumentStatus);
+          this.updateRequiredDocumentTypeStatus(document.importDocumentTypeId, response.data.requiredDocumentStatus);
         }
 
         this.refreshDocuments(id);
       });
   }
 
-  private refreshOrder(id: string): void {
-    this.ordersService.getById(id).subscribe((response) => {
+  private refreshImport(id: string): void {
+    this.importsService.getById(id).subscribe((response) => {
       if (!response.data) {
         return;
       }
 
-      this.orderChanged.emit(response.data);
+      this.importChanged.emit(response.data);
       this.loadDocumentTypeOptions();
     });
   }
 
   private refreshDocuments(id: string): void {
-    this.ordersService.getDocuments(id, OrderDocumentCategory.Gestion).subscribe((response) => {
+    this.importsService.getDocuments(id, ImportDocumentCategory.Gestion).subscribe((response) => {
       this.documents.set(response.data ?? []);
     });
   }
 
   private loadDocumentTypeOptions(): void {
-    const id = this.orderId();
+    const id = this.importId();
 
     this.isLoadingDocumentTypes.set(true);
 
-    this.ordersService
-      .getDocumentTypeOptionsByOrderId(id)
+    this.importsService
+      .getDocumentTypeOptionsByImportId(id)
       .pipe(finalize(() => this.isLoadingDocumentTypes.set(false)))
       .subscribe((response) => {
         this.documentTypeOptions.set(response.data ?? []);
@@ -319,10 +325,10 @@ export class OrderDocumentsComponent {
     this.approveConfirmDocumentTypeId.set(null);
   }
 
-  private updateRequiredDocumentTypeStatus(orderDocumentTypeId: string, status: number): void {
+  private updateRequiredDocumentTypeStatus(importDocumentTypeId: string, status: number): void {
     this.requiredDocumentTypes.update((requiredDocumentTypes) =>
       requiredDocumentTypes.map((requiredDocumentType) =>
-        requiredDocumentType.orderDocumentTypeId === orderDocumentTypeId ? { ...requiredDocumentType, status } : requiredDocumentType
+        requiredDocumentType.importDocumentTypeId === importDocumentTypeId ? { ...requiredDocumentType, status } : requiredDocumentType
       )
     );
   }
@@ -393,7 +399,7 @@ export class OrderDocumentsComponent {
     }
   }
 
-  private getSortedRequiredDocumentTypes(requireds: OrderDetailDto['orderDocumentTypeRequireds']): OrderDetailDto['orderDocumentTypeRequireds'] {
+  private getSortedRequiredDocumentTypes(requireds: ImportDetailDto['importDocumentTypeRequireds']): ImportDetailDto['importDocumentTypeRequireds'] {
     const sortBySortOrder = (left: { sortOrder: number }, right: { sortOrder: number }) => left.sortOrder - right.sortOrder;
     const requiredDocuments = requireds.filter((required) => required.isRequired).sort(sortBySortOrder);
     const optionalDocuments = requireds.filter((required) => !required.isRequired).sort(sortBySortOrder);

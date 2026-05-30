@@ -5,29 +5,19 @@
   line-height: 1.2;
 }
 
-.order-tab-label {
+.import-tab-label {
   display: inline-flex;
   align-items: center;
   gap: 0.6rem;
   font-weight: 600;
 }
 
-.order-tab-panel-empty {
-  min-height: 10rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--p-text-secondary-color);
-  font-weight: 600;
-  text-align: center;
-}
-
-.order-summary-grid {
+.import-summary-grid {
   display: grid;
   gap: 1rem;
 }
 
-.order-summary-card {
+.import-summary-card {
   display: flex;
   align-items: center;
   gap: 1rem;
@@ -37,7 +27,7 @@
   padding: 1rem 1.1rem;
 }
 
-.order-summary-card__icon {
+.import-summary-card__icon {
   display: inline-flex;
   width: 3rem;
   height: 3rem;
@@ -47,67 +37,59 @@
   font-size: 1.2rem;
 }
 
-.order-summary-card__icon--number {
+.import-summary-card__icon--number {
   background: color-mix(in srgb, var(--p-primary-color) 14%, white);
   color: var(--p-primary-color);
 }
 
-.order-summary-card__icon--date {
+.import-summary-card__icon--date {
   background: color-mix(in srgb, var(--p-primary-color) 20%, white);
   color: var(--p-primary-color);
 }
 
-.order-summary-card__icon--client {
+.import-summary-card__icon--client {
   background: color-mix(in srgb, var(--p-primary-color) 14%, white);
   color: var(--p-primary-color);
 }
 
-.order-summary-card__icon--status {
+.import-summary-card__icon--status {
   background: color-mix(in srgb, var(--p-primary-color) 14%, white);
   color: var(--p-primary-color);
 }
 
-.order-summary-card__content {
+.import-summary-card__content {
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
 }
 
-.order-summary-card__label {
+.import-summary-card__label {
   color: var(--p-text-secondary-color);
   font-size: 0.85rem;
   font-weight: 700;
   letter-spacing: 0.06em;
 }
 
-.order-summary-card__value {
+.import-summary-card__value {
   font-size: 1.35rem;
   font-weight: 500;
   line-height: 1.2;
 }
 
-.order-timeline-card {
+.import-timeline-card {
   border: 1px solid rgb(148 163 184 / 0.25);
   border-radius: 1rem;
   background: rgb(255 255 255 / 0.55);
   padding: 1.25rem;
 }
 
-.order-timeline-card__title {
-  margin-bottom: 1rem;
-  color: var(--p-text-secondary-color);
-  font-size: 0.95rem;
-  font-weight: 700;
-  letter-spacing: 0.05em;
-}
-
-.order-timeline {
+.import-timeline {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 0.75rem;
 }
 
-.order-timeline__item {
+.import-timeline__item {
   position: relative;
   display: flex;
   flex-direction: column;
@@ -116,7 +98,7 @@
   text-align: center;
 }
 
-.order-timeline__marker {
+.import-timeline__marker {
   position: relative;
   z-index: 1;
   display: inline-flex;
@@ -132,20 +114,20 @@
   font-weight: 700;
 }
 
-.order-timeline__marker--completed {
+.import-timeline__marker--completed {
   border-color: var(--p-green-500);
   background: var(--p-green-500);
   color: white;
 }
 
-.order-timeline__marker--current {
+.import-timeline__marker--current {
   border-width: 2px;
   border-color: var(--p-primary-color);
   color: var(--p-primary-color);
   box-shadow: 0 0 0 0.22rem color-mix(in srgb, var(--p-primary-color) 18%, transparent);
 }
 
-.order-timeline__connector {
+.import-timeline__connector {
   position: absolute;
   top: 1.25rem;
   left: calc(50% + 1.5rem);
@@ -154,38 +136,38 @@
   background: var(--p-content-border-color);
 }
 
-.order-timeline__connector--completed {
+.import-timeline__connector--completed {
   background: var(--p-green-500);
 }
 
-.order-timeline__label {
+.import-timeline__label {
   color: var(--p-text-secondary-color);
   font-size: 0.95rem;
   font-weight: 600;
   line-height: 1.2;
 }
 
-.order-timeline__label--active {
+.import-timeline__label--active {
   color: var(--p-text-color);
 }
 
 @media screen and (min-width: 768px) {
-  .order-summary-grid {
+  .import-summary-grid {
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 }
 
 @media screen and (max-width: 767px) {
-  .order-tab-label {
+  .import-tab-label {
     justify-content: center;
   }
 
-  .order-timeline {
+  .import-timeline {
     grid-template-columns: repeat(1, minmax(0, 1fr));
     gap: 1rem;
   }
 
-  .order-timeline__item {
+  .import-timeline__item {
     display: grid;
     grid-template-columns: 2.5rem 1fr;
     align-items: center;
@@ -194,14 +176,14 @@
     text-align: left;
   }
 
-  .order-timeline__connector {
+  .import-timeline__connector {
     top: calc(100% - 0.15rem);
     left: 1.2rem;
     width: 2px;
     height: 1rem;
   }
 
-  .order-timeline__label {
+  .import-timeline__label {
     min-height: 2.5rem;
     display: flex;
     align-items: center;
