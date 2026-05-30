@@ -15,6 +15,7 @@ import { FileSelectorComponent } from '../../../../common-components/file-select
 import { ApiResult, ApiResultOf } from '@models/api.types';
 import { AppToastService } from '@services/common/app-toast.service';
 import { UiBlockService } from '@services/common/ui-block.service';
+import { isReadOnlyImportStatus } from '@services/imports/import-status.constants';
 import {
   IMPORT_PAYMENT_TYPE_OPTIONS,
   ImportDetailDto,
@@ -71,6 +72,7 @@ export class ImportPaymentsComponent {
   readonly payments = signal<ImportPaymentDto[]>([]);
   readonly paymentTypeOptions = signal<ImportPaymentTypeOption[]>(IMPORT_PAYMENT_TYPE_OPTIONS);
   readonly totalPaid = computed(() => this.payments().reduce((sum, payment) => sum + payment.amount, 0));
+  readonly isReadOnly = computed(() => isReadOnlyImportStatus(this.importItem().statusId));
 
   readonly paymentForm: FormGroup<ImportPaymentsFormModel> = this.formBuilder.group({
     type: this.formBuilder.control<ImportPaymentType | null>(null, [Validators.required]),
@@ -97,22 +99,34 @@ export class ImportPaymentsComponent {
   }
 
   onDocumentFileSelected(file: File): void {
+    if (this.isReadOnly()) {
+      return;
+    }
+
     this.selectedDocumentFile.set(file);
     this.paymentForm.controls.importDocumentTypeId.updateValueAndValidity();
   }
 
   onDocumentFileCleared(): void {
+    if (this.isReadOnly()) {
+      return;
+    }
+
     this.selectedDocumentFile.set(null);
     this.paymentForm.controls.importDocumentTypeId.setValue(null);
     this.paymentForm.controls.importDocumentTypeId.updateValueAndValidity();
   }
 
   onCancel(): void {
+    if (this.isReadOnly()) {
+      return;
+    }
+
     this.resetPaymentForm();
   }
 
   onSave(): void {
-    if (this.isSavingPayment()) {
+    if (this.isSavingPayment() || this.isReadOnly()) {
       return;
     }
 
@@ -178,6 +192,10 @@ export class ImportPaymentsComponent {
   }
 
   onPaymentDelete(payment: ImportPaymentDto): void {
+    if (this.isReadOnly()) {
+      return;
+    }
+
     this.confirmationService.confirm({
       header: 'Confirmar eliminación',
       message: `¿Está seguro de eliminar el pago${payment.importDocumentName ? ` y su comprobante "${payment.importDocumentName}"` : ''}?`,
@@ -338,7 +356,7 @@ export class ImportPaymentsComponent {
   }
 
   private syncFormDisabledState(): void {
-    if (this.isSavingPayment()) {
+    if (this.isSavingPayment() || this.isReadOnly()) {
       this.paymentForm.disable({ emitEvent: false });
       return;
     }

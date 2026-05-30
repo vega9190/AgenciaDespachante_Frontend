@@ -92,6 +92,18 @@ export interface ImportLogDto {
   occurredAt: string;
 }
 
+export interface ImportLogListItemDto {
+  userName: string;
+  occurredAt: string;
+  message: string;
+  action: string;
+}
+
+export interface ImportLogsQuery {
+  page?: number;
+  pageSize?: number;
+}
+
 export interface ImportStatusOptionDto {
   id: string;
   name: string;

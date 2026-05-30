@@ -1,3 +1,4 @@
+<p-confirmdialog />
 <div class="imports-page flex flex-col gap-6">
   <div>
     <h1 class="page-title">Gestión de Importaciones</h1>
@@ -60,7 +61,7 @@
 
   <p-card>
     <div class="list-header">
-      <button type="button" pButton label="Nueva" icon="pi pi-plus" styleClass="flat-button" (click)="onCreate()"></button>
+      <button type="button" pButton label="Nuevo" icon="pi pi-plus" styleClass="flat-button" (click)="onCreate()"></button>
     </div>
 
     <p-table
@@ -98,7 +99,7 @@
           <td>{{ importItem.clientFullName }}</td>
           <td>{{ importItem.clientTaxId || '-' }}</td>
           <td>
-            <p-tag [value]="importItem.statusName" [severity]="getStatusSeverity(importItem.statusName)" />
+            <p-tag [value]="importItem.statusName" [severity]="getStatusSeverity(importItem.statusId)" />
           </td>
           <td>{{ importItem.createdUtc | date: 'dd/MM/yyyy' }}</td>
           <td>{{ importItem.totalPaymentsAmount | currency: 'Bs ': 'symbol': '1.2-2' }}</td>
@@ -110,9 +111,27 @@
               text
               rounded
               styleClass="flat-button"
+              [pTooltip]="'Editar'"
+              tooltipPosition="top"
               ariaLabel="Editar importación"
               (click)="onEdit(importItem)"
             ></button>
+            @if (canCancelImport(importItem.statusId)) {
+              <button
+                type="button"
+                pButton
+                icon="pi pi-times-circle"
+                text
+                rounded
+                severity="danger"
+                styleClass="flat-button"
+                [pTooltip]="'Cancelar'"
+                tooltipPosition="top"
+                ariaLabel="Cancelar importación"
+                [disabled]="cancellingImportId() === importItem.id"
+                (click)="onCancelImport(importItem)"
+              ></button>
+            }
           </td>
         </tr>
       </ng-template>

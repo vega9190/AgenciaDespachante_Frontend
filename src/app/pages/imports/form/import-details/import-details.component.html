@@ -54,7 +54,7 @@
       label="Guardar"
       icon="pi pi-save"
       styleClass="flat-button"
-      [disabled]="isLoadingImport() || isSaving()"
+      [disabled]="isLoadingImport() || isSaving() || isReadOnly()"
       (click)="onSubmit()"
     ></button>
   </div>

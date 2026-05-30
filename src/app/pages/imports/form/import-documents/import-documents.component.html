@@ -1,4 +1,3 @@
-<p-card class="order-form-card order-tab-panel-card">
   <div class="documents-layout">
     <section class="documents-panel documents-panel--form">
       <div class="flex items-center justify-between gap-3">
@@ -16,7 +15,7 @@
             optionLabel="name"
             optionValue="id"
             placeholder="Seleccionar"
-            [disabled]="isLoadingDocumentTypes() || isSavingDocument()"
+            [disabled]="isLoadingDocumentTypes() || isSavingDocument() || isReadOnly()"
           />
         </div>
 
@@ -24,7 +23,7 @@
           <label class="font-semibold">Archivo</label>
           <app-file-selector
             [selectedFile]="selectedDocumentFile()"
-            [disabled]="isSavingDocument()"
+            [disabled]="isSavingDocument() || isReadOnly()"
             (fileSelected)="onDocumentFileSelected($event)"
             (fileCleared)="onDocumentFileCleared()"
           />
@@ -44,7 +43,7 @@
           label="Cancelar"
           severity="secondary"
           styleClass="flat-button"
-          [disabled]="isSavingDocument()"
+          [disabled]="isSavingDocument() || isReadOnly()"
           (click)="onDocumentCancel()"
         ></button>
         <button
@@ -137,10 +136,16 @@
                 <div class="flex flex-col">
                   @for (document of section.documents; track trackByDocumentItem($index, document)) {
                     <div class="document-item-row grid grid-cols-1 gap-2 py-4 first:pt-0 last:pb-0 md:grid-cols-[minmax(0,1fr)_auto_auto] md:items-center md:gap-4">
-                      <div class="flex min-w-0 items-center gap-3 font-semibold">
+                      <div class="flex min-w-0 items-center gap-3">
                         <i [class]="document.icon"></i>
-                        <span class="min-w-0 overflow-hidden text-ellipsis whitespace-nowrap">{{ document.name }}</span>
-                      </div>
+                         <button
+                           type="button"
+                           class="min-w-0 overflow-hidden text-ellipsis whitespace-nowrap border-none bg-transparent p-0 text-left font-inherit text-primary cursor-pointer hover:underline"
+                           (click)="onDocumentDownload(document)"
+                         >
+                           {{ document.name }}
+                         </button>
+                       </div>
 
                       <div class="flex items-center justify-between gap-4 whitespace-nowrap text-sm text-color-secondary md:justify-start">
                         <span>{{ document.sizeLabel }}</span>
@@ -159,7 +164,7 @@
                           aria-label="Descargar documento"
                           (click)="onDocumentDownload(document)"
                         ></button>
-                        @if (!section.isApproved) {
+                        @if (!section.isApproved && !isReadOnly()) {
                           <button
                             type="button"
                             pButton
@@ -185,4 +190,3 @@
       }
     </section>
   </div>
-</p-card>

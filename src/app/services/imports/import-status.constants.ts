@@ -34,3 +34,16 @@ export const IMPORT_TIMELINE_STEPS: ImportTimelineStep[] = [
     statusId: IMPORT_STATUS_IDS.finalizado
   }
 ];
+
+export function isCancelledImportStatus(statusId: string | null | undefined): boolean {
+  return statusId?.toLowerCase() === IMPORT_STATUS_IDS.cancelado.toLowerCase();
+}
+
+export function isReadOnlyImportStatus(statusId: string | null | undefined): boolean {
+  const normalizedStatusId = statusId?.toLowerCase();
+
+  return (
+    normalizedStatusId === IMPORT_STATUS_IDS.finalizado.toLowerCase() ||
+    normalizedStatusId === IMPORT_STATUS_IDS.cancelado.toLowerCase()
+  );
+}

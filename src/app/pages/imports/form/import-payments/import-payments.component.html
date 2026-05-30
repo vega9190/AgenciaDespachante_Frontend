@@ -1,4 +1,3 @@
-<p-card class="order-form-card order-tab-panel-card">
   <div class="payments-layout">
     <section class="payments-panel payments-panel--form">
       <div class="flex items-center justify-between gap-3">
@@ -71,7 +70,7 @@
           <label class="font-semibold">Comprobante</label>
           <app-file-selector
             [selectedFile]="selectedDocumentFile()"
-            [disabled]="isSavingPayment()"
+            [disabled]="isSavingPayment() || isReadOnly()"
             (fileSelected)="onDocumentFileSelected($event)"
             (fileCleared)="onDocumentFileCleared()"
           />
@@ -83,8 +82,8 @@
       </div>
 
       <div class="form-actions mt-auto">
-        <button type="button" pButton label="Cancelar" severity="secondary" styleClass="flat-button" [disabled]="isSavingPayment()" (click)="onCancel()"></button>
-        <button type="button" pButton label="Guardar" icon="pi pi-save" styleClass="flat-button" [disabled]="isSavingPayment()" (click)="onSave()"></button>
+        <button type="button" pButton label="Cancelar" severity="secondary" styleClass="flat-button" [disabled]="isSavingPayment() || isReadOnly()" (click)="onCancel()"></button>
+        <button type="button" pButton label="Guardar" icon="pi pi-save" styleClass="flat-button" [disabled]="isSavingPayment() || isReadOnly()" (click)="onSave()"></button>
       </div>
     </section>
 
@@ -117,9 +116,19 @@
               <span class="payment-text-wrap">{{ payment.notes || '-' }}</span>
             </td>
             <td>{{ payment.importDocumentType || '-' }}</td>
-            <td>
-              <span class="payment-text-wrap">{{ payment.importDocumentName || '-' }}</span>
-            </td>
+             <td>
+               @if (payment.importDocumentId && payment.importDocumentName) {
+                 <button
+                   type="button"
+                   class="payment-text-wrap border-none bg-transparent p-0 text-left text-primary cursor-pointer hover:underline"
+                   (click)="onPaymentDownload(payment)"
+                 >
+                   {{ payment.importDocumentName }}
+                 </button>
+               } @else {
+                 <span class="payment-text-wrap">{{ payment.importDocumentName || '-' }}</span>
+               }
+             </td>
             <td>{{ payment.createdByUsername || '-' }}</td>
             <td>
               <div class="payments-table__actions">
@@ -137,18 +146,20 @@
                   ></button>
                 }
 
-                <button
-                  type="button"
-                  pButton
-                  [text]="true"
-                  rounded="true"
-                  icon="pi pi-trash"
-                  [pTooltip]="'Eliminar pago'"
-                  tooltipPosition="top"
-                  aria-label="Eliminar pago"
-                  [disabled]="deletingPaymentId() === payment.id"
-                  (click)="onPaymentDelete(payment)"
-                ></button>
+                @if (!isReadOnly()) {
+                  <button
+                    type="button"
+                    pButton
+                    [text]="true"
+                    rounded="true"
+                    icon="pi pi-trash"
+                    [pTooltip]="'Eliminar pago'"
+                    tooltipPosition="top"
+                    aria-label="Eliminar pago"
+                    [disabled]="deletingPaymentId() === payment.id"
+                    (click)="onPaymentDelete(payment)"
+                  ></button>
+                }
               </div>
             </td>
           </tr>
@@ -162,4 +173,3 @@
       </p-table>
     </section>
   </div>
-</p-card>

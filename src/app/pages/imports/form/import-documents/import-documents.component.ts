@@ -14,6 +14,7 @@ import { FileSelectorComponent } from '../../../../common-components/file-select
 import { ApiResult, ApiResultOf } from '@models/api.types';
 import { AppToastService } from '@services/common/app-toast.service';
 import { UiBlockService } from '@services/common/ui-block.service';
+import { isReadOnlyImportStatus } from '@services/imports/import-status.constants';
 import {
   ImportDetailDto,
   ImportDocumentCategory,
@@ -49,6 +50,7 @@ export class ImportDocumentsComponent {
   readonly documentTypeOptions = input<ImportDocumentTypeOptionDto[]>([]);
 
   readonly importChanged = output<ImportDetailDto>();
+  readonly logsChanged = output<void>();
 
   readonly isSavingDocument = signal(false);
   readonly documents = signal<ImportDocumentDto[]>([]);
@@ -57,9 +59,16 @@ export class ImportDocumentsComponent {
   readonly selectedDocumentFile = signal<File | null>(null);
   readonly approveConfirmDocumentTypeId = signal<string | null>(null);
   readonly approvingDocumentTypeId = signal<string | null>(null);
+  readonly isReadOnly = computed(() => isReadOnlyImportStatus(this.importItem().statusId));
 
   readonly canSaveDocument = computed(
-    () => !!this.importId() && !!this.selectedDocumentTypeId() && !!this.selectedDocumentFile() && !this.isSavingDocument() && !this.isLoadingDocumentTypes()
+    () =>
+      !!this.importId() &&
+      !!this.selectedDocumentTypeId() &&
+      !!this.selectedDocumentFile() &&
+      !this.isSavingDocument() &&
+      !this.isLoadingDocumentTypes() &&
+      !this.isReadOnly()
   );
   readonly documentSections = computed<DocumentSectionVm[]>(() => {
     const currentDocuments = this.documents();
@@ -81,7 +90,7 @@ export class ImportDocumentsComponent {
 
       const documentsCount = documents.length;
       const isApproved = required.status === DOCUMENT_STATUS.aprobado;
-      const canApprove = required.status === DOCUMENT_STATUS.enRevision;
+      const canApprove = required.status === DOCUMENT_STATUS.enRevision && !this.isReadOnly();
 
       return {
         importDocumentTypeId: required.importDocumentTypeId,
@@ -119,18 +128,34 @@ export class ImportDocumentsComponent {
   }
 
   onDocumentTypeChange(documentTypeId: string | null): void {
+    if (this.isReadOnly()) {
+      return;
+    }
+
     this.selectedDocumentTypeId.set(documentTypeId);
   }
 
   onDocumentFileSelected(file: File): void {
+    if (this.isReadOnly()) {
+      return;
+    }
+
     this.selectedDocumentFile.set(file);
   }
 
   onDocumentFileCleared(): void {
+    if (this.isReadOnly()) {
+      return;
+    }
+
     this.selectedDocumentFile.set(null);
   }
 
   onDocumentCancel(): void {
+    if (this.isReadOnly()) {
+      return;
+    }
+
     this.resetDocumentForm();
   }
 
@@ -139,7 +164,7 @@ export class ImportDocumentsComponent {
     const importDocumentTypeId = this.selectedDocumentTypeId();
     const file = this.selectedDocumentFile();
 
-    if (!importDocumentTypeId || !file || this.isSavingDocument()) {
+    if (!importDocumentTypeId || !file || this.isSavingDocument() || this.isReadOnly()) {
       return;
     }
 
@@ -162,6 +187,7 @@ export class ImportDocumentsComponent {
         }
 
         this.resetDocumentForm();
+        this.logsChanged.emit();
 
         if (response.data?.requiredDocumentStatus !== null && response.data?.requiredDocumentStatus !== undefined) {
           this.updateRequiredDocumentTypeStatus(importDocumentTypeId, response.data.requiredDocumentStatus);
@@ -195,6 +221,10 @@ export class ImportDocumentsComponent {
   }
 
   onDocumentDelete(document: DocumentSectionItem): void {
+    if (this.isReadOnly()) {
+      return;
+    }
+
     const id = this.importId();
 
     this.confirmationService.confirm({
@@ -211,7 +241,7 @@ export class ImportDocumentsComponent {
   onApproveBadgeClick(importDocumentTypeId: string, canApprove: boolean, event: Event): void {
     event.stopPropagation();
 
-    if (!canApprove || this.approvingDocumentTypeId()) {
+    if (!canApprove || this.approvingDocumentTypeId() || this.isReadOnly()) {
       return;
     }
 
@@ -283,6 +313,7 @@ export class ImportDocumentsComponent {
           this.updateRequiredDocumentTypeStatus(document.importDocumentTypeId, response.data.requiredDocumentStatus);
         }
 
+        this.logsChanged.emit();
         this.refreshDocuments(id);
       });
   }

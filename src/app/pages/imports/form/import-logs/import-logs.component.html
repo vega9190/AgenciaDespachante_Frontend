@@ -1,0 +1,38 @@
+<p-table
+  [value]="logs()"
+  [lazy]="true"
+  [paginator]="true"
+  [rows]="pageSize()"
+  [first]="first()"
+  [totalRecords]="totalItems()"
+  [rowsPerPageOptions]="pageSizeOptions"
+  [loading]="isLoading()"
+  responsiveLayout="scroll"
+  currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} seguimientos"
+  [showCurrentPageReport]="true"
+  (onLazyLoad)="onPageChange($event)"
+>
+  <ng-template #header>
+    <tr>
+      <th>Mensaje</th>
+      <th>Acción</th>
+      <th>Usuario</th>
+      <th>Fecha</th>
+    </tr>
+  </ng-template>
+
+  <ng-template #body let-log>
+    <tr>
+      <td>{{ log.message }}</td>
+      <td>{{ log.action }}</td>
+      <td>{{ log.userName || '-' }}</td>
+      <td>{{ log.occurredAt | date: 'dd/MM/yy HH:mm' }}</td>
+    </tr>
+  </ng-template>
+
+  <ng-template #emptymessage>
+    <tr>
+      <td colspan="4" class="py-6 text-center text-surface-500">No hay seguimientos registrados.</td>
+    </tr>
+  </ng-template>
+</p-table>

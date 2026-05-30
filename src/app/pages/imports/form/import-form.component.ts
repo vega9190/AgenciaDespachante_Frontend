@@ -4,28 +4,38 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
 import { finalize } from 'rxjs';
 
+import { ConfirmationService } from 'primeng/api';
+import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { Tab, TabList, TabPanel, TabPanels, Tabs } from 'primeng/tabs';
+import { TooltipModule } from 'primeng/tooltip';
 
-import { IMPORT_STATUS_IDS, IMPORT_TIMELINE_STEPS } from '@services/imports/import-status.constants';
+import { AppToastService } from '@services/common/app-toast.service';
+import { UiBlockService } from '@services/common/ui-block.service';
+import { IMPORT_STATUS_IDS, IMPORT_TIMELINE_STEPS, isCancelledImportStatus, isReadOnlyImportStatus } from '@services/imports/import-status.constants';
 import { CONTAINER_TYPE_OPTIONS, ImportDetailDto, ImportDocumentTypeOptionDto } from '@services/imports/imports.types';
 import { ImportsService } from '@services/imports/imports.service';
 import { ImportDetailsComponent } from './import-details/import-details.component';
 import { ImportDocumentsComponent } from './import-documents/import-documents.component';
+import { ImportLogsComponent } from './import-logs/import-logs.component';
 import { ImportPaymentsComponent } from './import-payments/import-payments.component';
 
 @Component({
   selector: 'app-import-form',
-  imports: [DatePipe, CardModule, ConfirmDialogModule, Tabs, TabList, Tab, TabPanels, TabPanel, ImportDetailsComponent, ImportDocumentsComponent, ImportPaymentsComponent],
+  imports: [ButtonModule, DatePipe, CardModule, ConfirmDialogModule, Tabs, TabList, Tab, TabPanels, TabPanel, TooltipModule, ImportDetailsComponent, ImportDocumentsComponent, ImportPaymentsComponent, ImportLogsComponent],
   templateUrl: './import-form.component.html',
   styleUrl: './import-form.component.css'
 })
 export class ImportFormComponent {
   private readonly importsService = inject(ImportsService);
+  private readonly confirmationService = inject(ConfirmationService);
+  private readonly appToastService = inject(AppToastService);
+  private readonly uiBlockService = inject(UiBlockService);
   private readonly route = inject(ActivatedRoute);
 
   readonly isLoading = signal(false);
+  readonly isUpdatingStatus = signal(false);
   readonly importItem = signal<ImportDetailDto | null>(null);
   readonly importId = signal<string | null>(null);
   readonly isLoadingDocumentTypes = signal(false);
@@ -33,7 +43,10 @@ export class ImportFormComponent {
   readonly containerTypeOptions = CONTAINER_TYPE_OPTIONS;
   readonly importTimelineSteps = IMPORT_TIMELINE_STEPS;
   readonly activeEditTab = signal('details');
+  readonly logsRefreshVersion = signal(0);
   readonly isEditMode = computed(() => this.importId() !== null);
+  readonly isReadOnly = computed(() => isReadOnlyImportStatus(this.importItem()?.statusId));
+  readonly canCancelImport = computed(() => !!this.importItem() && !this.isReadOnly() && !this.isUpdatingStatus());
   readonly pageTitle = computed(() => {
     if (!this.isEditMode()) {
       return 'Crear Importación';
@@ -66,7 +79,7 @@ export class ImportFormComponent {
 
     const normalizedStatusId = currentImport.statusId?.toLowerCase();
 
-    if (!normalizedStatusId || normalizedStatusId === IMPORT_STATUS_IDS.finalizado.toLowerCase() || this.isCancelledStatus(normalizedStatusId)) {
+    if (!normalizedStatusId || normalizedStatusId === IMPORT_STATUS_IDS.finalizado.toLowerCase() || isCancelledImportStatus(normalizedStatusId)) {
       return null;
     }
 
@@ -101,11 +114,16 @@ export class ImportFormComponent {
 
   onImportChanged(importItem: ImportDetailDto): void {
     this.importItem.set(importItem);
+    this.refreshLogs();
     this.loadDocumentTypeOptions(importItem.id);
   }
 
+  refreshLogs(): void {
+    this.logsRefreshVersion.update((current) => current + 1);
+  }
+
   getCurrentTimelineStepIndex(statusId: string | null | undefined): number {
-    if (!statusId || this.isCancelledStatus(statusId)) {
+    if (!statusId || isCancelledImportStatus(statusId)) {
       return -1;
     }
 
@@ -121,12 +139,36 @@ export class ImportFormComponent {
     return currentStepIndex > -1 && stepIndex === currentStepIndex;
   }
 
+  isFinalizedTimelineStep(stepIndex: number, currentStepIndex: number, statusId: string | null | undefined): boolean {
+    if (!statusId) {
+      return false;
+    }
+
+    return stepIndex === this.importTimelineSteps.length - 1
+      && currentStepIndex === stepIndex
+      && statusId.toLowerCase() === IMPORT_STATUS_IDS.finalizado.toLowerCase();
+  }
+
   getTimelineConnectorState(stepIndex: number, currentStepIndex: number): 'completed' | 'pending' {
     return currentStepIndex > stepIndex ? 'completed' : 'pending';
   }
 
-  private isCancelledStatus(statusId: string): boolean {
-    return statusId.toLowerCase() === IMPORT_STATUS_IDS.cancelado.toLowerCase();
+  onCancelImport(): void {
+    const currentImport = this.importItem();
+
+    if (!currentImport || !this.canCancelImport()) {
+      return;
+    }
+
+    this.confirmationService.confirm({
+      header: 'Cancelar importación',
+      message: '¿Está seguro de cancelar la importación?',
+      icon: 'pi pi-exclamation-triangle',
+      acceptLabel: 'Sí, cancelar',
+      rejectLabel: 'No',
+      acceptButtonStyleClass: 'p-button-danger',
+      accept: () => this.cancelImport(currentImport.id)
+    });
   }
 
   private requiresDocumentApprovalLegend(statusId: string): boolean {
@@ -145,6 +187,30 @@ export class ImportFormComponent {
       .pipe(finalize(() => this.isLoading.set(false)))
       .subscribe((response) => {
         this.importItem.set(response.data ?? null);
+      });
+  }
+
+  private cancelImport(id: string): void {
+    this.isUpdatingStatus.set(true);
+    this.uiBlockService.block();
+
+    this.importsService
+      .updateStatus(id, { statusId: IMPORT_STATUS_IDS.cancelado })
+      .pipe(
+        finalize(() => {
+          this.isUpdatingStatus.set(false);
+          this.uiBlockService.unblock();
+        })
+      )
+      .subscribe((response) => {
+        this.appToastService.showApiMessages(response);
+
+        if (!response?.isValid) {
+          return;
+        }
+
+        this.refreshLogs();
+        this.loadImport(id);
       });
   }
 

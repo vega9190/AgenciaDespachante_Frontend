@@ -5,15 +5,21 @@ import { Router } from '@angular/router';
 import { finalize } from 'rxjs';
 
 import { AutoCompleteCompleteEvent, AutoCompleteModule } from 'primeng/autocomplete';
+import { ConfirmationService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
 import { TableLazyLoadEvent, TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
+import { TooltipModule } from 'primeng/tooltip';
 
 import { ClientsService } from '@services/clients/clients.service';
 import { ClientOptionDto } from '@services/clients/clients.types';
+import { AppToastService } from '@services/common/app-toast.service';
+import { UiBlockService } from '@services/common/ui-block.service';
+import { IMPORT_STATUS_IDS, isReadOnlyImportStatus } from '@services/imports/import-status.constants';
 import { ImportListItemDto, ImportsListQuery, ImportStatusOptionDto } from '@services/imports/imports.types';
 import { ImportsService } from '@services/imports/imports.service';
 
@@ -31,7 +37,7 @@ interface SelectOption {
 
 @Component({
   selector: 'app-imports-list',
-  imports: [ReactiveFormsModule, DatePipe, CurrencyPipe, AutoCompleteModule, ButtonModule, CardModule, InputTextModule, SelectModule, TableModule, TagModule],
+  imports: [ReactiveFormsModule, DatePipe, CurrencyPipe, AutoCompleteModule, ButtonModule, CardModule, ConfirmDialogModule, InputTextModule, SelectModule, TableModule, TagModule, TooltipModule],
   templateUrl: './imports-list.component.html',
   styleUrl: './imports-list.component.css'
 })
@@ -39,6 +45,9 @@ export class ImportsListComponent {
   private readonly formBuilder = inject(FormBuilder);
   private readonly importsService = inject(ImportsService);
   private readonly clientsService = inject(ClientsService);
+  private readonly confirmationService = inject(ConfirmationService);
+  private readonly appToastService = inject(AppToastService);
+  private readonly uiBlockService = inject(UiBlockService);
   private readonly router = inject(Router);
 
   readonly pageSizeOptions = [10, 20, 50];
@@ -52,6 +61,7 @@ export class ImportsListComponent {
   readonly first = computed(() => (this.page() - 1) * this.pageSize());
   readonly clientSuggestions = signal<ClientOptionDto[]>([]);
   readonly statusOptions = signal<SelectOption[]>([{ label: 'Todos', value: null }]);
+  readonly cancellingImportId = signal<string | null>(null);
 
   readonly filtersForm: FormGroup<ImportFiltersForm> = this.formBuilder.group({
     importNumber: this.formBuilder.nonNullable.control(''),
@@ -100,6 +110,22 @@ export class ImportsListComponent {
     void this.router.navigate(['/imports/create']);
   }
 
+  onCancelImport(importItem: ImportListItemDto): void {
+    if (!this.canCancelImport(importItem.statusId)) {
+      return;
+    }
+
+    this.confirmationService.confirm({
+      header: 'Cancelar importación',
+      message: '¿Está seguro de cancelar la importación?',
+      icon: 'pi pi-exclamation-triangle',
+      acceptLabel: 'Sí, cancelar',
+      rejectLabel: 'No',
+      acceptButtonStyleClass: 'p-button-danger',
+      accept: () => this.cancelImport(importItem.id)
+    });
+  }
+
   onClientSearch(event: AutoCompleteCompleteEvent): void {
     const search = typeof event.query === 'string' ? event.query.trim() : '';
 
@@ -114,26 +140,26 @@ export class ImportsListComponent {
     this.loadClientSuggestions();
   }
 
-  getStatusSeverity(statusName: string): 'success' | 'warn' | 'danger' | 'info' | 'secondary' | 'contrast' {
-    const normalizedStatus = statusName.trim().toLowerCase();
+  canCancelImport(statusId: string): boolean {
+    return !isReadOnlyImportStatus(statusId);
+  }
 
-    if (normalizedStatus.includes('entregado') || normalizedStatus.includes('completado') || normalizedStatus.includes('finalizado')) {
+  getStatusSeverity(statusId: string): 'success' | 'warn' | 'danger' | 'info' | 'secondary' | 'contrast' {
+    const normalizedStatusId = statusId.trim().toLowerCase();
+
+    if (normalizedStatusId === IMPORT_STATUS_IDS.finalizado.toLowerCase()) {
       return 'success';
     }
 
-    if (normalizedStatus.includes('proceso') || normalizedStatus.includes('curso') || normalizedStatus.includes('gestion')) {
-      return 'info';
-    }
-
-    if (normalizedStatus.includes('pendiente')) {
-      return 'warn';
-    }
-
-    if (normalizedStatus.includes('cancelado') || normalizedStatus.includes('rechazado')) {
+    if (normalizedStatusId === IMPORT_STATUS_IDS.cancelado.toLowerCase()) {
       return 'danger';
     }
 
-    return 'secondary';
+    if (normalizedStatusId === IMPORT_STATUS_IDS.nuevo.toLowerCase()) {
+      return 'secondary';
+    }
+
+    return 'info';
   }
 
   private loadFilterOptions(): void {
@@ -156,6 +182,29 @@ export class ImportsListComponent {
       .subscribe((response) => {
         this.imports.set(response.data?.items ?? []);
         this.totalItems.set(response.data?.totalItems ?? 0);
+      });
+  }
+
+  private cancelImport(id: string): void {
+    this.cancellingImportId.set(id);
+    this.uiBlockService.block();
+
+    this.importsService
+      .updateStatus(id, { statusId: IMPORT_STATUS_IDS.cancelado })
+      .pipe(
+        finalize(() => {
+          this.cancellingImportId.set(null);
+          this.uiBlockService.unblock();
+        })
+      )
+      .subscribe((response) => {
+        this.appToastService.showApiMessages(response);
+
+        if (!response?.isValid) {
+          return;
+        }
+
+        this.loadImports();
       });
   }
 

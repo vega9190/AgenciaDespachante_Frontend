@@ -41,12 +41,34 @@
       </div>
 
       <div class="import-summary-card">
-        <div class="import-summary-card__icon import-summary-card__icon--status">
-          <i class="pi pi-briefcase"></i>
-        </div>
-        <div class="import-summary-card__content">
-          <span class="import-summary-card__label">ESTADO</span>
-          <strong class="import-summary-card__value">{{ currentImport.statusName }}</strong>
+        <div class="flex items-center justify-between gap-3 w-full">
+          <div class="flex items-center gap-4 min-w-0">
+            <div class="import-summary-card__icon import-summary-card__icon--status">
+              <i class="pi pi-briefcase"></i>
+            </div>
+            <div class="import-summary-card__content">
+              <span class="import-summary-card__label">ESTADO</span>
+              <strong class="import-summary-card__value">{{ currentImport.statusName }}</strong>
+            </div>
+          </div>
+
+          @if (canCancelImport()) {
+            <button
+              type="button"
+              pButton
+              icon="pi pi-times-circle"
+              size="large"
+              text
+              rounded
+              severity="danger"
+              styleClass="flat-button shrink-0"
+              [pTooltip]="'Cancelar Importación'"
+              tooltipPosition="top"
+              ariaLabel="Cancelar importación"
+              [disabled]="isUpdatingStatus()"
+              (click)="onCancelImport()"
+            ></button>
+          }
         </div>
       </div>
     </div>
@@ -59,6 +81,7 @@
               class="import-timeline__marker"
               [class.import-timeline__marker--completed]="isCompletedTimelineStep(stepIndex, currentTimelineStepIndex)"
               [class.import-timeline__marker--current]="isCurrentTimelineStep(stepIndex, currentTimelineStepIndex)"
+              [class.import-timeline__marker--finalized]="isFinalizedTimelineStep(stepIndex, currentTimelineStepIndex, currentImport.statusId)"
             >
               @if (stepIndex === importTimelineSteps.length - 1) {
                 <i class="pi pi-flag"></i>
@@ -78,12 +101,10 @@
 
             <span
               class="import-timeline__label"
-              [class.import-timeline__label--active]="
-                isCompletedTimelineStep(stepIndex, currentTimelineStepIndex) || isCurrentTimelineStep(stepIndex, currentTimelineStepIndex)
-              "
-            >
-              {{ step.label }}
-            </span>
+               [class.import-timeline__label--active]="isCompletedTimelineStep(stepIndex, currentTimelineStepIndex) || isCurrentTimelineStep(stepIndex, currentTimelineStepIndex)"
+             >
+               {{ step.label }}
+             </span>
           </div>
         }
       </div>
@@ -116,6 +137,12 @@
             <span>Registro de Pagos</span>
           </span>
         </p-tab>
+        <p-tab value="logs">
+          <span class="import-tab-label">
+            <i class="pi pi-history"></i>
+            <span>Seguimientos</span>
+          </span>
+        </p-tab>
       </p-tablist>
 
       <p-tabpanels>
@@ -136,6 +163,7 @@
             [isLoadingDocumentTypes]="isLoadingDocumentTypes()"
             [documentTypeOptions]="documentTypeOptions()"
             (importChanged)="onImportChanged($event)"
+            (logsChanged)="refreshLogs()"
           />
         </p-tabpanel>
 
@@ -145,6 +173,10 @@
             [importItem]="currentImport"
             (importChanged)="onImportChanged($event)"
           />
+        </p-tabpanel>
+
+        <p-tabpanel value="logs">
+          <app-import-logs [importId]="currentImport.id" [refreshVersion]="logsRefreshVersion()" />
         </p-tabpanel>
       </p-tabpanels>
     </p-tabs>

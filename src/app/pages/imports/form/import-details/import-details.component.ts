@@ -1,4 +1,4 @@
-import { Component, effect, inject, input, output, signal } from '@angular/core';
+import { Component, computed, effect, inject, input, output, signal } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { finalize } from 'rxjs';
@@ -14,6 +14,7 @@ import { ClientsService } from '@services/clients/clients.service';
 import { ClientOptionDto } from '@services/clients/clients.types';
 import { AppToastService } from '@services/common/app-toast.service';
 import { UiBlockService } from '@services/common/ui-block.service';
+import { isReadOnlyImportStatus } from '@services/imports/import-status.constants';
 import { ContainerTypeOption, CreateImportRequest, ImportDetailDto, UpdateImportRequest } from '@services/imports/imports.types';
 import { ImportsService } from '@services/imports/imports.service';
 
@@ -47,6 +48,7 @@ export class ImportDetailsComponent {
   readonly isSaving = signal(false);
   readonly isLoadingClients = signal(false);
   readonly clientSuggestions = signal<ClientOptionDto[]>([]);
+  readonly isReadOnly = computed(() => isReadOnlyImportStatus(this.importItem()?.statusId));
 
   readonly importForm: FormGroup<ImportDetailsFormModel> = this.formBuilder.group({
     client: this.formBuilder.control<ClientOptionDto | null>(null, [Validators.required]),
@@ -82,9 +84,22 @@ export class ImportDetailsComponent {
         containerType: currentImport.containerType
       });
     });
+
+    effect(() => {
+      if (this.isSaving() || this.isReadOnly()) {
+        this.importForm.disable({ emitEvent: false });
+        return;
+      }
+
+      this.importForm.enable({ emitEvent: false });
+    });
   }
 
   onClientSearch(event: AutoCompleteCompleteEvent): void {
+    if (this.isReadOnly()) {
+      return;
+    }
+
     const search = typeof event.query === 'string' ? event.query.trim() : '';
 
     if (search.length > 0 && search.length < 3) {
@@ -95,6 +110,10 @@ export class ImportDetailsComponent {
   }
 
   onClientDropdownClick(): void {
+    if (this.isReadOnly()) {
+      return;
+    }
+
     this.loadClientSuggestions();
   }
 
@@ -103,7 +122,7 @@ export class ImportDetailsComponent {
   }
 
   onSubmit(): void {
-    if (this.importForm.invalid || this.isSaving()) {
+    if (this.importForm.invalid || this.isSaving() || this.isReadOnly()) {
       this.importForm.markAllAsTouched();
       return;
     }

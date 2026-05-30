@@ -12,6 +12,8 @@ import {
   ImportDetailDto,
   ImportDocumentCategory,
   ImportDocumentDto,
+  ImportLogListItemDto,
+  ImportLogsQuery,
   ImportDocumentTypeOptionDto,
   ImportListItemDto,
   ImportPaymentDto,
@@ -41,7 +43,7 @@ export class ImportsService {
   }
 
   updateStatus(id: string, request: UpdateImportStatusRequest) {
-    return this.httpClient.put(`${this.importsUrl}/${id}/status`, request);
+    return this.httpClient.put<ApiResultOf<null>>(`${this.importsUrl}/${id}/status`, request);
   }
 
   getList(query: ImportsListQuery = {}) {
@@ -62,6 +64,12 @@ export class ImportsService {
 
   getPayments(id: string) {
     return this.httpClient.get<ApiResultOf<ImportPaymentDto[]>>(`${this.importsUrl}/${id}/payments`);
+  }
+
+  getLogs(id: string, query: ImportLogsQuery = {}) {
+    return this.httpClient.get<ApiResultOf<PagedResult<ImportLogListItemDto>>>(`${this.importsUrl}/${id}/logs`, {
+      params: buildHttpParams(query)
+    });
   }
 
   getStatusOptions() {
