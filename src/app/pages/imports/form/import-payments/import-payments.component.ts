@@ -83,9 +83,12 @@ export class ImportPaymentsComponent {
   constructor() {
     effect(() => {
       this.importId();
-      this.payments.set(this.importItem().payments);
       this.resetPaymentForm();
       this.loadDocumentTypeOptions();
+    });
+
+    effect(() => {
+      this.payments.set(this.importItem().payments);
     });
 
     effect(() => {

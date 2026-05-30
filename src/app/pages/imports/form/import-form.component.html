@@ -87,6 +87,10 @@
           </div>
         }
       </div>
+
+      @if (timelineLegend(); as legend) {
+        <p class="import-timeline__legend">{{ legend }}</p>
+      }
     </div>
 
     <p-tabs class="import-tabs" [value]="activeEditTab()">
@@ -126,6 +130,8 @@
           <app-import-documents
             [importId]="currentImport.id"
             [importItem]="currentImport"
+            [isLoadingDocumentTypes]="isLoadingDocumentTypes()"
+            [documentTypeOptions]="documentTypeOptions()"
             (importChanged)="onImportChanged($event)"
           />
         </p-tabpanel>

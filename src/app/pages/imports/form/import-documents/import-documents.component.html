@@ -32,6 +32,8 @@
 
         @if (isLoadingDocumentTypes()) {
           <div class="form-loading">Cargando tipos de documento...</div>
+        } @else if (documentTypeOptions().length === 0) {
+          <div class="form-loading">No hay tipos de documento disponibles.</div>
         }
       </div>
 

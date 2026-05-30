@@ -89,6 +89,15 @@
   gap: 0.75rem;
 }
 
+.import-timeline__legend {
+  margin: 1rem 0 0;
+  color: color-mix(in srgb, var(--p-primary-color) 75%, var(--p-text-color) 25%);
+  font-size: 0.95rem;
+  font-weight: 500;
+  line-height: 1.4;
+  text-align: center;
+}
+
 .import-timeline__item {
   position: relative;
   display: flex;
@@ -187,5 +196,9 @@
     min-height: 2.5rem;
     display: flex;
     align-items: center;
+  }
+
+  .import-timeline__legend {
+    text-align: left;
   }
 }

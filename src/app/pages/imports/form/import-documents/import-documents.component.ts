@@ -45,12 +45,12 @@ export class ImportDocumentsComponent {
 
   readonly importId = input.required<string>();
   readonly importItem = input.required<ImportDetailDto>();
+  readonly isLoadingDocumentTypes = input(false);
+  readonly documentTypeOptions = input<ImportDocumentTypeOptionDto[]>([]);
 
   readonly importChanged = output<ImportDetailDto>();
 
-  readonly isLoadingDocumentTypes = signal(false);
   readonly isSavingDocument = signal(false);
-  readonly documentTypeOptions = signal<ImportDocumentTypeOptionDto[]>([]);
   readonly documents = signal<ImportDocumentDto[]>([]);
   readonly requiredDocumentTypes = signal<ImportDocumentTypeRequiredDto[]>([]);
   readonly selectedDocumentTypeId = signal<string | null>(null);
@@ -111,11 +111,9 @@ export class ImportDocumentsComponent {
 
   constructor() {
     effect(() => {
-      this.importId();
       const currentImport = this.importItem();
       this.documents.set(currentImport.documents);
       this.requiredDocumentTypes.set(currentImport.importDocumentTypeRequireds);
-      this.loadDocumentTypeOptions();
       this.resetDocumentForm();
     });
   }
@@ -296,7 +294,6 @@ export class ImportDocumentsComponent {
       }
 
       this.importChanged.emit(response.data);
-      this.loadDocumentTypeOptions();
     });
   }
 
@@ -304,19 +301,6 @@ export class ImportDocumentsComponent {
     this.importsService.getDocuments(id, ImportDocumentCategory.Gestion).subscribe((response) => {
       this.documents.set(response.data ?? []);
     });
-  }
-
-  private loadDocumentTypeOptions(): void {
-    const id = this.importId();
-
-    this.isLoadingDocumentTypes.set(true);
-
-    this.importsService
-      .getDocumentTypeOptionsByImportId(id)
-      .pipe(finalize(() => this.isLoadingDocumentTypes.set(false)))
-      .subscribe((response) => {
-        this.documentTypeOptions.set(response.data ?? []);
-      });
   }
 
   private resetDocumentForm(): void {
