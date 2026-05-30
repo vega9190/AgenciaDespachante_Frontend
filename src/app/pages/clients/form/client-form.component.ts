@@ -44,7 +44,14 @@ export class ClientFormComponent {
   readonly client = signal<ClientDetailDto | null>(null);
   readonly clientId = signal<string | null>(null);
   readonly isEditMode = computed(() => this.clientId() !== null);
-  readonly pageTitle = computed(() => (this.isEditMode() ? 'Editar Cliente' : 'Crear Cliente'));
+  readonly pageTitle = computed(() => {
+    if (!this.isEditMode()) {
+      return 'Crear Cliente';
+    }
+
+    const clientNumber = this.client()?.clientNumber;
+    return clientNumber ? `Editar Cliente - #${clientNumber}` : 'Editar Cliente';
+  });
 
   readonly clientForm: FormGroup<ClientFormModel> = this.formBuilder.group({
     companyName: this.formBuilder.nonNullable.control('', [Validators.required, Validators.maxLength(150)]),

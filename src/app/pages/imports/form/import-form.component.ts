@@ -34,7 +34,14 @@ export class ImportFormComponent {
   readonly importTimelineSteps = IMPORT_TIMELINE_STEPS;
   readonly activeEditTab = signal('details');
   readonly isEditMode = computed(() => this.importId() !== null);
-  readonly pageTitle = computed(() => (this.isEditMode() ? 'Editar Importación' : 'Crear Importación'));
+  readonly pageTitle = computed(() => {
+    if (!this.isEditMode()) {
+      return 'Crear Importación';
+    }
+
+    const importNumber = this.importItem()?.importNumber;
+    return importNumber ? `Editar Importación - #${importNumber}` : 'Editar Importación';
+  });
   readonly requiredTimelineDocumentNames = computed(() => {
     const currentImport = this.importItem();
 
