@@ -63,8 +63,7 @@ export class TariffItemComponent {
         },
         error: () => {
           this.resetResults();
-          this.errorMessage.set('No pudimos clasificar el producto en este momento.');
-          this.appToastService.showServerError('No pudimos clasificar el producto en este momento.');
+          this.errorMessage.set('No pudimos clasificar el producto en este momento.');          
         }
       });
   }

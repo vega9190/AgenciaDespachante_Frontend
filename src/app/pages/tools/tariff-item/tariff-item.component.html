@@ -1,9 +1,12 @@
 <div class="tariff-item-page">
-  <section class="tariff-item-hero">
-    <p-card styleClass="tariff-item-shell">
-      <div class="tariff-item-shell__header">
-        <span class="tariff-item-shell__eyebrow">Partida Arancelaria</span>
-        <h1 class="tariff-item-shell__title">Consulta a nuestro agente a que partida arancelaria puede pertenecer tu item</h1>
+  <div>
+    <h1 class="page-title">Partida Arancelaria</h1>
+  </div>
+
+  <p-card styleClass="tariff-item-shell">
+    <div class="tariff-item-shell__content">
+      <div class="tariff-item-shell__header">        
+        <h2 class="tariff-item-shell__title">Consulta a nuestro agente a qué partida arancelaria puede pertenecer tu item</h2>
         <p class="tariff-item-shell__subtitle">Escribe una descripcion breve del producto para iniciar la consulta desde este buscador.</p>
       </div>
 
@@ -90,8 +93,8 @@
           <span>Intenta con una descripcion mas especifica para mejorar la clasificacion.</span>
         </div>
       }
-    </p-card>
-  </section>
+    </div>
+  </p-card>
 
   @if (isLoading()) {
     <div class="tariff-item-loading-overlay">
