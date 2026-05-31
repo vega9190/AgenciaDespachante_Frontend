@@ -1,3 +1,104 @@
-<div class="p-4">
-  <h1 class="m-0 text-2xl font-semibold">Hola Mundo</h1>
+<div class="tariff-item-page">
+  <section class="tariff-item-hero">
+    <p-card styleClass="tariff-item-shell">
+      <div class="tariff-item-shell__header">
+        <span class="tariff-item-shell__eyebrow">Partida Arancelaria</span>
+        <h1 class="tariff-item-shell__title">Consulta a nuestro agente a que partida arancelaria puede pertenecer tu item</h1>
+        <p class="tariff-item-shell__subtitle">Escribe una descripcion breve del producto para iniciar la consulta desde este buscador.</p>
+      </div>
+
+      <form class="tariff-item-search" (ngSubmit)="submitSearch()">
+        <div class="tariff-item-search__bar">
+          <input
+            type="text"
+            name="tariffItemQuery"
+            pInputText
+            [ngModel]="query()"
+            (ngModelChange)="query.set($event)"
+            [disabled]="isLoading()"
+            placeholder="Describe tu item aqui"
+            class="tariff-item-search__input"
+          />
+
+          <div class="tariff-item-search__actions">
+            @if (query()) {
+              <button
+                type="button"
+                pButton
+                icon="pi pi-times"
+                severity="secondary"
+                [text]="true"
+                rounded="true"
+                [disabled]="isLoading()"
+                aria-label="Limpiar texto"
+                (click)="clearQuery()"
+              ></button>
+            }
+
+            <button
+              type="submit"
+              pButton
+              icon="pi pi-search"
+              rounded="true"
+              aria-label="Buscar partida arancelaria"
+              [disabled]="!canSearch()"
+            ></button>
+          </div>
+        </div>
+      </form>
+
+      @if (errorMessage()) {
+        <div class="tariff-item-feedback tariff-item-feedback--error">
+          <i class="pi pi-exclamation-circle"></i>
+          <span>{{ errorMessage() }}</span>
+        </div>
+      }
+
+      @if (hasResults()) {
+        <div class="tariff-item-results">
+          <div class="tariff-item-results__heading">
+            <span class="tariff-item-results__eyebrow">Sugerencias encontradas</span>
+            <p class="tariff-item-results__summary">
+              Mostrando hasta {{ maxSuggestions }} opciones para
+              <strong>"{{ searchedDescription() }}"</strong>
+            </p>
+          </div>
+
+          <div class="tariff-item-results__list">
+            @for (suggestion of suggestions(); track suggestion.code + suggestion.description) {
+              <article class="tariff-item-result-card">
+                <div class="tariff-item-result-card__grid">
+                  <div class="tariff-item-result-card__main">
+                    <span class="tariff-item-result-card__code">{{ suggestion.code }}</span>
+                    <h2 class="tariff-item-result-card__description">{{ suggestion.description }}</h2>
+                  </div>
+
+                  <div class="tariff-item-result-card__reasoning">
+                    <span class="tariff-item-result-card__reasoning-label">Razonamiento</span>
+                    <p>{{ suggestion.reasoning }}</p>
+                  </div>
+                </div>
+              </article>
+            }
+          </div>
+        </div>
+      }
+
+      @if (showEmptyState()) {
+        <div class="tariff-item-feedback tariff-item-feedback--empty">
+          <strong>No se encontraron sugerencias.</strong>
+          <span>Intenta con una descripcion mas especifica para mejorar la clasificacion.</span>
+        </div>
+      }
+    </p-card>
+  </section>
+
+  @if (isLoading()) {
+    <div class="tariff-item-loading-overlay">
+      <div class="tariff-item-loading-overlay__spinner" aria-hidden="true"></div>
+      <div class="tariff-item-loading-overlay__content">
+        <p>Nuestro agente esta clasificando tu producto. Espera unos segundos, por favor.</p>
+      </div>
+    </div>
+  }
 </div>
