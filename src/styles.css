@@ -210,7 +210,7 @@ body a {
 
 .layout-menu-container {
   flex: 1;
-  overflow: auto;
+  overflow: visible;
   padding: 1rem 0.75rem;
 }
 
@@ -234,8 +234,27 @@ body a {
   transition: background-color var(--set-transition-duration);
 }
 
+.layout-menu-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 3.5rem;
+  height: 3.5rem;
+  margin-bottom: 0.5rem;
+  margin-inline: auto;
+  border: 0;
+  border-radius: 9999px;
+  padding: 0.95rem;
+  background: transparent;
+  color: var(--set-text-color-menu);
+  cursor: pointer;
+  transition: background-color var(--set-transition-duration);
+}
+
 .layout-menu a:hover,
-.layout-menu a.active-route {
+.layout-menu a.active-route,
+.layout-menu-button:hover,
+.layout-menu-button.active-route {
   background: var(--set-p-surface-menu-hover);
 }
 
@@ -250,6 +269,60 @@ body a {
 
 .layout-menuitem-text {
   display: none;
+}
+
+.layout-menu-item {
+  position: relative;
+}
+
+.layout-submenu {
+  position: absolute;
+  top: 0;
+  left: calc(100% + 0.75rem);
+  min-width: 15rem;
+  margin: 0;
+  padding: 0.5rem;
+  list-style: none;
+  border: 1px solid rgb(139 92 246 / 0.12);
+  border-radius: 1rem;
+  background: var(--set-surface-overlay);
+  box-shadow: 0 18px 40px rgb(76 29 149 / 0.14);
+}
+
+.layout-submenu::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -0.75rem;
+  width: 0.75rem;
+}
+
+.layout-submenu-title {
+  padding: 0.75rem 1rem 0.5rem;
+  color: var(--p-text-color);
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.layout-submenu a {
+  justify-content: flex-start;
+  width: auto;
+  height: auto;
+  gap: 0.75rem;
+  margin: 0;
+  border-radius: var(--set-border-radius);
+  padding: 0.85rem 1rem;
+  color: var(--p-text-color);
+}
+
+.layout-submenu .layout-menuitem-text {
+  display: inline;
+}
+
+.layout-submenu .layout-menuitem-icon,
+.layout-submenu .layout-menuitem-icon::before {
+  font-size: 1.1rem;
 }
 
 .layout-content-wrapper {
@@ -362,6 +435,7 @@ body a {
 
   .layout-menu-container {
     padding: 1rem 1.25rem;
+    overflow: auto;
   }
 
   .layout-menu a {
@@ -374,13 +448,48 @@ body a {
     padding: 0.9rem 1rem;
   }
 
+  .layout-menu-button {
+    justify-content: flex-start;
+    width: 100%;
+    height: auto;
+    gap: 0.75rem;
+    margin-inline: 0;
+    border-radius: var(--set-border-radius);
+    padding: 0.9rem 1rem;
+  }
+
   .layout-menu a .layout-menuitem-icon,
-  .layout-menu a .layout-menuitem-icon::before {
+  .layout-menu a .layout-menuitem-icon::before,
+  .layout-menu-button .layout-menuitem-icon,
+  .layout-menu-button .layout-menuitem-icon::before {
     font-size: 1.15rem;
   }
 
   .layout-menuitem-text {
     display: inline;
+  }
+
+  .layout-submenu {
+    position: static;
+    min-width: 0;
+    margin: 0 0 0.5rem;
+    padding: 0 0 0 2.75rem;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .layout-submenu::before {
+    display: none;
+  }
+
+  .layout-submenu-title {
+    padding: 0.75rem 0 0.5rem;
+    color: var(--set-text-color-menu);
+  }
+
+  .layout-submenu a {
+    color: var(--set-text-color-menu);
   }
 
   .layout-content-wrapper {

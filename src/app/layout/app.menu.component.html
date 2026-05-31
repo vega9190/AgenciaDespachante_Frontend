@@ -1,11 +1,39 @@
 <ul class="layout-menu">
   @for (item of menuItems; track item.label) {
-    <li>
-      <a [routerLink]="item.routerLink" routerLinkActive="active-route" [pTooltip]="item.label" tooltipPosition="right"
-        [tooltipDisabled]="!layoutService.isDesktop()">
-        <i [class]="item.icon + ' layout-menuitem-icon'"></i>
-        <span class="layout-menuitem-text">{{ item.label }}</span>
-      </a>
+    <li class="layout-menu-item" (mouseenter)="onParentMouseEnter(item)" (mouseleave)="onParentMouseLeave(item)">
+      @if (item.items?.length) {
+        <button
+          type="button"
+          class="layout-menu-button"
+          [class.active-route]="isExpanded(item) || hasActiveChild(item)"
+          [pTooltip]="layoutService.isDesktop() ? '' : item.label"
+          tooltipPosition="right"
+          [tooltipDisabled]="!layoutService.isDesktop()"
+          (click)="toggleItem(item)">
+          <i [class]="item.icon + ' layout-menuitem-icon'"></i>
+          <span class="layout-menuitem-text">{{ item.label }}</span>
+        </button>
+
+        @if (isExpanded(item)) {
+          <ul class="layout-submenu">
+            <li class="layout-submenu-title">{{ item.label }}</li>
+            @for (child of item.items; track child.label) {
+              <li>
+                <a [routerLink]="child.routerLink" routerLinkActive="active-route" (click)="onChildSelect(item)">
+                  <i [class]="child.icon + ' layout-menuitem-icon'"></i>
+                  <span class="layout-menuitem-text">{{ child.label }}</span>
+                </a>
+              </li>
+            }
+          </ul>
+        }
+      } @else {
+        <a [routerLink]="item.routerLink" routerLinkActive="active-route" [pTooltip]="item.label" tooltipPosition="right"
+          [tooltipDisabled]="!layoutService.isDesktop()">
+          <i [class]="item.icon + ' layout-menuitem-icon'"></i>
+          <span class="layout-menuitem-text">{{ item.label }}</span>
+        </a>
+      }
     </li>
   }
 </ul>

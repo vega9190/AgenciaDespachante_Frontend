@@ -55,6 +55,19 @@ export const routes: Routes = [
             loadComponent: () => import('@pages/imports/form/import-form.component').then((m) => m.ImportFormComponent)
           }
         ]
+      },
+      {
+        path: 'tools',
+        children: [
+          {
+            path: 'generate-dam',
+            loadComponent: () => import('@pages/tools/generate-dam/generate-dam.component').then((m) => m.GenerateDamComponent)
+          },
+          {
+            path: 'tariff-item',
+            loadComponent: () => import('@pages/tools/tariff-item/tariff-item.component').then((m) => m.TariffItemComponent)
+          }
+        ]
       }
     ]
   },
