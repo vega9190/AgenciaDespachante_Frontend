@@ -1,0 +1,327 @@
+<p-dialog
+  [visible]="visible()"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [closable]="true"
+  [dismissableMask]="false"
+  [style]="{ width: 'min(1100px, 96vw)' }"
+  [contentStyle]="{ overflow: 'auto' }"
+  header="Verificar información"
+  styleClass="generate-dam-review-dialog"
+  (onHide)="onHide()"
+>
+  @if (reviewData(); as data) {
+    <div class="review-dialog" (click)="closeArancelPopover()">
+      <div class="review-dialog__stepper">
+        <div class="review-dialog__step" [class.review-dialog__step--active]="currentStep() === 1" [class.review-dialog__step--done]="currentStep() > 1">
+          <span class="review-dialog__step-index">1</span>
+          <span class="review-dialog__step-label">Proveedor</span>
+        </div>
+        <div class="review-dialog__step" [class.review-dialog__step--active]="currentStep() === 2" [class.review-dialog__step--done]="currentStep() > 2">
+          <span class="review-dialog__step-index">2</span>
+          <span class="review-dialog__step-label">Lugares</span>
+        </div>
+        <div class="review-dialog__step" [class.review-dialog__step--active]="currentStep() === 3">
+          <span class="review-dialog__step-index">3</span>
+          <span class="review-dialog__step-label">Items</span>
+        </div>
+      </div>
+
+      @if (currentStep() === 1) {
+        <div class="review-dialog__grid">
+          <div class="review-field review-field--full">
+            <label class="font-semibold">NIT Importador/Consignatario <span class="required-mark">*</span></label>
+            <input pInputText [(ngModel)]="data.proveedor.nitImportadorConsignatario" />
+          </div>
+
+          <div class="review-field review-field--full">
+            <label class="font-semibold">Razón Social <span class="required-mark">*</span></label>
+            <input pInputText [(ngModel)]="data.proveedor.razonSocial" />
+          </div>
+
+          <div class="review-field">
+            <label class="font-semibold">Dirección <span class="required-mark">*</span></label>
+            <input pInputText [(ngModel)]="data.proveedor.calleAvenida" />
+          </div>
+
+          <div class="review-field">
+            <label class="font-semibold">Número <span class="required-mark">*</span></label>
+            <input pInputText [(ngModel)]="data.proveedor.numero" />
+          </div>
+
+          <div class="review-field">
+            <label class="font-semibold">País <span class="required-mark">*</span></label>
+            <p-select
+              [options]="countries()"
+              optionLabel="descripcion"
+              optionValue="codigo"
+              appendTo="body"
+              [filter]="true"
+              [ngModel]="data.proveedor.pais.codigo"
+              (ngModelChange)="data.proveedor.pais = countries().find((item) => item.codigo === $event) ?? { codigo: '', descripcion: '' }"
+            />
+          </div>
+
+          <div class="review-field">
+            <label class="font-semibold">Ciudad <span class="required-mark">*</span></label>
+            <p-select
+              [options]="seaports()"
+              optionLabel="label"
+              optionValue="codigo"
+              appendTo="body"
+              [filter]="true"
+              [ngModel]="data.proveedor.ciudad.codigo"
+              (ngModelChange)="data.proveedor.ciudad = seaports().find((item) => item.codigo === $event) ?? { codigo: '', descripcion: '', label: '' }"
+            />
+          </div>
+
+          <div class="review-field review-field--full">
+            <label class="font-semibold">Teléfono / Fax</label>
+            <input pInputText [(ngModel)]="data.proveedor.telefonoFax" />
+          </div>
+        </div>
+      }
+
+      @if (currentStep() === 2) {
+        <div class="review-dialog__grid">
+          <div class="review-field">
+            <label class="font-semibold">País de Adquisición <span class="required-mark">*</span></label>
+            <p-select
+              [options]="countries()"
+              optionLabel="descripcion"
+              optionValue="codigo"
+              appendTo="body"
+              [filter]="true"
+              [ngModel]="data.paisAdquisicion.codigo"
+              (ngModelChange)="data.paisAdquisicion = countries().find((item) => item.codigo === $event) ?? { codigo: '', descripcion: '' }"
+            />
+          </div>
+
+          <div class="review-field">
+            <label class="font-semibold">País de Procedencia <span class="required-mark">*</span></label>
+            <p-select
+              [options]="countries()"
+              optionLabel="descripcion"
+              optionValue="codigo"
+              appendTo="body"
+              [filter]="true"
+              [ngModel]="data.paisProcedencia.codigo"
+              (ngModelChange)="data.paisProcedencia = countries().find((item) => item.codigo === $event) ?? { codigo: '', descripcion: '' }"
+            />
+          </div>
+
+          <div class="review-field">
+            <label class="font-semibold">País de Exportación <span class="required-mark">*</span></label>
+            <p-select
+              [options]="countries()"
+              optionLabel="descripcion"
+              optionValue="codigo"
+              appendTo="body"
+              [filter]="true"
+              [ngModel]="data.paisExportacion.codigo"
+              (ngModelChange)="data.paisExportacion = countries().find((item) => item.codigo === $event) ?? { codigo: '', descripcion: '' }"
+            />
+          </div>
+
+          <div class="review-field">
+            <label class="font-semibold">País de Tránsito <span class="required-mark">*</span></label>
+            <p-select
+              [options]="countries()"
+              optionLabel="descripcion"
+              optionValue="codigo"
+              appendTo="body"
+              [filter]="true"
+              [ngModel]="data.paisTransito.codigo"
+              (ngModelChange)="data.paisTransito = countries().find((item) => item.codigo === $event) ?? { codigo: '', descripcion: '' }"
+            />
+          </div>
+
+          <div class="review-field review-field--full">
+            <label class="font-semibold">Aduana de Ingreso <span class="required-mark">*</span></label>
+            <p-select
+              [options]="aduanaIngresoOptions()"
+              optionLabel="descripcion"
+              optionValue="codigo"
+              appendTo="body"
+              [filter]="true"
+              [ngModel]="data.aduanaIngreso.codigo"
+              (ngModelChange)="data.aduanaIngreso = aduanaIngresoOptions().find((item) => item.codigo === $event) ?? { codigo: '', descripcion: '' }"
+            />
+          </div>
+        </div>
+      }
+
+      @if (currentStep() === 3) {
+        <div class="review-dialog__items">
+          @for (item of data.items; track trackItem($index); let itemIndex = $index) {
+            <div class="review-item-card">
+              <div class="review-item-card__header">
+                <strong>Item {{ itemIndex + 1 }}</strong>
+              </div>
+
+              <div class="review-dialog__grid">
+                <div class="review-field review-field--full">
+                  <label class="font-semibold">Sub-partida arancelaria <span class="required-mark">*</span></label>
+                  <div class="review-arancel-row">
+                    <p-select
+                      styleClass="review-arancel-select"
+                      [options]="filteredArancelOptions()"
+                      optionLabel="description"
+                      optionValue="cleanCode"
+                      appendTo="body"
+                      [filter]="true"
+                      filterBy="cleanCode,description"
+                      [ngModel]="item.subPartidaArancelariaCodigo"
+                      (onFilter)="onArancelSearch($event.filter)"
+                      (ngModelChange)="onArancelChange(item, $event)"
+                    >
+                      <ng-template #selectedItem let-selectedOption>
+                        @if (selectedOption) {
+                          <div class="review-arancel-option">
+                            <strong class="review-arancel-option__code">{{ selectedOption.cleanCode }}</strong>
+                            <span class="review-arancel-option__description">{{ selectedOption.description }}</span>
+                          </div>
+                        }
+                      </ng-template>
+                      <ng-template let-option #item>
+                        <div class="review-arancel-option">
+                          <strong class="review-arancel-option__code">{{ option.cleanCode }}</strong>
+                          <span class="review-arancel-option__description">{{ option.description }}</span>
+                        </div>
+                      </ng-template>
+                    </p-select>
+
+                    @if (item.arancelSuggestions.length > 0) {
+                      <div class="review-arancel-popover-wrapper" (click)="$event.stopPropagation()">
+                        <button
+                          type="button"
+                          pButton
+                          icon="pi pi-info-circle"
+                          severity="contrast"
+                          [text]="true"
+                          rounded="true"
+                          class="review-arancel-info-button"
+                          pTooltip="Sugerencias"
+                          tooltipPosition="top"
+                          (click)="toggleArancelPopover(itemIndex, $event)"
+                        ></button>
+
+                        @if (isArancelPopoverOpen(itemIndex)) {
+                          <div class="review-arancel-popover">
+                            <p class="review-arancel-popover__title">Sugerencias</p>
+                            <p class="review-arancel-popover__subtitle">Haz click en una opción para asignarla al item.</p>
+
+                            <div class="review-arancel-popover__list">
+                              @for (suggestion of item.arancelSuggestions; track suggestion.cleanCode) {
+                                <button
+                                  type="button"
+                                  class="review-arancel-popover__option"
+                                  [class.review-arancel-popover__option--selected]="suggestion.cleanCode === item.subPartidaArancelariaCodigo"
+                                  (click)="applySuggestedArancel(item, suggestion, $event)"
+                                >
+                                  <div class="review-arancel-popover__option-header">
+                                    <strong>{{ suggestion.cleanCode }}</strong>
+
+                                    @if (suggestion.cleanCode === item.subPartidaArancelariaCodigo) {
+                                      <span class="review-arancel-popover__badge">Seleccionada</span>
+                                    }
+                                  </div>
+
+                                  <span>{{ suggestion.description }}</span>
+                                </button>
+                              }
+                            </div>
+                          </div>
+                        }
+                      </div>
+                    }
+                  </div>
+                </div>
+
+                <div class="review-field">
+                  <label class="font-semibold">Nombre mercancía <span class="required-mark">*</span></label>
+                  <input pInputText [(ngModel)]="item.especifiqueNombreTxt" />
+                </div>
+
+                <div class="review-field">
+                  <label class="font-semibold">Descripción comercial <span class="required-mark">*</span></label>
+                  <input pInputText [(ngModel)]="item.descripcionComercialMercancia" />
+                </div>
+
+                <div class="review-field">
+                  <label class="font-semibold">Modelo</label>
+                  <input pInputText [(ngModel)]="item.modelo" />
+                </div>
+
+                <div class="review-field">
+                  <label class="font-semibold">Clase</label>
+                  <input pInputText [(ngModel)]="item.clase" />
+                </div>
+
+                <div class="review-field">
+                  <label class="font-semibold">Uso <span class="required-mark">*</span></label>
+                  <p-select
+                    [options]="usoOptions()"
+                    optionLabel="descripcion"
+                    optionValue="codigo"
+                    appendTo="body"
+                    [filter]="true"
+                    [ngModel]="item.usoCodigo"
+                    (ngModelChange)="onUsoChange(item, $event)"
+                  />
+                </div>
+
+                <div class="review-field">
+                  <label class="font-semibold">Estado Mercadería</label>
+                  <p-select
+                    [options]="estadoMercaderiaOptions()"
+                    optionLabel="descripcion"
+                    optionValue="codigo"
+                    appendTo="body"
+                    [filter]="true"
+                    [showClear]="true"
+                    [ngModel]="item.estadoCodigo"
+                    (ngModelChange)="onEstadoChange(item, $event)"
+                  />
+                </div>
+
+                @if (item.usoCodigo === '99') {
+                  <div class="review-field review-field--full">
+                    <label class="font-semibold">Especifique <span class="required-mark">*</span></label>
+                    <input pInputText [(ngModel)]="item.usoEspecifique" />
+                  </div>
+                }
+              </div>
+            </div>
+          }
+        </div>
+      }
+
+      <div class="review-dialog__actions">
+        <button type="button" pButton label="Cancelar" severity="secondary" styleClass="flat-button" (click)="onCancel()"></button>
+
+        <div class="review-dialog__actions-right">
+          @if (currentStep() > 1) {
+            <button type="button" pButton label="Anterior" severity="secondary" styleClass="flat-button" (click)="prevStep()"></button>
+          }
+
+          @if (currentStep() < 3) {
+            <button
+              type="button"
+              pButton
+              label="Siguiente"
+              styleClass="flat-button"
+              [disabled]="currentStep() === 1 ? !isStep1Valid() : !isStep2Valid()"
+              (click)="nextStep()"
+            ></button>
+          }
+
+          @if (currentStep() === 3) {
+            <button type="button" pButton label="Generar DAM" styleClass="flat-button" [disabled]="!isReviewValid()" (click)="onConfirm()"></button>
+          }
+        </div>
+      </div>
+    </div>
+  }
+</p-dialog>

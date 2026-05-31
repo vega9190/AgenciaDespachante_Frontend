@@ -1,3 +1,300 @@
-<div class="p-4">
-  <h1 class="m-0 text-2xl font-semibold">Hola Mundo</h1>
+<div class="generate-dam-page flex flex-col gap-12">
+  <div>
+    <h1 class="page-title">{{ pageTitle }}</h1>
+  </div>
+
+  <form class="generate-dam-layout" [formGroup]="generateDamForm" (ngSubmit)="onSubmit()">
+    <div class="generate-dam-main-grid">
+      <div class="generate-dam-column generate-dam-column--left">
+        <p-card class="generate-dam-card">
+          <div class="generate-dam-card__header">
+            <h2>Documentos</h2>
+            <p>Carga la factura y el BOL para procesar la información.</p>
+          </div>
+
+          <div class="generate-dam-form-grid generate-dam-form-grid--single">
+            <div class="flex flex-col gap-2">
+              <label class="font-semibold">Factura <span class="required-mark">*</span></label>
+              <app-file-selector
+                [accept]="fileAccept"
+                [helperText]="fileHelperText"
+                [selectedFile]="facturaFile()?.file ?? null"
+                [disabled]="isSubmitting()"
+                (fileSelected)="onFacturaSelected($event)"
+                (fileCleared)="onFacturaCleared()"
+              />
+              @if (getFieldError('factura')) {
+                <small class="field-error">{{ getFieldError('factura') }}</small>
+              }
+            </div>
+
+            <div class="flex flex-col gap-2">
+              <label class="font-semibold">BOL <span class="required-mark">*</span></label>
+              <app-file-selector
+                [accept]="fileAccept"
+                [helperText]="fileHelperText"
+                [selectedFile]="bolFile()?.file ?? null"
+                [disabled]="isSubmitting()"
+                (fileSelected)="onBolSelected($event)"
+                (fileCleared)="onBolCleared()"
+              />
+              @if (getFieldError('bol')) {
+                <small class="field-error">{{ getFieldError('bol') }}</small>
+              }
+            </div>
+          </div>
+        </p-card>
+
+        <p-card class="generate-dam-card">
+          <div class="generate-dam-card__header">
+            <h2>Datos Generales</h2>
+            <p>Completa los datos necesarios para la declaración.</p>
+          </div>
+
+          <div class="generate-dam-form-grid">
+            <div class="flex flex-col gap-2 generate-dam-field--full">
+              <label for="numeroReferencia" class="font-semibold">Número de Referencia <span class="required-mark">*</span></label>
+              <input id="numeroReferencia" type="text" pInputText formControlName="numeroReferencia" />
+              @if (getFieldError('numeroReferencia')) {
+                <small class="field-error">{{ getFieldError('numeroReferencia') }}</small>
+              }
+            </div>
+
+            <div class="flex flex-col gap-2">
+              <label class="font-semibold">Forma Envío <span class="required-mark">*</span></label>
+              <p-select formControlName="formaEnvio" [options]="formaEnvioOptions" optionLabel="descripcion" optionValue="codigo" placeholder="Seleccionar" appendTo="body" [filter]="true" />
+              @if (getFieldError('formaEnvio')) {
+                <small class="field-error">{{ getFieldError('formaEnvio') }}</small>
+              }
+            </div>
+
+            <div class="flex flex-col gap-2">
+              <label class="font-semibold">Desde Frontera <span class="required-mark">*</span></label>
+              <p-select formControlName="desdeFrontera" [options]="transporteModoOptions" optionLabel="descripcion" optionValue="codigo" placeholder="Seleccionar" appendTo="body" [filter]="true" />
+              @if (getFieldError('desdeFrontera')) {
+                <small class="field-error">{{ getFieldError('desdeFrontera') }}</small>
+              }
+            </div>
+
+            <div class="flex flex-col gap-2">
+              <label class="font-semibold">Hasta Frontera <span class="required-mark">*</span></label>
+              <p-select formControlName="hastaFrontera" [options]="transporteModoOptions" optionLabel="descripcion" optionValue="codigo" placeholder="Seleccionar" appendTo="body" [filter]="true" />
+              @if (getFieldError('hastaFrontera')) {
+                <small class="field-error">{{ getFieldError('hastaFrontera') }}</small>
+              }
+            </div>
+
+            <div class="flex flex-col gap-2">
+              <label class="font-semibold">Destino Régimen Aduanero <span class="required-mark">*</span></label>
+              <p-select formControlName="destinoRegimenAduanero" [options]="destinoRegimenAduaneroOptions" optionLabel="descripcion" optionValue="codigo" placeholder="Seleccionar" appendTo="body" [filter]="true" />
+              @if (getFieldError('destinoRegimenAduanero')) {
+                <small class="field-error">{{ getFieldError('destinoRegimenAduanero') }}</small>
+              }
+            </div>
+
+            <div class="flex flex-col gap-2">
+              <label class="font-semibold">Modalidad Régimen <span class="required-mark">*</span></label>
+              <p-select formControlName="modalidadRegimen" [options]="modalidadRegimenOptions()" optionLabel="descripcion" optionValue="codigo" placeholder="Seleccionar" appendTo="body" [filter]="true" />
+              @if (getFieldError('modalidadRegimen')) {
+                <small class="field-error">{{ getFieldError('modalidadRegimen') }}</small>
+              }
+            </div>
+
+            <div class="flex flex-col gap-2">
+              <label class="font-semibold">Modalidad Despacho <span class="required-mark">*</span></label>
+              <p-select formControlName="modalidadDespacho" [options]="modalidadDespachoOptions()" optionLabel="descripcion" optionValue="codigo" placeholder="Seleccionar" appendTo="body" [filter]="true" />
+              @if (getFieldError('modalidadDespacho')) {
+                <small class="field-error">{{ getFieldError('modalidadDespacho') }}</small>
+              }
+            </div>
+
+            <div class="flex flex-col gap-2">
+              <label class="font-semibold">Destino/Régimen Posterior @if (generateDamForm.controls.destinoRegimenPosterior.enabled) { <span class="required-mark">*</span> }</label>
+              <p-select formControlName="destinoRegimenPosterior" [options]="destinoRegimenPosteriorOptions()" optionLabel="descripcion" optionValue="codigo" placeholder="Seleccionar" appendTo="body" [filter]="true" />
+              @if (getFieldError('destinoRegimenPosterior')) {
+                <small class="field-error">{{ getFieldError('destinoRegimenPosterior') }}</small>
+              }
+            </div>
+
+            <div class="flex flex-col gap-2">
+              <label class="font-semibold">Modalidad Despacho Posterior @if (generateDamForm.controls.modalidadDespachoPosterior.enabled) { <span class="required-mark">*</span> }</label>
+              <p-select formControlName="modalidadDespachoPosterior" [options]="modalidadDespachoPosteriorOptions()" optionLabel="descripcion" optionValue="codigo" placeholder="Seleccionar" appendTo="body" [filter]="true" />
+              @if (getFieldError('modalidadDespachoPosterior')) {
+                <small class="field-error">{{ getFieldError('modalidadDespachoPosterior') }}</small>
+              }
+            </div>
+
+            <div class="flex flex-col gap-2">
+              <label class="font-semibold">Emisión Parte Recepción</label>
+              <p-select formControlName="emisionParteRecepcion" [options]="emisionParteRecepcionOptions" optionLabel="descripcion" optionValue="codigo" placeholder="Seleccionar" appendTo="body" [filter]="true" />
+            </div>
+
+            <div class="flex flex-col gap-2">
+              <label class="font-semibold">Tipo Mercadería</label>
+              <p-select formControlName="tipoMercaderia" [options]="tipoMercaderiaOptions" optionLabel="descripcion" optionValue="codigo" placeholder="Seleccionar" appendTo="body" [filter]="true" />
+            </div>
+
+            <div class="generate-dam-checkboxes generate-dam-field--full">
+              <p-checkbox inputId="cargaConsolidada" binary="true" formControlName="cargaConsolidada" />
+              <label for="cargaConsolidada">Carga Consolidada</label>
+
+              <p-checkbox inputId="vieneZonaFranca" binary="true" formControlName="vieneZonaFranca" />
+              <label for="vieneZonaFranca">Viene de Zona Franca</label>
+            </div>
+          </div>
+        </p-card>
+      </div>
+
+      <div class="generate-dam-column generate-dam-column--right">
+        <p-card class="generate-dam-card">
+          <div class="generate-dam-card__header">
+            <h2>Proveedor</h2>
+            <p>Correo de contacto del proveedor para completar el JSON.</p>
+          </div>
+
+          <div class="generate-dam-form-grid generate-dam-form-grid--single">
+            <div class="flex flex-col gap-2">
+              <label for="correoElectronico" class="font-semibold">Correo Electrónico <span class="required-mark">*</span></label>
+              <input id="correoElectronico" type="email" pInputText formControlName="correoElectronico" />
+              @if (getFieldError('correoElectronico')) {
+                <small class="field-error">{{ getFieldError('correoElectronico') }}</small>
+              }
+            </div>
+          </div>
+        </p-card>
+
+        <p-card class="generate-dam-card">
+          <div class="generate-dam-card__header">
+            <h2>Factura</h2>
+            <p>Configura los datos comerciales que alimentan la transacción.</p>
+          </div>
+
+          <div class="generate-dam-form-grid">
+            <div class="flex flex-col gap-2">
+              <label class="font-semibold">Condición Vendedor <span class="required-mark">*</span></label>
+              <p-select formControlName="condicionVendedor" [options]="condicionVendedorOptions" optionLabel="descripcion" optionValue="codigo" placeholder="Seleccionar" appendTo="body" [filter]="true" />
+              @if (getFieldError('condicionVendedor')) {
+                <small class="field-error">{{ getFieldError('condicionVendedor') }}</small>
+              }
+            </div>
+
+            <div class="flex flex-col gap-2">
+              <label class="font-semibold">Condición Entrega <span class="required-mark">*</span></label>
+              <p-select formControlName="condicionEntrega" [options]="condicionEntregaOptions" optionLabel="descripcion" optionValue="codigo" placeholder="Seleccionar" appendTo="body" [filter]="true" />
+              @if (getFieldError('condicionEntrega')) {
+                <small class="field-error">{{ getFieldError('condicionEntrega') }}</small>
+              }
+            </div>
+
+            <div class="flex flex-col gap-2">
+              <label class="font-semibold">Destino Mercadería <span class="required-mark">*</span></label>
+              <p-select formControlName="destinoMercaderia" [options]="destinoMercaderiaOptions" optionLabel="descripcion" optionValue="codigo" placeholder="Seleccionar" appendTo="body" [filter]="true" />
+              @if (getFieldError('destinoMercaderia')) {
+                <small class="field-error">{{ getFieldError('destinoMercaderia') }}</small>
+              }
+            </div>
+
+            <div class="flex flex-col gap-2">
+              <label class="font-semibold">Forma de Pago <span class="required-mark">*</span></label>
+              <p-select formControlName="formaPago" [options]="formaPagoOptions" optionLabel="descripcion" optionValue="codigo" placeholder="Seleccionar" appendTo="body" [filter]="true" />
+              @if (getFieldError('formaPago')) {
+                <small class="field-error">{{ getFieldError('formaPago') }}</small>
+              }
+            </div>
+
+            <div class="flex flex-col gap-2 generate-dam-field--full">
+              <label class="font-semibold">Medio de Pago <span class="required-mark">*</span></label>
+              <p-select formControlName="medioPago" [options]="medioPagoOptions" optionLabel="descripcion" optionValue="codigo" placeholder="Seleccionar" appendTo="body" [filter]="true" />
+              @if (getFieldError('medioPago')) {
+                <small class="field-error">{{ getFieldError('medioPago') }}</small>
+              }
+            </div>
+          </div>
+        </p-card>
+
+        <p-card class="generate-dam-card">
+          <div class="generate-dam-card__header">
+            <h2>DAM</h2>
+            <p>Datos complementarios para la mercancía.</p>
+          </div>
+
+          <div class="generate-dam-form-grid">
+            <div class="flex flex-col gap-2">
+              <label class="font-semibold">Unidad Comercial <span class="required-mark">*</span></label>
+              <p-select formControlName="unidadComercial" [options]="unidadComercialOptions" optionLabel="descripcion" optionValue="codigo" placeholder="Seleccionar" appendTo="body" [filter]="true" />
+              @if (getFieldError('unidadComercial')) {
+                <small class="field-error">{{ getFieldError('unidadComercial') }}</small>
+              }
+            </div>
+
+            <div class="flex flex-col gap-2">
+              <label class="font-semibold">Embalaje <span class="required-mark">*</span></label>
+              <p-select formControlName="embalaje" [options]="embalajeOptions" optionLabel="descripcion" optionValue="codigo" placeholder="Seleccionar" appendTo="body" [filter]="true" />
+              @if (getFieldError('embalaje')) {
+                <small class="field-error">{{ getFieldError('embalaje') }}</small>
+              }
+            </div>
+
+            <div class="flex flex-col gap-2">
+              <label class="font-semibold">Estado Mercadería <span class="required-mark">*</span></label>
+              <p-select formControlName="estadoMercaderia" [options]="estadoMercaderiaOptions" optionLabel="descripcion" optionValue="codigo" placeholder="Seleccionar" appendTo="body" [filter]="true" />
+              @if (getFieldError('estadoMercaderia')) {
+                <small class="field-error">{{ getFieldError('estadoMercaderia') }}</small>
+              }
+            </div>
+
+            <div class="flex flex-col gap-2">
+              <label class="font-semibold">Uso <span class="required-mark">*</span></label>
+              <p-select formControlName="uso" [options]="usoOptions" optionLabel="descripcion" optionValue="codigo" placeholder="Seleccionar" appendTo="body" [filter]="true" />
+              @if (getFieldError('uso')) {
+                <small class="field-error">{{ getFieldError('uso') }}</small>
+              }
+            </div>
+
+            @if (generateDamForm.controls.uso.value === '99') {
+              <div class="flex flex-col gap-2 generate-dam-field--full">
+                <label for="usoEspecifique" class="font-semibold">Especifique <span class="required-mark">*</span></label>
+                <input id="usoEspecifique" type="text" pInputText [ngModel]="usoEspecifique()" [ngModelOptions]="{ standalone: true }" (ngModelChange)="usoEspecifique.set($event)" />
+                @if (!usoEspecifique().trim()) {
+                  <small class="field-error">Este campo es obligatorio.</small>
+                }
+              </div>
+            }
+          </div>
+        </p-card>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" pButton label="Generar DAM" icon="pi pi-file-export" styleClass="flat-button" [disabled]="!canSubmit()"></button>
+    </div>
+  </form>
+
+  <app-generate-dam-review-dialog
+    [visible]="showReviewDialog()"
+    [reviewData]="reviewData()"
+    [countries]="countries"
+    [seaports]="seaports"
+    [arancelOptions]="arancelOptions"
+    [usoOptions]="usoOptions"
+    [estadoMercaderiaOptions]="estadoMercaderiaOptions"
+    [aduanaIngresoOptions]="aduanaIngresoOptions"
+    (cancelled)="closeReviewDialog()"
+    (confirmed)="confirmReview($event)"
+  />
+
+  @if (isSubmitting()) {
+    <div class="generate-dam-loading-overlay">
+      <div class="generate-dam-loading-overlay__spinner" aria-hidden="true"></div>
+
+      <div class="generate-dam-loading-overlay__content">
+        <p>
+          Nuestro agente está trabajando en obtener la información necesaria.<br />
+          El proceso dura entre <span>1-3 minutos</span>.
+        </p>
+
+        <div class="generate-dam-loading-overlay__timer">{{ timerDisplay }}</div>
+      </div>
+    </div>
+  }
 </div>

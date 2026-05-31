@@ -1,3 +1,175 @@
 :host {
   display: block;
 }
+
+.page-title {
+  margin: 0;
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.generate-dam-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.generate-dam-main-grid {
+  display: grid;
+  gap: 1rem;
+}
+
+.generate-dam-column {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.generate-dam-card {
+  width: 100%;
+}
+
+.generate-dam-card__header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin-bottom: 1.25rem;
+}
+
+.generate-dam-card__header h2 {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+
+.generate-dam-card__header p {
+  margin: 0;
+  color: var(--p-text-secondary-color);
+  line-height: 1.5;
+}
+
+.generate-dam-form-grid {
+  display: grid;
+  gap: 1rem;
+}
+
+.generate-dam-form-grid--single {
+  grid-template-columns: 1fr;
+}
+
+.generate-dam-field--full {
+  grid-column: 1 / -1;
+}
+
+.generate-dam-checkboxes {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.field-error {
+  color: var(--p-red-500);
+}
+
+.required-mark {
+  color: var(--p-red-500);
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}
+
+.generate-dam-loading-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  background: rgb(15 23 42 / 0.65);
+  padding: 1.5rem;
+}
+
+.generate-dam-loading-overlay__spinner {
+  width: 3.5rem;
+  height: 3.5rem;
+  border: 0.35rem solid rgb(255 255 255 / 0.28);
+  border-top-color: white;
+  border-radius: 9999px;
+  animation: generate-dam-spin 0.8s linear infinite;
+}
+
+.generate-dam-loading-overlay__content {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: min(100%, 32rem);
+  border-radius: 1rem;
+  background: white;
+  box-shadow: 0 24px 60px rgb(15 23 42 / 0.24);
+  padding: 1.5rem 2rem;
+  text-align: center;
+}
+
+.generate-dam-loading-overlay__content p {
+  margin: 0;
+  color: var(--p-text-color);
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.6;
+}
+
+.generate-dam-loading-overlay__content span {
+  color: var(--p-primary-color);
+  font-weight: 700;
+}
+
+.generate-dam-loading-overlay__timer {
+  color: var(--p-primary-color);
+  font-size: 2.4rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.14em;
+}
+
+@keyframes generate-dam-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media screen and (min-width: 992px) {
+  .generate-dam-main-grid {
+    grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+    align-items: start;
+  }
+
+  .generate-dam-form-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media screen and (max-width: 767px) {
+  .form-actions {
+    flex-direction: column;
+  }
+
+  .generate-dam-checkboxes {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .generate-dam-loading-overlay__content {
+    padding: 1.25rem;
+  }
+
+  .generate-dam-loading-overlay__timer {
+    font-size: 2rem;
+  }
+}

@@ -97,7 +97,7 @@ export class FileSelectorComponent {
     const hasValidExtension = acceptedExtensions.some((extension) => fileName.endsWith(extension));
 
     if (!hasValidExtension) {
-      return 'Solo se permiten archivos PDF, XLS, XLSX, JPG o PNG.';
+      return `Solo se permiten archivos ${this.formatAcceptedExtensions(acceptedExtensions)}.`;
     }
 
     if (file.size > this.maxFileSizeBytes()) {
@@ -105,5 +105,25 @@ export class FileSelectorComponent {
     }
 
     return '';
+  }
+
+  private formatAcceptedExtensions(acceptedExtensions: string[]): string {
+    const labels = acceptedExtensions
+      .map((extension) => extension.replace(/^\./, '').trim().toUpperCase())
+      .filter((extension, index, allExtensions) => extension.length > 0 && allExtensions.indexOf(extension) === index);
+
+    if (labels.length === 0) {
+      return 'validos';
+    }
+
+    if (labels.length === 1) {
+      return labels[0];
+    }
+
+    if (labels.length === 2) {
+      return `${labels[0]} o ${labels[1]}`;
+    }
+
+    return `${labels.slice(0, -1).join(', ')} o ${labels[labels.length - 1]}`;
   }
 }
