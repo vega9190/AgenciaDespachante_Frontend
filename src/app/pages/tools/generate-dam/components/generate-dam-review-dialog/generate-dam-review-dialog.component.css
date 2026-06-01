@@ -18,20 +18,20 @@
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  border: 1px solid rgb(148 163 184 / 0.2);
+  border: 1px solid var(--tenant-layout-border);
   border-radius: 0.85rem;
   padding: 0.85rem 1rem;
-  background: rgb(255 255 255 / 0.8);
+  background: color-mix(in srgb, var(--tenant-content-background) 88%, white);
 }
 
 .review-dialog__step--active {
-  border-color: color-mix(in srgb, var(--p-primary-color) 40%, white);
-  background: color-mix(in srgb, var(--p-primary-color) 8%, white);
+  border-color: color-mix(in srgb, var(--tenant-secondary) 40%, white);
+  background: color-mix(in srgb, var(--tenant-secondary) 8%, white);
 }
 
 .review-dialog__step--done {
-  border-color: color-mix(in srgb, var(--p-green-500) 40%, white);
-  background: color-mix(in srgb, var(--p-green-500) 8%, white);
+  border-color: color-mix(in srgb, var(--tenant-success-color) 40%, white);
+  background: color-mix(in srgb, var(--tenant-success-surface) 72%, white);
 }
 
 .review-dialog__step-index {
@@ -41,8 +41,8 @@
   align-items: center;
   justify-content: center;
   border-radius: 9999px;
-  background: color-mix(in srgb, var(--p-primary-color) 12%, white);
-  color: var(--p-primary-color);
+  background: color-mix(in srgb, var(--tenant-secondary) 12%, white);
+  color: var(--tenant-secondary);
   font-weight: 700;
 }
 
@@ -78,9 +78,9 @@
 }
 
 .review-item-card {
-  border: 1px solid rgb(148 163 184 / 0.2);
+  border: 1px solid var(--tenant-layout-border);
   border-radius: 1rem;
-  background: rgb(255 255 255 / 0.7);
+  background: color-mix(in srgb, var(--tenant-content-background) 85%, white);
   padding: 1rem;
 }
 
@@ -108,9 +108,9 @@
   width: 2.75rem;
   height: 2.75rem;
   border-radius: 0.85rem;
-  color: var(--p-primary-color);
-  background: color-mix(in srgb, var(--p-primary-color) 10%, white);
-  border: 1px solid color-mix(in srgb, var(--p-primary-color) 25%, white);
+  color: var(--tenant-secondary);
+  background: color-mix(in srgb, var(--tenant-secondary) 10%, white);
+  border: 1px solid color-mix(in srgb, var(--tenant-secondary) 25%, white);
   transition:
     background-color 0.2s ease,
     border-color 0.2s ease,
@@ -119,9 +119,9 @@
 }
 
 .review-arancel-info-button:hover {
-  color: var(--p-primary-color);
-  background: color-mix(in srgb, var(--p-primary-color) 16%, white);
-  border-color: color-mix(in srgb, var(--p-primary-color) 40%, white);
+  color: var(--tenant-secondary);
+  background: color-mix(in srgb, var(--tenant-secondary) 16%, white);
+  border-color: color-mix(in srgb, var(--tenant-secondary) 40%, white);
   transform: translateY(-1px);
 }
 
@@ -135,16 +135,16 @@
   right: 0;
   z-index: 10;
   width: min(24rem, 85vw);
-  border: 1px solid rgb(148 163 184 / 0.2);
+  border: 1px solid var(--tenant-layout-border);
   border-radius: 1rem;
-  background: white;
-  box-shadow: 0 18px 40px rgb(15 23 42 / 0.18);
+  background: var(--tenant-content-background);
+  box-shadow: var(--tenant-overlay-shadow);
   padding: 0.9rem;
 }
 
 .review-arancel-popover__title {
   margin: 0;
-  color: var(--p-primary-color);
+  color: var(--tenant-secondary);
   font-size: 0.8rem;
   font-weight: 700;
   letter-spacing: 0.04em;
@@ -172,22 +172,22 @@
   flex-direction: column;
   gap: 0.35rem;
   width: 100%;
-  border: 1px solid rgb(148 163 184 / 0.2);
+  border: 1px solid var(--tenant-layout-border);
   border-radius: 0.85rem;
-  background: rgb(248 250 252 / 0.85);
+  background: color-mix(in srgb, var(--tenant-content-background) 84%, white);
   padding: 0.75rem;
   text-align: left;
   transition: border-color 0.2s ease, background-color 0.2s ease;
 }
 
 .review-arancel-popover__option:hover {
-  border-color: color-mix(in srgb, var(--p-primary-color) 35%, white);
-  background: color-mix(in srgb, var(--p-primary-color) 6%, white);
+  border-color: color-mix(in srgb, var(--tenant-secondary) 35%, white);
+  background: color-mix(in srgb, var(--tenant-secondary) 6%, white);
 }
 
 .review-arancel-popover__option--selected {
-  border-color: color-mix(in srgb, var(--p-green-500) 45%, white);
-  background: color-mix(in srgb, var(--p-green-500) 8%, white);
+  border-color: color-mix(in srgb, var(--tenant-success-color) 45%, white);
+  background: color-mix(in srgb, var(--tenant-success-surface) 72%, white);
 }
 
 .review-arancel-popover__option-header {
@@ -200,8 +200,8 @@
 .review-arancel-popover__badge {
   flex-shrink: 0;
   border-radius: 9999px;
-  background: color-mix(in srgb, var(--p-green-500) 16%, white);
-  color: var(--p-green-700, var(--p-green-500));
+  background: var(--tenant-success-surface);
+  color: var(--tenant-success-color);
   font-size: 0.7rem;
   font-weight: 700;
   padding: 0.2rem 0.55rem;

@@ -92,15 +92,15 @@
   align-items: center;
   justify-content: center;
   gap: 1.5rem;
-  background: rgb(15 23 42 / 0.65);
+  background: color-mix(in srgb, var(--tenant-layout-background) 65%, transparent);
   padding: 1.5rem;
 }
 
 .generate-dam-loading-overlay__spinner {
   width: 3.5rem;
   height: 3.5rem;
-  border: 0.35rem solid rgb(255 255 255 / 0.28);
-  border-top-color: white;
+  border: 0.35rem solid color-mix(in srgb, var(--tenant-layout-text) 28%, transparent);
+  border-top-color: var(--tenant-layout-text);
   border-radius: 9999px;
   animation: generate-dam-spin 0.8s linear infinite;
 }
@@ -111,8 +111,8 @@
   gap: 1rem;
   width: min(100%, 32rem);
   border-radius: 1rem;
-  background: white;
-  box-shadow: 0 24px 60px rgb(15 23 42 / 0.24);
+  background: var(--tenant-content-background);
+  box-shadow: var(--tenant-overlay-shadow);
   padding: 1.5rem 2rem;
   text-align: center;
 }
@@ -126,12 +126,12 @@
 }
 
 .generate-dam-loading-overlay__content span {
-  color: var(--p-primary-color);
+  color: var(--tenant-secondary);
   font-weight: 700;
 }
 
 .generate-dam-loading-overlay__timer {
-  color: var(--p-primary-color);
+  color: var(--tenant-secondary);
   font-size: 2.4rem;
   font-weight: 700;
   font-variant-numeric: tabular-nums;

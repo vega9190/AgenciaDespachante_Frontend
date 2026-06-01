@@ -10,9 +10,9 @@
 
 .file-selector__dropzone {
   display: flex;
-  border: 1px dashed color-mix(in srgb, var(--p-primary-color) 30%, var(--p-content-border-color));
+  border: 1px dashed color-mix(in srgb, var(--tenant-secondary) 18%, var(--tenant-content-border));
   border-radius: 0.95rem;
-  background: color-mix(in srgb, var(--p-primary-color) 4%, var(--p-surface-0));
+  background: color-mix(in srgb, var(--tenant-secondary) 4%, var(--tenant-content-background));
   padding: 0.75rem;
   transition:
     border-color 0.2s ease,
@@ -21,9 +21,9 @@
 }
 
 .file-selector__dropzone--drag-active {
-  border-color: var(--p-primary-color);
-  background: color-mix(in srgb, var(--p-primary-color) 8%, var(--p-surface-0));
-  box-shadow: 0 0 0 0.2rem color-mix(in srgb, var(--p-primary-color) 12%, transparent);
+  border-color: var(--tenant-secondary);
+  background: color-mix(in srgb, var(--tenant-secondary) 8%, var(--tenant-content-background));
+  box-shadow: 0 0 0 0.2rem color-mix(in srgb, var(--tenant-secondary) 12%, transparent);
 }
 
 .file-selector__dropzone--disabled {
@@ -44,7 +44,7 @@
 }
 
 .file-selector__dropzone-icon {
-  color: var(--p-primary-color);
+  color: var(--tenant-secondary);
   font-size: 1.35rem;
 }
 
@@ -60,9 +60,9 @@
   align-items: center;
   justify-content: space-between;
   gap: 0.75rem;
-  border: 1px solid color-mix(in srgb, var(--p-primary-color) 18%, var(--p-content-border-color));
+  border: 1px solid color-mix(in srgb, var(--tenant-secondary) 14%, var(--tenant-content-border));
   border-radius: 9999px;
-  background: color-mix(in srgb, var(--p-primary-color) 6%, var(--p-surface-0));
+  background: color-mix(in srgb, var(--tenant-secondary) 6%, var(--tenant-content-background));
   padding: 0.35rem 0.5rem 0.35rem 0.75rem;
 }
 
@@ -74,7 +74,7 @@
 }
 
 .file-selector__selected-file-icon {
-  color: var(--p-primary-color);
+  color: var(--tenant-secondary);
 }
 
 .file-selector__selected-file-name {

@@ -118,11 +118,11 @@
             <td>{{ payment.importDocumentType || '-' }}</td>
              <td>
                @if (payment.importDocumentId && payment.importDocumentName) {
-                 <button
-                   type="button"
-                   class="payment-text-wrap border-none bg-transparent p-0 text-left text-primary cursor-pointer hover:underline"
-                   (click)="onPaymentDownload(payment)"
-                 >
+                  <button
+                    type="button"
+                    class="payment-text-wrap payment-download-link border-none bg-transparent p-0 text-left cursor-pointer hover:underline"
+                    (click)="onPaymentDownload(payment)"
+                  >
                    {{ payment.importDocumentName }}
                  </button>
                } @else {

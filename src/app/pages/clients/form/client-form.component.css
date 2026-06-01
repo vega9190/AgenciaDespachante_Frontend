@@ -20,9 +20,9 @@
   display: flex;
   align-items: center;
   gap: 1rem;
-  border: 1px solid rgb(148 163 184 / 0.35);
+  border: 1px solid var(--tenant-layout-border);
   border-radius: 1rem;
-  background: rgb(255 255 255 / 0.55);
+  background: color-mix(in srgb, var(--tenant-content-background) 88%, white);
   padding: 1rem 1.1rem;
 }
 
@@ -37,18 +37,18 @@
 }
 
 .client-summary-card__icon--number {
-  background: color-mix(in srgb, var(--p-primary-color) 14%, white);
-  color: var(--p-primary-color);
+  background: color-mix(in srgb, var(--tenant-secondary) 14%, white);
+  color: var(--tenant-secondary);
 }
 
 .client-summary-card__icon--date {
-  background: color-mix(in srgb, var(--p-primary-color) 20%, white);
-  color: var(--p-primary-color);
+  background: color-mix(in srgb, var(--tenant-secondary) 20%, white);
+  color: var(--tenant-secondary);
 }
 
 .client-summary-card__icon--status {
-  background: color-mix(in srgb, var(--p-primary-color) 14%, white);
-  color: var(--p-primary-color);
+  background: color-mix(in srgb, var(--tenant-secondary) 14%, white);
+  color: var(--tenant-secondary);
 }
 
 .client-summary-card__content {
@@ -79,7 +79,7 @@
 }
 
 .client-summary-card__help {
-  color: #334155;
+  color: var(--p-text-secondary-color);
   font-size: 0.95rem;
 }
 

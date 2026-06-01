@@ -1,16 +1,6 @@
-export interface AssetsConfig {
-  favicon?: string | null;
-  logo?: string | null;
-  styleSheet?: string | null;
-}
-
 export interface ClientConfig {
   key: string;
-  loginTitle: string;
-  loginSubTitle?: string | null;
-  siteTitle?: string;
   theme?: string | null;
-  assetsConfig?: AssetsConfig | null;
 }
 
 export type ColorPalette = {
@@ -30,4 +20,28 @@ export type ColorPalette = {
 export interface Theme {
   palette: ColorPalette;
   primaryShade: keyof ColorPalette;
+  secondaryColor: string;
+  secondaryHoverColor: string;
+  secondaryActiveColor: string;
+  secondaryContrastColor: string;
+  tertiaryColor: string;
+  tertiaryHoverColor: string;
+  tertiaryActiveColor: string;
+  tertiaryContrastColor: string;
+  layoutBackground: string;
+  layoutSurface: string;
+  layoutSurfaceOverlay: string;
+  layoutBorder: string;
+  layoutHighlight: string;
+  layoutText: string;
+  layoutTextMuted: string;
+  contentBackground: string;
+  contentBorder: string;
+  contentShadow: string;
+  overlayShadow: string;
+  overlayBackdrop: string;
+  successColor: string;
+  successSurface: string;
+  dangerColor: string;
+  dangerSurface: string;
 }

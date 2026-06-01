@@ -1,9 +1,61 @@
-import { seedPurplePalette } from './color-palettes.config';
+import { seedPurplePalette, tenant1RedPalette } from './color-palettes.config';
 import { Theme } from '../theming.types';
 
 export const themes: Record<string, Theme> = {
   default: {
     palette: seedPurplePalette,
-    primaryShade: 600
+    primaryShade: 600,
+    secondaryColor: '#6d28d9',
+    secondaryHoverColor: '#5b21b6',
+    secondaryActiveColor: '#4c1d95',
+    secondaryContrastColor: '#ffffff',
+    tertiaryColor: '#ede9fe',
+    tertiaryHoverColor: '#ddd6fe',
+    tertiaryActiveColor: '#c4b5fd',
+    tertiaryContrastColor: '#4c1d95',
+    layoutBackground: '#6d28d9',
+    layoutSurface: 'var(--p-surface-ground)',
+    layoutSurfaceOverlay: 'var(--p-surface-0)',
+    layoutBorder: 'color-mix(in srgb, var(--p-primary-700) 12%, transparent)',
+    layoutHighlight: 'rgb(255 255 255 / 0.14)',
+    layoutText: 'var(--p-surface-0)',
+    layoutTextMuted: 'rgb(255 255 255 / 0.78)',
+    contentBackground: '#ffffff',
+    contentBorder: 'rgb(203 213 225 / 0.82)',
+    contentShadow: '0 18px 40px color-mix(in srgb, var(--p-primary-900) 8%, transparent)',
+    overlayShadow: '0 18px 40px color-mix(in srgb, var(--p-primary-900) 14%, transparent)',
+    overlayBackdrop: 'rgb(15 23 42 / 0.32)',
+    successColor: 'var(--p-green-600, var(--p-green-500))',
+    successSurface: 'color-mix(in srgb, var(--p-green-500) 12%, white)',
+    dangerColor: 'var(--p-red-700, var(--p-red-500))',
+    dangerSurface: 'color-mix(in srgb, var(--p-red-500) 12%, white)'
+  },
+  tenant1: {
+    palette: tenant1RedPalette,
+    primaryShade: 700,
+    secondaryColor: '#dc2626',
+    secondaryHoverColor: '#b91c1c',
+    secondaryActiveColor: '#991b1b',
+    secondaryContrastColor: '#ffffff',
+    tertiaryColor: '#7f1d1d',
+    tertiaryHoverColor: '#6b1111',
+    tertiaryActiveColor: '#570d0d',
+    tertiaryContrastColor: '#ffffff',
+    layoutBackground: '#0f0f0f',
+    layoutSurface: '#121212',
+    layoutSurfaceOverlay: '#ffffff',
+    layoutBorder: 'color-mix(in srgb, #0f0f0f 10%, #d1d5db 90%)',
+    layoutHighlight: 'rgb(255 255 255 / 0.08)',
+    layoutText: '#fafafa',
+    layoutTextMuted: 'rgb(255 255 255 / 0.72)',
+    contentBackground: '#fafafa',
+    contentBorder: 'rgb(209 213 219 / 0.75)',
+    contentShadow: '0 18px 40px color-mix(in srgb, #000000 28%, transparent)',
+    overlayShadow: '0 18px 40px color-mix(in srgb, #000000 40%, transparent)',
+    overlayBackdrop: 'rgb(0 0 0 / 0.65)',
+    successColor: 'var(--p-green-600, var(--p-green-500))',
+    successSurface: 'color-mix(in srgb, var(--p-green-500) 10%, white)',
+    dangerColor: 'var(--p-red-700, var(--p-red-500))',
+    dangerSurface: 'color-mix(in srgb, var(--p-red-500) 14%, white)'
   }
 };

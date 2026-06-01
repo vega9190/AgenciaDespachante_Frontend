@@ -20,6 +20,6 @@ export class ThemeConfigService {
     const config = resolveTenantConfig(hostname);
 
     this.currentConfig.set(config);
-    this.themeApplicator.applyConfiguration(config.key, config.theme, config.assetsConfig, config.siteTitle ?? config.loginTitle);
+    this.themeApplicator.applyConfiguration(config.theme);
   }
 }

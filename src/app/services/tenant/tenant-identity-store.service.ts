@@ -7,8 +7,8 @@ import { TenantIdentityDto } from './tenant-settings.types';
 import { TenantSettingsService } from './tenant-settings.service';
 
 const DEFAULT_TENANT_NAME = 'Transportadora';
-const DEFAULT_LOGO_URL = '/assets/tenants/default/logo.svg';
-const DEFAULT_FAVICON_URL = '/assets/tenants/default/favicon.svg';
+const DEFAULT_LOGO_URL = '/assets/branding/logo.svg';
+const DEFAULT_FAVICON_URL = '/assets/branding/favicon.svg';
 
 @Injectable({
   providedIn: 'root'

@@ -37,7 +37,7 @@ const theme: ThemeType = {
             950: '{slate.950}'
           },
           formField: {
-            hoverBorderColor: '{primary.color}'
+            hoverBorderColor: '{surface.300}'
           }
         },
         dark: {
@@ -56,7 +56,7 @@ const theme: ThemeType = {
             950: '{slate.950}'
           },
           formField: {
-            hoverBorderColor: '{primary.400}'
+            hoverBorderColor: '{surface.500}'
           }
         }
       },

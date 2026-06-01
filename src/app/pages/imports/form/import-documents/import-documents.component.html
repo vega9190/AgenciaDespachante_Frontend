@@ -138,13 +138,14 @@
                     <div class="document-item-row grid grid-cols-1 gap-2 py-4 first:pt-0 last:pb-0 md:grid-cols-[minmax(0,1fr)_auto_auto] md:items-center md:gap-4">
                       <div class="flex min-w-0 items-center gap-3">
                         <i [class]="document.icon"></i>
-                         <button
-                           type="button"
-                           class="min-w-0 overflow-hidden text-ellipsis whitespace-nowrap border-none bg-transparent p-0 text-left font-inherit text-primary cursor-pointer hover:underline"
-                           (click)="onDocumentDownload(document)"
-                         >
-                           {{ document.name }}
-                         </button>
+                          <button
+                            type="button"
+                            class="min-w-0 overflow-hidden text-ellipsis whitespace-nowrap border-none bg-transparent p-0 text-left font-inherit cursor-pointer hover:underline"
+                            [style.color]="'var(--tenant-secondary)'"
+                            (click)="onDocumentDownload(document)"
+                          >
+                            {{ document.name }}
+                          </button>
                        </div>
 
                       <div class="flex items-center justify-between gap-4 whitespace-nowrap text-sm text-color-secondary md:justify-start">

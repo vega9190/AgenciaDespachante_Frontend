@@ -2,17 +2,13 @@ import { ClientConfig } from '../theming.types';
 
 export const defaultTenantConfig: ClientConfig = {
   key: 'default',
-  loginTitle: 'Transportadora',
-  loginSubTitle: '',
-  siteTitle: 'Transportadora',
-  theme: 'default',
-  assetsConfig: {
-    favicon: 'favicon.svg',
-    logo: 'logo.svg',
-    styleSheet: 'styles.css'
-  }
+  theme: 'default'
 };
 
 export const tenantDefinitions: Record<string, ClientConfig> = {
-  default: defaultTenantConfig
+  default: defaultTenantConfig,
+  tenant1: {
+    key: 'tenant1',
+    theme: 'tenant1'
+  }
 };

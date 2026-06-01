@@ -21,9 +21,9 @@
   display: flex;
   align-items: center;
   gap: 1rem;
-  border: 1px solid rgb(148 163 184 / 0.35);
+  border: 1px solid var(--tenant-layout-border);
   border-radius: 1rem;
-  background: rgb(255 255 255 / 0.55);
+  background: color-mix(in srgb, var(--tenant-content-background) 88%, white);
   padding: 1rem 1.1rem;
 }
 
@@ -38,23 +38,23 @@
 }
 
 .import-summary-card__icon--number {
-  background: color-mix(in srgb, var(--p-primary-color) 14%, white);
-  color: var(--p-primary-color);
+  background: color-mix(in srgb, var(--tenant-secondary) 14%, white);
+  color: var(--tenant-secondary);
 }
 
 .import-summary-card__icon--date {
-  background: color-mix(in srgb, var(--p-primary-color) 20%, white);
-  color: var(--p-primary-color);
+  background: color-mix(in srgb, var(--tenant-secondary) 20%, white);
+  color: var(--tenant-secondary);
 }
 
 .import-summary-card__icon--client {
-  background: color-mix(in srgb, var(--p-primary-color) 14%, white);
-  color: var(--p-primary-color);
+  background: color-mix(in srgb, var(--tenant-secondary) 14%, white);
+  color: var(--tenant-secondary);
 }
 
 .import-summary-card__icon--status {
-  background: color-mix(in srgb, var(--p-primary-color) 14%, white);
-  color: var(--p-primary-color);
+  background: color-mix(in srgb, var(--tenant-secondary) 14%, white);
+  color: var(--tenant-secondary);
 }
 
 .import-summary-card__content {
@@ -77,9 +77,9 @@
 }
 
 .import-timeline-card {
-  border: 1px solid rgb(148 163 184 / 0.25);
+  border: 1px solid var(--tenant-layout-border);
   border-radius: 1rem;
-  background: rgb(255 255 255 / 0.55);
+  background: color-mix(in srgb, var(--tenant-content-background) 88%, white);
   padding: 1.25rem;
 }
 
@@ -95,14 +95,10 @@
   justify-content: center;
   gap: 0.55rem;
   margin: 1rem 0 0;
-  /* border: 1px solid color-mix(in srgb, var(--p-primary-color) 8%, transparent);
-  border-radius: 0.85rem;
-  background: color-mix(in srgb, var(--p-primary-color) 10%, white); */
-  color: color-mix(in srgb, var(--p-primary-color) 75%, var(--p-text-color) 25%);
+  color: var(--tenant-secondary);
   font-size: 0.95rem;
   font-weight: 600;
   line-height: 1.4;
-  /* padding: 0.8rem 1rem; */
   text-align: center;
 }
 
@@ -144,16 +140,16 @@
 
 .import-timeline__marker--current {
   border-width: 2px;
-  border-color: var(--p-primary-color);
-  color: var(--p-primary-color);
-  box-shadow: 0 0 0 0.22rem color-mix(in srgb, var(--p-primary-color) 18%, transparent);
+  border-color: var(--tenant-secondary);
+  color: var(--tenant-secondary);
+  box-shadow: 0 0 0 0.22rem color-mix(in srgb, var(--tenant-secondary) 18%, transparent);
 }
 
 .import-timeline__marker--finalized {
   border-width: 2px;
-  border-color: var(--p-green-500);
-  background: color-mix(in srgb, var(--p-green-500) 12%, white);
-  color: var(--p-green-600, var(--p-green-500));
+  border-color: var(--tenant-success-color);
+  background: var(--tenant-success-surface);
+  color: var(--tenant-success-color);
   box-shadow: 0 0 0 0.22rem color-mix(in srgb, var(--p-green-500) 18%, transparent);
 }
 
@@ -167,7 +163,7 @@
 }
 
 .import-timeline__connector--completed {
-  background: var(--p-green-500);
+  background: var(--tenant-success-color);
 }
 
 .import-timeline__label {

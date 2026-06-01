@@ -10,7 +10,6 @@ import { InputGroupAddonModule } from 'primeng/inputgroupaddon';
 import { InputTextModule } from 'primeng/inputtext';
 
 import { AuthService } from '@core/auth/auth.service';
-import { ThemeConfigService } from '@core/theming/theme-config.service';
 import { LayoutService } from '@layout/service/app.layout.service';
 import { TenantIdentityStoreService } from '@services/tenant/tenant-identity-store.service';
 
@@ -26,7 +25,6 @@ export class LoginComponent {
   private readonly router = inject(Router);
   private readonly layoutService = inject(LayoutService);
 
-  readonly themeConfigService = inject(ThemeConfigService);
   readonly tenantIdentityStore = inject(TenantIdentityStoreService);
   readonly isSubmitting = signal(false);
   readonly isUnauthorized = signal(false);
