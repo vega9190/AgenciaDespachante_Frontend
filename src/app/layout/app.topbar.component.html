@@ -1,7 +1,7 @@
 <div class="layout-topbar">
   <a class="app-logo" routerLink="/dashboard">
-    <img src="/assets/tenants/default/logo.svg" alt="Frontend Seed logo" />
-    <span>{{ themeConfigService.currentConfig().loginTitle }}</span>
+    <img [src]="tenantIdentityStore.logoUrl()" [alt]="tenantIdentityStore.name() + ' logo'" />
+    <span>{{ tenantIdentityStore.name() }}</span>
   </a>
 
   <button class="topbar-menubutton p-link" type="button" (click)="onMenuButtonClick()">

@@ -5,7 +5,7 @@ import { ButtonModule } from 'primeng/button';
 import { MenuModule } from 'primeng/menu';
 
 import { AuthService } from '@core/auth/auth.service';
-import { ThemeConfigService } from '@core/theming/theme-config.service';
+import { TenantIdentityStoreService } from '@services/tenant/tenant-identity-store.service';
 import { LayoutService } from './service/app.layout.service';
 
 @Component({
@@ -17,7 +17,7 @@ export class AppTopbarComponent {
   readonly layoutService = inject(LayoutService);
   readonly router = inject(Router);
   readonly authService = inject(AuthService);
-  readonly themeConfigService = inject(ThemeConfigService);
+  readonly tenantIdentityStore = inject(TenantIdentityStoreService);
   readonly profileMenuItems: MenuItem[] = [
     {
       label: 'Logout',

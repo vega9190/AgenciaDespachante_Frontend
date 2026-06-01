@@ -12,6 +12,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { AuthService } from '@core/auth/auth.service';
 import { ThemeConfigService } from '@core/theming/theme-config.service';
 import { LayoutService } from '@layout/service/app.layout.service';
+import { TenantIdentityStoreService } from '@services/tenant/tenant-identity-store.service';
 
 @Component({
   selector: 'app-login',
@@ -26,6 +27,7 @@ export class LoginComponent {
   private readonly layoutService = inject(LayoutService);
 
   readonly themeConfigService = inject(ThemeConfigService);
+  readonly tenantIdentityStore = inject(TenantIdentityStoreService);
   readonly isSubmitting = signal(false);
   readonly isUnauthorized = signal(false);
   readonly isFilledInput = computed(() => this.layoutService.config.inputStyle === 'filled');

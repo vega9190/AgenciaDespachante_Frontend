@@ -2,8 +2,8 @@
   <div class="bg-surface-50 dark:bg-surface-950 flex h-screen w-screen items-center justify-center" [ngClass]="{ 'p-input-filled': isFilledInput() }">
     <div class="bg-surface-0 dark:bg-surface-900 seed-login-card">
       <div class="mb-1 flex flex-col items-center gap-1 text-center">
-        <img src="/assets/tenants/default/logo.svg" alt="Frontend Seed logo" class="h-16 w-16 rounded-2xl shadow-sm" />
-        <span class="text-2xl font-bold">{{ themeConfigService.currentConfig().loginTitle }}</span>
+        <img [src]="tenantIdentityStore.logoUrl()" [alt]="tenantIdentityStore.name() + ' logo'" class="h-16 w-16 rounded-2xl shadow-sm" />
+        <span class="text-2xl font-bold">{{ tenantIdentityStore.name() }}</span>
         @if (themeConfigService.currentConfig().loginSubTitle) {
           <span class="text-muted-color text-base font-medium">{{ themeConfigService.currentConfig().loginSubTitle }}</span>
         }

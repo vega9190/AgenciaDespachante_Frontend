@@ -1,7 +1,7 @@
 <div class="layout-footer">
   <div class="footer-start">
-    <img src="/assets/tenants/default/logo.svg" alt="Frontend Seed logo" />
-    <span class="app-name">Frontend Seed</span>
+    <img [src]="tenantIdentityStore.logoUrl()" [alt]="tenantIdentityStore.name() + ' logo'" />
+    <span class="app-name">{{ tenantIdentityStore.name() }}</span>
   </div>
-  <div class="footer-end">© {{ currentYear }} Frontend Seed</div>
+  <div class="footer-end">© {{ currentYear }} {{ tenantIdentityStore.name() }}</div>
 </div>

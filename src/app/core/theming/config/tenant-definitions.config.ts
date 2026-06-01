@@ -2,9 +2,9 @@ import { ClientConfig } from '../theming.types';
 
 export const defaultTenantConfig: ClientConfig = {
   key: 'default',
-  loginTitle: 'Frontend Seed',
-  loginSubTitle: 'PrimeNG starter',
-  siteTitle: 'Frontend Seed',
+  loginTitle: 'Transportadora',
+  loginSubTitle: '',
+  siteTitle: 'Transportadora',
   theme: 'default',
   assetsConfig: {
     favicon: 'favicon.svg',
