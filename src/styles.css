@@ -62,18 +62,26 @@ body a {
 
 :root {
   --set-border-radius: 0.75rem;
-  --set-color-background: linear-gradient(150deg, var(--p-primary-500) 0%, var(--p-primary-900) 100%);
+  --set-color-background: linear-gradient(
+    150deg,
+    var(--tenant-layout-background, var(--p-primary-500)) 0%,
+    color-mix(in srgb, var(--tenant-layout-background, var(--p-primary-900)) 82%, black) 100%
+  );
   --set-font-family: var(--font-family);
   --set-p-primary-600: var(--p-primary-600);
   --set-p-primary-color: var(--p-primary-color);
   --set-p-primary-contrast-color: var(--p-primary-contrast-color);
-  --set-p-surface-ground: var(--p-surface-ground);
-  --set-p-surface-menu-hover: rgb(255 255 255 / 0.14);
-  --set-surface-border: var(--p-content-border-color);
-  --set-surface-ground: linear-gradient(180deg, #f8f5ff 0%, #ffffff 22%);
-  --set-surface-overlay: var(--p-surface-0);
-  --set-text-color-menu: var(--p-surface-0);
-  --set-text-color-secondary: rgb(255 255 255 / 0.78);
+  --set-p-surface-ground: var(--tenant-layout-surface, var(--p-surface-ground));
+  --set-p-surface-menu-hover: var(--tenant-layout-highlight, rgb(255 255 255 / 0.14));
+  --set-surface-border: var(--tenant-content-border, var(--p-content-border-color));
+  --set-surface-ground: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--tenant-layout-background, #f8f5ff) 8%, white) 0%,
+    var(--tenant-content-background, #ffffff) 22%
+  );
+  --set-surface-overlay: var(--tenant-layout-overlay-surface, var(--p-surface-0));
+  --set-text-color-menu: var(--tenant-layout-text, var(--p-surface-0));
+  --set-text-color-secondary: var(--tenant-layout-text-muted, rgb(255 255 255 / 0.78));
   --set-transition-duration: var(--transition-duration);
 }
 
@@ -120,7 +128,7 @@ body a {
   height: 3rem;
   border: 0;
   border-radius: 9999px;
-  background: rgb(255 255 255 / 0.12);
+  background: color-mix(in srgb, var(--set-text-color-menu) 12%, transparent);
 }
 
 .topbar-menubutton span,
@@ -131,7 +139,7 @@ body a {
   width: 1.75rem;
   height: 3px;
   border-radius: 9999px;
-  background: white;
+  background: var(--set-text-color-menu);
   content: '';
 }
 
@@ -163,11 +171,11 @@ body a {
 .topbar-profile-menu-button {
   width: 2rem;
   height: 2rem;
-  color: white !important;
+  color: var(--set-text-color-menu) !important;
 }
 
 .topbar-profile-menu-button:hover {
-  background: rgb(255 255 255 / 0.12) !important;
+  background: color-mix(in srgb, var(--set-text-color-menu) 12%, transparent) !important;
 }
 
 .user-avatar {
@@ -177,15 +185,15 @@ body a {
   align-items: center;
   justify-content: center;
   border-radius: 9999px;
-  background: rgb(255 255 255 / 0.2);
-  color: white;
+  background: color-mix(in srgb, var(--set-text-color-menu) 20%, transparent);
+  color: var(--set-text-color-menu);
   font-weight: 700;
 }
 
 .profile-details {
   display: flex;
   flex-direction: column;
-  color: white;
+  color: var(--set-text-color-menu);
 }
 
 .profile-name {
@@ -283,10 +291,10 @@ body a {
   margin: 0;
   padding: 0.5rem;
   list-style: none;
-  border: 1px solid rgb(139 92 246 / 0.12);
+  border: 1px solid color-mix(in srgb, var(--tenant-layout-border, #000000) 70%, transparent);
   border-radius: 1rem;
   background: var(--set-surface-overlay);
-  box-shadow: 0 18px 40px rgb(76 29 149 / 0.14);
+  box-shadow: var(--tenant-overlay-shadow, 0 18px 40px rgb(76 29 149 / 0.14));
 }
 
 .layout-submenu::before {
@@ -336,8 +344,8 @@ body a {
   overflow: auto;
   border-top-left-radius: 2rem;
   background: var(--set-surface-ground);
-  border-top: 1px solid rgb(255 255 255 / 0.22);
-  box-shadow: inset 0 3px 4px rgb(0 0 0 / 0.06);
+  border-top: 1px solid color-mix(in srgb, var(--set-text-color-menu) 22%, transparent);
+  box-shadow: inset 0 3px 4px color-mix(in srgb, var(--tenant-layout-background, #000000) 8%, transparent);
   padding: 1rem 2rem 2rem;;
 }
 
@@ -355,18 +363,18 @@ body a {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgb(15 23 42 / 0.32);
+  background: var(--tenant-overlay-backdrop, rgb(15 23 42 / 0.32));
 }
 
 .app-ui-blocker__panel {
   display: inline-flex;
   align-items: center;
   gap: 0.75rem;
-  border: 1px solid rgb(139 92 246 / 0.14);
+  border: 1px solid color-mix(in srgb, var(--tenant-layout-border, #000000) 70%, transparent);
   border-radius: 1rem;
   background: var(--set-surface-overlay);
   padding: 1rem 1.25rem;
-  box-shadow: 0 18px 40px rgb(15 23 42 / 0.14);
+  box-shadow: var(--tenant-overlay-shadow, 0 18px 40px rgb(15 23 42 / 0.14));
   font-weight: 600;
 }
 
@@ -398,9 +406,9 @@ body a {
 
 .card,
 .p-card {
-  border: 1px solid rgb(139 92 246 / 0.08);
+  border: 1px solid color-mix(in srgb, var(--tenant-content-border, #000000) 60%, transparent);
   border-radius: 1rem;
-  box-shadow: 0 18px 40px rgb(76 29 149 / 0.08);
+  box-shadow: var(--tenant-content-shadow, 0 18px 40px rgb(76 29 149 / 0.08));
 }
 
 @media screen and (max-width: 991px) {
