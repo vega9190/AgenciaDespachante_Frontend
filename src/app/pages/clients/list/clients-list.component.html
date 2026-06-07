@@ -8,7 +8,7 @@
       <form [formGroup]="filtersForm" class="filters-grid">
         <div class="flex flex-col gap-2">
           <label for="name" class="font-semibold">Nombre</label>
-          <input id="name" type="text" pInputText formControlName="name" placeholder="Buscar por nombre" />
+          <input id="name" type="text" pInputText formControlName="name" placeholder="Buscar por empresa o contacto" />
         </div>
 
         <div class="flex flex-col gap-2">
@@ -18,16 +18,7 @@
 
         <div class="flex flex-col gap-2">
           <label for="contactPhone" class="font-semibold">Teléfono</label>
-          <input
-            id="contactPhone"
-            type="text"
-            pInputText
-            formControlName="contactPhone"
-            placeholder="Buscar por teléfono"
-            inputmode="numeric"
-            maxlength="20"
-            (input)="onPhoneInput($event)"
-          />
+          <app-phone-input inputId="contactPhone" [control]="filtersForm.controls.contactPhone" placeholder="Buscar por teléfono" />
         </div>
 
         <div class="flex flex-col gap-2">

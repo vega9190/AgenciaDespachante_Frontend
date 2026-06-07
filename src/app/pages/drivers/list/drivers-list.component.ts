@@ -1,6 +1,7 @@
 import { DatePipe } from '@angular/common';
 import { Component, computed, inject, signal } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { finalize } from 'rxjs';
 
 import { ButtonModule } from 'primeng/button';
@@ -35,6 +36,7 @@ interface SelectOption {
 export class DriversListComponent {
   private readonly formBuilder = inject(FormBuilder);
   private readonly driverService = inject(DriverService);
+  private readonly router = inject(Router);
 
   readonly pageSizeOptions = [10, 20, 50];
   readonly statusOptions: SelectOption[] = [
@@ -94,11 +96,11 @@ export class DriversListComponent {
   }
 
   onEdit(driver: DriverListItemDto): void {
-    console.log('Edit driver', driver);
+    void this.router.navigate(['/drivers', driver.id]);
   }
 
   onCreate(): void {
-    console.log('Create driver');
+    void this.router.navigate(['/drivers/create']);
   }
 
   getStatusLabel(isActive: boolean): string {

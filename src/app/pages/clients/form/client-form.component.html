@@ -69,16 +69,7 @@
 
       <div class="flex flex-col gap-2">
         <label for="contactPhone" class="font-semibold">Teléfono de Contacto</label>
-        <input
-          id="contactPhone"
-          type="text"
-          pInputText
-          formControlName="contactPhone"
-          inputmode="numeric"
-          maxlength="9"
-          placeholder="123-45678"
-          (input)="onPhoneInput($event)"
-        />
+        <app-phone-input inputId="contactPhone" [control]="clientForm.controls.contactPhone" />
         @if (getFieldError('contactPhone')) {
           <small class="field-error">{{ getFieldError('contactPhone') }}</small>
         }

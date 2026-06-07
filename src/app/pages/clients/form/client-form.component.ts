@@ -10,6 +10,7 @@ import { CardModule } from 'primeng/card';
 import { InputTextModule } from 'primeng/inputtext';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
 
+import { AppPhoneInputComponent } from '../../../common-components/app-phone-input/app-phone-input.component';
 import { ApiResult, ApiResultOf } from '@models/api.types';
 import { ClientsService } from '@services/clients/clients.service';
 import { ClientCreateRequest, ClientDetailDto, ClientUpdateRequest } from '@services/clients/clients.types';
@@ -27,7 +28,7 @@ interface ClientFormModel {
 
 @Component({
   selector: 'app-client-form',
-  imports: [ReactiveFormsModule, DatePipe, ButtonModule, CardModule, InputTextModule, ToggleSwitchModule],
+  imports: [ReactiveFormsModule, DatePipe, ButtonModule, CardModule, InputTextModule, ToggleSwitchModule, AppPhoneInputComponent],
   templateUrl: './client-form.component.html',
   styleUrl: './client-form.component.css'
 })
@@ -100,17 +101,6 @@ export class ClientFormComponent {
 
   onCancel(): void {
     void this.router.navigate(['/clients']);
-  }
-
-  onPhoneInput(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    const maskedValue = this.formatPhone(input.value);
-
-    if (input.value !== maskedValue) {
-      input.value = maskedValue;
-    }
-
-    this.clientForm.controls.contactPhone.setValue(maskedValue);
   }
 
   getFieldError(controlName: keyof ClientFormModel): string {

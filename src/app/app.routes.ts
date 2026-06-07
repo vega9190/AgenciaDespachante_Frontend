@@ -62,6 +62,14 @@ export const routes: Routes = [
           {
             path: '',
             loadComponent: () => import('@pages/drivers/list/drivers-list.component').then((m) => m.DriversListComponent)
+          },
+          {
+            path: 'create',
+            loadComponent: () => import('@pages/drivers/form/driver-form.component').then((m) => m.DriverFormComponent)
+          },
+          {
+            path: ':id',
+            loadComponent: () => import('@pages/drivers/form/driver-form.component').then((m) => m.DriverFormComponent)
           }
         ]
       },

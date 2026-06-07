@@ -1,0 +1,11 @@
+<input
+  pInputText
+  class="w-full"
+  [id]="inputId()"
+  [formControl]="control()"
+  [placeholder]="placeholder()"
+  [attr.aria-labelledby]="ariaLabelledBy()"
+  inputmode="numeric"
+  maxlength="9"
+  (input)="onInput($event)"
+/>

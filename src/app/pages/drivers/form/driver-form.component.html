@@ -1,0 +1,104 @@
+<div class="driver-form-page flex flex-col gap-12">
+  <div>
+    <div>
+      <h1 class="page-title">{{ pageTitle() }}</h1>
+    </div>
+  </div>
+
+  @if (driver(); as currentDriver) {
+    <div class="driver-summary-grid">
+      <div class="driver-summary-card">
+        <div class="driver-summary-card__icon driver-summary-card__icon--number">
+          <i class="pi pi-hashtag"></i>
+        </div>
+        <div class="driver-summary-card__content">
+          <span class="driver-summary-card__label">NRO. CHOFER</span>
+          <strong class="driver-summary-card__value">{{ currentDriver.driverNumber }}</strong>
+        </div>
+      </div>
+
+      <div class="driver-summary-card">
+        <div class="driver-summary-card__icon driver-summary-card__icon--date">
+          <i class="pi pi-calendar"></i>
+        </div>
+        <div class="driver-summary-card__content">
+          <span class="driver-summary-card__label">CHOFER DESDE</span>
+          <strong class="driver-summary-card__value">{{ currentDriver.createdUtc | date: 'dd/MM/yyyy' }}</strong>
+        </div>
+      </div>
+
+      <div class="driver-summary-card driver-summary-card--status">
+        <div class="driver-summary-card__icon driver-summary-card__icon--status">
+          <i class="pi pi-shield"></i>
+        </div>
+        <div class="driver-summary-card__content driver-summary-card__content--status">
+          <span class="driver-summary-card__label">CHOFER ACTIVO</span>
+          <strong class="driver-summary-card__value">{{ driverForm.controls.isActive.value ? 'Activo' : 'Inactivo' }}</strong>
+          <span class="driver-summary-card__help">Permitir que este chofer siga disponible para operaciones.</span>
+        </div>
+        <p-toggleswitch inputId="isActive" [formControl]="driverForm.controls.isActive" />
+      </div>
+    </div>
+  }
+
+  <p-card class="driver-form-card">
+    <div class="form-grid" [formGroup]="driverForm">
+      <div class="flex flex-col gap-2">
+        <label for="name" class="font-semibold">Nombre</label>
+        <input id="name" type="text" pInputText formControlName="name" maxlength="50" />
+        @if (getFieldError('name')) {
+          <small class="field-error">{{ getFieldError('name') }}</small>
+        }
+      </div>
+
+      <div class="flex flex-col gap-2">
+        <label for="lastName" class="font-semibold">Apellido</label>
+        <input id="lastName" type="text" pInputText formControlName="lastName" maxlength="50" />
+        @if (getFieldError('lastName')) {
+          <small class="field-error">{{ getFieldError('lastName') }}</small>
+        }
+      </div>
+
+      <div class="flex flex-col gap-2">
+        <label id="phoneNumberLabel" class="font-semibold">Teléfono</label>
+        <app-phone-input inputId="phoneNumber" ariaLabelledBy="phoneNumberLabel" [control]="driverForm.controls.phoneNumber" />
+        @if (getFieldError('phoneNumber')) {
+          <small class="field-error">{{ getFieldError('phoneNumber') }}</small>
+        }
+      </div>
+
+      <div class="flex flex-col gap-2">
+        <label id="isExternalLabel" class="font-semibold">Tipo Chofer</label>
+        <p-select
+          inputId="isExternal"
+          ariaLabelledBy="isExternalLabel"
+          formControlName="isExternal"
+          [options]="driverTypeOptions"
+          optionLabel="label"
+          optionValue="value"
+          placeholder="Seleccionar"
+        />
+        @if (getFieldError('isExternal')) {
+          <small class="field-error">{{ getFieldError('isExternal') }}</small>
+        }
+      </div>
+    </div>
+
+    @if (isLoading()) {
+      <div class="form-loading">Cargando chofer...</div>
+    }
+
+    <div class="form-actions">
+      <button type="button" pButton label="Volver" severity="secondary" styleClass="flat-button" (click)="onCancel()"></button>
+      <button
+        type="button"
+        pButton
+        label="Guardar"
+        icon="pi pi-save"
+        styleClass="flat-button"
+        [disabled]="isLoading() || isSaving()"
+        (click)="onSubmit()"
+      ></button>
+    </div>
+  </p-card>
+</div>

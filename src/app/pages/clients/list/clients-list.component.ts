@@ -11,6 +11,7 @@ import { SelectModule } from 'primeng/select';
 import { TableLazyLoadEvent, TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
 
+import { AppPhoneInputComponent } from '../../../common-components/app-phone-input/app-phone-input.component';
 import { ClientsService } from '@services/clients/clients.service';
 import { ClientListItemDto, ClientsListQuery } from '@services/clients/clients.types';
 
@@ -28,7 +29,7 @@ interface ClientStatusOption {
 
 @Component({
   selector: 'app-clients-list',
-  imports: [ReactiveFormsModule, DatePipe, ButtonModule, CardModule, InputTextModule, SelectModule, TableModule, TagModule],
+  imports: [ReactiveFormsModule, DatePipe, ButtonModule, CardModule, InputTextModule, SelectModule, TableModule, TagModule, AppPhoneInputComponent],
   templateUrl: './clients-list.component.html',
   styleUrl: './clients-list.component.css'
 })
@@ -80,17 +81,6 @@ export class ClientsListComponent {
     this.loadClients();
   }
 
-  onPhoneInput(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    const sanitizedValue = input.value.replace(/\D+/g, '');
-
-    if (input.value !== sanitizedValue) {
-      input.value = sanitizedValue;
-    }
-
-    this.filtersForm.controls.contactPhone.setValue(sanitizedValue);
-  }
-
   onPageChange(event: TableLazyLoadEvent): void {
     const rows = event.rows ?? this.pageSize();
     const first = event.first ?? 0;
@@ -136,7 +126,7 @@ export class ClientsListComponent {
       pageSize: this.pageSize(),
       name: formValue.name,
       taxId: formValue.taxId,
-      contactPhone: formValue.contactPhone,
+      contactPhone: formValue.contactPhone.replace(/\D+/g, '') || undefined,
       isActive: formValue.isActive ?? undefined,
       sortBy: 'createdUtc',
       sortDirection: 'desc'
