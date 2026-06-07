@@ -1,6 +1,7 @@
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 
+import { buildHttpParams } from '../../functions/common.function';
 import { ApiResultOf } from '@models/api.types';
 
 import { environment } from '../../../environments/environment';
@@ -46,18 +47,4 @@ export class ClientsService {
       params: buildHttpParams({ search })
     });
   }
-}
-
-function buildHttpParams<T extends object>(query: T): HttpParams {
-  let params = new HttpParams();
-
-  for (const [key, value] of Object.entries(query) as Array<[string, string | number | boolean | null | undefined]>) {
-    if (value === undefined || value === null || value === '') {
-      continue;
-    }
-
-    params = params.set(key, String(value));
-  }
-
-  return params;
 }

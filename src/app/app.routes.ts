@@ -57,6 +57,15 @@ export const routes: Routes = [
         ]
       },
       {
+        path: 'drivers',
+        children: [
+          {
+            path: '',
+            loadComponent: () => import('@pages/drivers/list/drivers-list.component').then((m) => m.DriversListComponent)
+          }
+        ]
+      },
+      {
         path: 'tools',
         children: [
           {

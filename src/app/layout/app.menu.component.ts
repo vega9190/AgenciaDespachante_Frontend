@@ -41,6 +41,11 @@ export class AppMenuComponent {
       routerLink: ['/clients']
     },
     {
+      label: 'Choferes',
+      icon: 'pi pi-id-card',
+      routerLink: ['/drivers']
+    },
+    {
       label: 'Importaciones',
       icon: 'pi pi-clipboard',
       routerLink: ['/imports']

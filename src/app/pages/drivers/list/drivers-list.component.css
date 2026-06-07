@@ -1,0 +1,68 @@
+:host {
+  display: block;
+}
+
+.page-title {
+  margin: 0;
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.filters-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.filters-grid {
+  display: grid;
+  gap: 1rem;
+}
+
+.filter-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  justify-content: flex-end;
+}
+
+.list-header {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 1rem;
+}
+
+:host ::ng-deep .p-card-body {
+  gap: 0;
+}
+
+:host ::ng-deep .p-datatable-tbody > tr > td,
+:host ::ng-deep .p-datatable-thead > tr > th {
+  white-space: nowrap;
+}
+
+@media (min-width: 1024px) {
+  .filters-layout {
+    align-items: end;
+    flex-direction: row;
+  }
+
+  .filters-grid {
+    flex: 1;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+
+  .filter-actions {
+    flex-shrink: 0;
+    padding-top: 1.85rem;
+  }
+}
+
+@media (max-width: 767px) {
+  .list-header {
+    align-items: stretch;
+    flex-direction: column;
+  }
+}
