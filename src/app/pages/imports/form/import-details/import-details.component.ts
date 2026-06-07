@@ -1,5 +1,5 @@
 import { Component, computed, effect, inject, input, output, signal } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { finalize } from 'rxjs';
 
@@ -9,6 +9,7 @@ import { CardModule } from 'primeng/card';
 import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
 
+import { ImportDetailsFormModel } from '../../models/import-form.models';
 import { ApiResult, ApiResultOf } from '@models/api.types';
 import { ClientsService } from '@services/clients/clients.service';
 import { ClientOptionDto } from '@services/clients/clients.types';
@@ -17,12 +18,6 @@ import { UiBlockService } from '@services/common/ui-block.service';
 import { isReadOnlyImportStatus } from '@services/imports/import-status.constants';
 import { ContainerTypeOption, CreateImportRequest, ImportDetailDto, UpdateImportRequest } from '@services/imports/imports.types';
 import { ImportsService } from '@services/imports/imports.service';
-
-interface ImportDetailsFormModel {
-  client: FormControl<ClientOptionDto | null>;
-  containerNumber: FormControl<string>;
-  containerType: FormControl<number | null>;
-}
 
 @Component({
   selector: 'app-import-details',

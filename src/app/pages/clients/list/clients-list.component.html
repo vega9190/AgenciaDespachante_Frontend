@@ -17,14 +17,15 @@
         </div>
 
         <div class="flex flex-col gap-2">
-          <label for="contactPhone" class="font-semibold">Teléfono</label>
-          <app-phone-input inputId="contactPhone" [control]="filtersForm.controls.contactPhone" placeholder="Buscar por teléfono" />
+          <label id="contactPhoneLabel" class="font-semibold">Teléfono</label>
+          <app-phone-input inputId="contactPhone" ariaLabelledBy="contactPhoneLabel" [control]="filtersForm.controls.contactPhone" placeholder="Buscar por teléfono" />
         </div>
 
         <div class="flex flex-col gap-2">
-          <label for="isActive" class="font-semibold">Estado</label>
+          <label id="isActiveLabel" class="font-semibold">Estado</label>
           <p-select
             inputId="isActive"
+            ariaLabelledBy="isActiveLabel"
             formControlName="isActive"
             [options]="statusOptions"
             optionLabel="label"
@@ -93,6 +94,8 @@
             text
             rounded
             styleClass="flat-button"
+            [pTooltip]="'Editar'"
+            tooltipPosition="top"
             ariaLabel="Editar cliente"
             (click)="onEdit(client)"
           ></button>

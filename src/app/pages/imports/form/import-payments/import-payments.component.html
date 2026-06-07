@@ -41,8 +41,11 @@
           </div>
 
           <div class="flex flex-col gap-2">
-            <label for="paymentDate" class="font-semibold">Fecha</label>
-            <input id="paymentDate" type="date" pInputText formControlName="paymentDate" />
+            <label id="paymentDateLabel" class="font-semibold">Fecha</label>
+            <p-datepicker inputId="paymentDate" ariaLabelledBy="paymentDateLabel" formControlName="paymentDate" dateFormat="dd/mm/yy" [iconDisplay]="'input'" [showIcon]="true" [readonlyInput]="true" />
+            @if (getFieldError('paymentDate')) {
+              <small class="field-error">{{ getFieldError('paymentDate') }}</small>
+            }
           </div>
         </div>
 

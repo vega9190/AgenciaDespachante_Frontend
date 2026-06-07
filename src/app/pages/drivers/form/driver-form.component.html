@@ -1,3 +1,5 @@
+<p-confirmdialog />
+
 <div class="driver-form-page flex flex-col gap-12">
   <div>
     <div>
@@ -18,6 +20,16 @@
       </div>
 
       <div class="driver-summary-card">
+        <div class="driver-summary-card__icon driver-summary-card__icon--type">
+          <i class="pi pi-users"></i>
+        </div>
+        <div class="driver-summary-card__content">
+          <span class="driver-summary-card__label">TIPO CHOFER</span>
+          <strong class="driver-summary-card__value">{{ currentDriver.isExternal ? 'Externo' : 'Interno' }}</strong>
+        </div>
+      </div>
+
+      <div class="driver-summary-card">
         <div class="driver-summary-card__icon driver-summary-card__icon--date">
           <i class="pi pi-calendar"></i>
         </div>
@@ -25,7 +37,7 @@
           <span class="driver-summary-card__label">CHOFER DESDE</span>
           <strong class="driver-summary-card__value">{{ currentDriver.createdUtc | date: 'dd/MM/yyyy' }}</strong>
         </div>
-      </div>
+      </div>      
 
       <div class="driver-summary-card driver-summary-card--status">
         <div class="driver-summary-card__icon driver-summary-card__icon--status">
@@ -41,64 +53,136 @@
     </div>
   }
 
-  <p-card class="driver-form-card">
-    <div class="form-grid" [formGroup]="driverForm">
-      <div class="flex flex-col gap-2">
-        <label for="name" class="font-semibold">Nombre</label>
-        <input id="name" type="text" pInputText formControlName="name" maxlength="50" />
-        @if (getFieldError('name')) {
-          <small class="field-error">{{ getFieldError('name') }}</small>
-        }
+  <div class="driver-main-grid" [class.driver-main-grid--edit]="isEditMode()">
+    <p-card class="driver-form-card">
+      <div class="driver-details-section" [formGroup]="driverForm">
+        <div class="driver-details-section__header">
+          <h2 class="driver-details-section__title">Detalle</h2>
+        </div>
+
+        <div class="form-grid">
+          <div class="flex flex-col gap-2">
+            <label for="name" class="font-semibold">Nombre</label>
+            <input id="name" type="text" pInputText formControlName="name" maxlength="50" />
+            @if (getFieldError('name')) {
+              <small class="field-error">{{ getFieldError('name') }}</small>
+            }
+          </div>
+
+          <div class="flex flex-col gap-2">
+            <label for="lastName" class="font-semibold">Apellido</label>
+            <input id="lastName" type="text" pInputText formControlName="lastName" maxlength="50" />
+            @if (getFieldError('lastName')) {
+              <small class="field-error">{{ getFieldError('lastName') }}</small>
+            }
+          </div>
+
+          <div class="flex flex-col gap-2">
+            <label id="phoneNumberLabel" class="font-semibold">Teléfono</label>
+            <app-phone-input inputId="phoneNumber" ariaLabelledBy="phoneNumberLabel" [control]="driverForm.controls.phoneNumber" />
+            @if (getFieldError('phoneNumber')) {
+              <small class="field-error">{{ getFieldError('phoneNumber') }}</small>
+            }
+          </div>      
+
+          <div class="flex flex-col gap-2">
+            <label id="isExternalLabel" class="font-semibold">Tipo Chofer</label>
+            <p-select
+              inputId="isExternal"
+              ariaLabelledBy="isExternalLabel"
+              formControlName="isExternal"
+              [options]="driverTypeOptions"
+              optionLabel="label"
+              optionValue="value"
+              placeholder="Seleccionar"
+            />
+            @if (getFieldError('isExternal')) {
+              <small class="field-error">{{ getFieldError('isExternal') }}</small>
+            }
+          </div>
+
+          @if (isEditMode()) {
+            <div class="flex flex-col gap-2">
+              <label id="transportCardExpirationDateLabel" class="font-semibold">Fecha Expiración del Documento</label>
+              <p-datepicker
+                inputId="transportCardExpirationDate"
+                ariaLabelledBy="transportCardExpirationDateLabel"
+                formControlName="transportCardExpirationDate"
+                dateFormat="dd/mm/yy"
+                [iconDisplay]="'input'"
+                [showIcon]="true"
+                [readonlyInput]="true"
+              />
+              @if (getFieldError('transportCardExpirationDate')) {
+                <small class="field-error">{{ getFieldError('transportCardExpirationDate') }}</small>
+              }
+            </div>
+          }
+        </div>
       </div>
 
-      <div class="flex flex-col gap-2">
-        <label for="lastName" class="font-semibold">Apellido</label>
-        <input id="lastName" type="text" pInputText formControlName="lastName" maxlength="50" />
-        @if (getFieldError('lastName')) {
-          <small class="field-error">{{ getFieldError('lastName') }}</small>
-        }
-      </div>
+      @if (isLoading()) {
+        <div class="form-loading">Cargando chofer...</div>
+      }
 
-      <div class="flex flex-col gap-2">
-        <label id="phoneNumberLabel" class="font-semibold">Teléfono</label>
-        <app-phone-input inputId="phoneNumber" ariaLabelledBy="phoneNumberLabel" [control]="driverForm.controls.phoneNumber" />
-        @if (getFieldError('phoneNumber')) {
-          <small class="field-error">{{ getFieldError('phoneNumber') }}</small>
-        }
+      <div class="form-actions">
+        <button type="button" pButton label="Volver" severity="secondary" styleClass="flat-button" (click)="onCancel()"></button>
+        <button
+          type="button"
+          pButton
+          label="Guardar"
+          icon="pi pi-save"
+          styleClass="flat-button"
+          [disabled]="isLoading() || isSaving()"
+          (click)="onSubmit()"
+        ></button>
       </div>
+    </p-card>
 
-      <div class="flex flex-col gap-2">
-        <label id="isExternalLabel" class="font-semibold">Tipo Chofer</label>
-        <p-select
-          inputId="isExternal"
-          ariaLabelledBy="isExternalLabel"
-          formControlName="isExternal"
-          [options]="driverTypeOptions"
-          optionLabel="label"
-          optionValue="value"
-          placeholder="Seleccionar"
-        />
-        @if (getFieldError('isExternal')) {
-          <small class="field-error">{{ getFieldError('isExternal') }}</small>
-        }
-      </div>
-    </div>
+    @if (isEditMode()) {
+      <p-card class="driver-form-card">
+        <div class="driver-documents-section" [formGroup]="driverForm">
+          <div class="driver-documents-section__header">
+            <h2 class="driver-documents-section__title">Tarjeta de Operación</h2>
+          </div>
 
-    @if (isLoading()) {
-      <div class="form-loading">Cargando chofer...</div>
+          <div class="driver-documents-grid">
+            <div class="driver-documents-item">
+              <label class="driver-documents-item__label">
+                <i class="pi pi-credit-card"></i>
+                Anverso (frente)
+              </label>
+
+              <app-image-single-selector
+                [imageUrl]="frontDocument().imageUrl"
+                [fileName]="frontDocument().fileName"
+                [disabled]="isLoading() || isSaving()"
+                [isLoading]="frontDocument().isLoading"
+                (fileSelected)="onDocumentSelected('front', $event)"
+                (downloadRequested)="onDocumentDownload('front')"
+                (deleteRequested)="onDocumentDelete('front')"
+              />
+            </div>
+
+            <div class="driver-documents-item">
+              <label class="driver-documents-item__label">
+                <i class="pi pi-credit-card"></i>
+                Reverso (dorso)
+              </label>
+
+              <app-image-single-selector
+                [imageUrl]="backDocument().imageUrl"
+                [fileName]="backDocument().fileName"
+                [disabled]="isLoading() || isSaving()"
+                [isLoading]="backDocument().isLoading"
+                (fileSelected)="onDocumentSelected('back', $event)"
+                (downloadRequested)="onDocumentDownload('back')"
+                (deleteRequested)="onDocumentDelete('back')"
+              />
+            </div>
+          </div>
+        </div>
+      </p-card>
     }
-
-    <div class="form-actions">
-      <button type="button" pButton label="Volver" severity="secondary" styleClass="flat-button" (click)="onCancel()"></button>
-      <button
-        type="button"
-        pButton
-        label="Guardar"
-        icon="pi pi-save"
-        styleClass="flat-button"
-        [disabled]="isLoading() || isSaving()"
-        (click)="onSubmit()"
-      ></button>
-    </div>
-  </p-card>
+  </div>
 </div>

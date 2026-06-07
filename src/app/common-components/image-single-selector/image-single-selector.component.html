@@ -1,0 +1,55 @@
+<div class="image-single-selector">
+  <input #fileInput type="file" class="image-single-selector__input" [accept]="accept()" [disabled]="disabled() || isLoading()" (change)="onFileInputChange($event)" />
+
+  <div
+    class="image-single-selector__card"
+    [class.image-single-selector__card--empty]="!imageUrl()"
+    [class.image-single-selector__card--drag-active]="isDragActive()"
+    [class.image-single-selector__card--disabled]="disabled()"
+    [class.image-single-selector__card--loading]="isLoading()"
+    (dragover)="onDragOver($event)"
+    (dragleave)="onDragLeave($event)"
+    (drop)="onDrop($event)"
+  >
+    @if (imageUrl(); as currentImageUrl) {
+      <div class="image-single-selector__preview-shell">
+        <div class="image-single-selector__preview-frame">
+          <img class="image-single-selector__preview-image" [src]="currentImageUrl" [alt]="fileName() ?? 'Vista previa'" />
+        </div>
+
+        <div class="image-single-selector__footer">
+          <button type="button" class="image-single-selector__file-link" [disabled]="isLoading()" (click)="onDownloadClick()">
+            {{ fileName() ?? 'Descargar imagen' }}
+          </button>
+
+          <button
+            type="button"
+            pButton
+            severity="danger"
+            [outlined]="true"
+            icon="pi pi-trash"
+            class="image-single-selector__delete-button"
+            [disabled]="disabled() || isLoading()"
+            (click)="onDeleteClick()"
+          ></button>
+        </div>
+      </div>
+    } @else {
+      <button type="button" class="image-single-selector__empty" [disabled]="disabled() || isLoading()" (click)="openFileDialog()">
+        <i class="pi pi-cloud-upload image-single-selector__upload-icon"></i>
+        <span>                  
+          <strong class="image-single-selector__empty-title">{{ emptyTitle() }}</strong>
+        </span>
+        @if (emptySubtitle()) {
+          <span class="image-single-selector__empty-subtitle">{{ emptySubtitle() }}</span>
+        }
+
+        <small class="image-single-selector__helper italic">{{ helperText() }}</small>
+      </button>
+    }
+  </div>
+
+  @if (validationMessage()) {
+    <small class="image-single-selector__error">{{ validationMessage() }}</small>
+  }
+</div>

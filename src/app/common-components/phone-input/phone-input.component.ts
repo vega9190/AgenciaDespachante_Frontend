@@ -6,8 +6,8 @@ import { InputTextModule } from 'primeng/inputtext';
 @Component({
   selector: 'app-phone-input',
   imports: [ReactiveFormsModule, InputTextModule],
-  templateUrl: './app-phone-input.component.html',
-  styleUrl: './app-phone-input.component.css'
+  templateUrl: './phone-input.component.html',
+  styleUrl: './phone-input.component.css'
 })
 export class AppPhoneInputComponent implements OnInit {
   readonly control = input.required<FormControl<string>>();

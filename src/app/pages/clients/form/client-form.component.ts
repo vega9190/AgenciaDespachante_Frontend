@@ -1,7 +1,7 @@
 import { DatePipe } from '@angular/common';
 import { Component, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { finalize } from 'rxjs';
 
@@ -10,21 +10,13 @@ import { CardModule } from 'primeng/card';
 import { InputTextModule } from 'primeng/inputtext';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
 
-import { AppPhoneInputComponent } from '../../../common-components/app-phone-input/app-phone-input.component';
+import { AppPhoneInputComponent } from '../../../common-components/phone-input/phone-input.component';
+import { ClientFormModel } from '../models/client-form.models';
 import { ApiResult, ApiResultOf } from '@models/api.types';
 import { ClientsService } from '@services/clients/clients.service';
 import { ClientCreateRequest, ClientDetailDto, ClientUpdateRequest } from '@services/clients/clients.types';
 import { AppToastService } from '@services/common/app-toast.service';
 import { UiBlockService } from '@services/common/ui-block.service';
-
-interface ClientFormModel {
-  companyName: FormControl<string>;
-  contactName: FormControl<string>;
-  address: FormControl<string>;
-  contactPhone: FormControl<string>;
-  taxId: FormControl<string>;
-  isActive: FormControl<boolean>;
-}
 
 @Component({
   selector: 'app-client-form',

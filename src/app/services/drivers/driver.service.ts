@@ -67,6 +67,7 @@ export class DriverService {
   downloadDocument(id: string, isFront: boolean) {
     return this.httpClient.get(`${this.driversUrl}/${id}/documents/file`, {
       params: buildHttpParams({ isFront }),
+      observe: 'response',
       responseType: 'blob'
     });
   }

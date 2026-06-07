@@ -24,9 +24,10 @@
         </div>
 
         <div class="flex flex-col gap-2">
-          <label for="client" class="font-semibold">Cliente</label>
+          <label id="clientLabel" class="font-semibold">Cliente</label>
           <p-autocomplete
             inputId="client"
+            ariaLabelledBy="clientLabel"
             formControlName="client"
             [suggestions]="clientSuggestions()"
             optionLabel="name"
@@ -39,9 +40,10 @@
         </div>
 
         <div class="flex flex-col gap-2">
-          <label for="statusId" class="font-semibold">Estado</label>
+          <label id="statusIdLabel" class="font-semibold">Estado</label>
           <p-select
             inputId="statusId"
+            ariaLabelledBy="statusIdLabel"
             formControlName="statusId"
             [options]="statusOptions()"
             optionLabel="label"

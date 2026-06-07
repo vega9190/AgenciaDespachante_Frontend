@@ -14,6 +14,7 @@ import { TagModule } from 'primeng/tag';
 
 import { DriverService } from '@services/drivers/driver.service';
 import { DriverListItemDto, DriversListQuery } from '@services/drivers/drivers.types';
+import { TooltipModule } from 'primeng/tooltip';
 
 interface DriversFiltersForm {
   driverNumber: FormControl<number | null>;
@@ -29,7 +30,7 @@ interface SelectOption {
 
 @Component({
   selector: 'app-drivers-list',
-  imports: [ReactiveFormsModule, DatePipe, ButtonModule, CardModule, InputNumberModule, InputTextModule, SelectModule, TableModule, TagModule],
+  imports: [ReactiveFormsModule, DatePipe, ButtonModule, CardModule, InputNumberModule, InputTextModule, SelectModule, TableModule, TagModule, TooltipModule],
   templateUrl: './drivers-list.component.html',
   styleUrl: './drivers-list.component.css'
 })
@@ -117,6 +118,22 @@ export class DriversListComponent {
 
   getDocumentLabel(itHasDocument: boolean): string {
     return itHasDocument ? 'Si' : 'No';
+  }
+
+  getDocumentSeverity(itHasDocument: boolean): 'success' | 'danger' {
+    return itHasDocument ? 'success' : 'danger';
+  }
+
+  showExpirationAlert(driver: DriverListItemDto): boolean {
+    return driver.isExpired || driver.itExpiresSoon;
+  }
+
+  getExpirationAlertTooltip(driver: DriverListItemDto): string {
+    if (driver.isExpired) {
+      return 'La tarjeta de Operación caducó';
+    }
+
+    return 'La tarjeta de Operación caducará pronto';
   }
 
   private loadDrivers(): void {

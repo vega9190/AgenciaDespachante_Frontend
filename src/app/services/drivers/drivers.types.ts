@@ -18,6 +18,8 @@ export interface DriverListItemDto {
   itHasDocument: boolean;
   createdUtc: string;
   isExternal: boolean;
+  itExpiresSoon: boolean; 
+  isExpired: boolean;
 }
 
 export interface PagedResult<T> {

@@ -7,9 +7,10 @@
     <div class="filters-layout filters-content">
       <form [formGroup]="filtersForm" class="filters-grid">
         <div class="flex flex-col gap-2">
-          <label for="driverNumber" class="font-semibold">Nro. Chofer</label>
+          <label id="driverNumberLabel" class="font-semibold">Nro. Chofer</label>
           <p-inputnumber
             inputId="driverNumber"
+            ariaLabelledBy="driverNumberLabel"
             formControlName="driverNumber"
             [min]="1"
             [useGrouping]="false"
@@ -23,9 +24,10 @@
         </div>
 
         <div class="flex flex-col gap-2">
-          <label for="isActive" class="font-semibold">Estado</label>
+          <label id="isActiveLabel" class="font-semibold">Estado</label>
           <p-select
             inputId="isActive"
+            ariaLabelledBy="isActiveLabel"
             formControlName="isActive"
             [options]="statusOptions"
             optionLabel="label"
@@ -35,9 +37,10 @@
         </div>
 
         <div class="flex flex-col gap-2">
-          <label for="isExternal" class="font-semibold">Tipo Chofer</label>
+          <label id="isExternalLabel" class="font-semibold">Tipo Chofer</label>
           <p-select
             inputId="isExternal"
+            ariaLabelledBy="isExternalLabel"
             formControlName="isExternal"
             [options]="driverTypeOptions"
             optionLabel="label"
@@ -82,7 +85,7 @@
           <th>Estado</th>
           <th>Tipo Chofer</th>
           <th>Fecha Alta</th>
-          <th>Documento</th>
+          <th>Documento Subido</th>
           <th class="text-center">Acciones</th>
         </tr>
       </ng-template>
@@ -97,18 +100,40 @@
           </td>
           <td>{{ getDriverTypeLabel(driver.isExternal) }}</td>
           <td>{{ driver.createdUtc | date: 'dd/MM/yyyy' }}</td>
-          <td>{{ getDocumentLabel(driver.itHasDocument) }}</td>
+          <td>
+            <p-tag [value]="getDocumentLabel(driver.itHasDocument)" [severity]="getDocumentSeverity(driver.itHasDocument)" />
+          </td>
           <td class="text-center">
-            <button
-              type="button"
-              pButton
-              icon="pi pi-pencil"
-              text
-              rounded
-              styleClass="flat-button"
-              ariaLabel="Editar chofer"
-              (click)="onEdit(driver)"
-            ></button>
+            <div class="driver-actions">
+              <button
+                type="button"
+                pButton
+                icon="pi pi-pencil"
+                text
+                rounded
+                styleClass="flat-button"
+                [pTooltip]="'Editar'"
+                tooltipPosition="top"
+                ariaLabel="Editar chofer"
+                (click)="onEdit(driver)"
+              ></button>
+
+              @if (showExpirationAlert(driver)) {
+                <button
+                  type="button"
+                  pButton
+                  icon="pi pi-info-circle"
+                  text
+                  rounded
+                  styleClass="flat-button driver-actions__alert"
+                  [class.driver-actions__alert--expired]="driver.isExpired"
+                  [class.driver-actions__alert--soon]="!driver.isExpired && driver.itExpiresSoon"
+                  [pTooltip]="getExpirationAlertTooltip(driver)"
+                  tooltipPosition="top"
+                  [ariaLabel]="getExpirationAlertTooltip(driver)"
+                ></button>
+              }
+            </div>
           </td>
         </tr>
       </ng-template>

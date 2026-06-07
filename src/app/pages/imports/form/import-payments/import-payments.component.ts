@@ -1,10 +1,11 @@
 import { Component, computed, effect, inject, input, output, signal } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { finalize } from 'rxjs';
 
 import { ConfirmationService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
+import { DatePickerModule } from 'primeng/datepicker';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
@@ -12,6 +13,8 @@ import { TableModule } from 'primeng/table';
 import { TooltipModule } from 'primeng/tooltip';
 
 import { FileSelectorComponent } from '../../../../common-components/file-selector/file-selector.component';
+import { formatDateForBackend } from '../../../../functions/common.function';
+import { ImportPaymentsFormModel } from '../../models/import-form.models';
 import { ApiResult, ApiResultOf } from '@models/api.types';
 import { AppToastService } from '@services/common/app-toast.service';
 import { UiBlockService } from '@services/common/ui-block.service';
@@ -28,20 +31,13 @@ import {
 } from '@services/imports/imports.types';
 import { ImportsService } from '@services/imports/imports.service';
 
-interface ImportPaymentsFormModel {
-  type: FormControl<ImportPaymentType | null>;
-  amount: FormControl<number | null>;
-  paymentDate: FormControl<string>;
-  notes: FormControl<string>;
-  importDocumentTypeId: FormControl<string | null>;
-}
-
 @Component({
   selector: 'app-import-payments',
   imports: [
     ReactiveFormsModule,
     ButtonModule,
     CardModule,
+    DatePickerModule,
     FileSelectorComponent,
     InputNumberModule,
     InputTextModule,
@@ -77,7 +73,7 @@ export class ImportPaymentsComponent {
   readonly paymentForm: FormGroup<ImportPaymentsFormModel> = this.formBuilder.group({
     type: this.formBuilder.control<ImportPaymentType | null>(null, [Validators.required]),
     amount: this.formBuilder.control<number | null>(null, [Validators.required, Validators.min(0.01)]),
-    paymentDate: this.formBuilder.nonNullable.control(this.getTodayDateValue()),
+    paymentDate: this.formBuilder.control<Date | null>(this.getTodayDate(), [Validators.required]),
     notes: this.formBuilder.nonNullable.control(''),
     importDocumentTypeId: this.formBuilder.control<string | null>({ value: null, disabled: true })
   });
@@ -309,7 +305,7 @@ export class ImportPaymentsComponent {
     const request: SaveImportPaymentRequest = {
       type: formValue.type,
       amount: formValue.amount,
-      paymentDate: formValue.paymentDate,
+      paymentDate: formatDateForBackend(formValue.paymentDate) ?? '',
       notes: formValue.notes.trim() || undefined
     };
 
@@ -329,7 +325,7 @@ export class ImportPaymentsComponent {
     this.paymentForm.reset({
       type: null,
       amount: null,
-      paymentDate: this.getTodayDateValue(),
+      paymentDate: this.getTodayDate(),
       notes: '',
       importDocumentTypeId: null
     });
@@ -374,13 +370,9 @@ export class ImportPaymentsComponent {
     documentTypeControl.enable({ emitEvent: false });
   }
 
-  private getTodayDateValue(): string {
+  private getTodayDate(): Date {
     const today = new Date();
-    const year = today.getFullYear();
-    const month = String(today.getMonth() + 1).padStart(2, '0');
-    const day = String(today.getDate()).padStart(2, '0');
-
-    return `${year}-${month}-${day}`;
+    return new Date(today.getFullYear(), today.getMonth(), today.getDate());
   }
 
   private isSuccessfulResponse<T>(response: ApiResultOf<T> | ApiResult | null | undefined): response is ApiResult {

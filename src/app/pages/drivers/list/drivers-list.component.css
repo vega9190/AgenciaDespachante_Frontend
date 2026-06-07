@@ -34,6 +34,25 @@
   gap: 1rem;
 }
 
+.driver-actions {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+}
+
+:host ::ng-deep .driver-actions__alert {
+  pointer-events: auto;
+}
+
+:host ::ng-deep .driver-actions__alert--expired {
+  color: var(--p-red-500);
+}
+
+:host ::ng-deep .driver-actions__alert--soon {
+  color: var(--p-orange-500);
+}
+
 :host ::ng-deep .p-card-body {
   gap: 0;
 }
