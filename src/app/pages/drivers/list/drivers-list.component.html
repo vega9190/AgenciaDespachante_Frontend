@@ -119,19 +119,16 @@
               ></button>
 
               @if (showExpirationAlert(driver)) {
-                <button
-                  type="button"
-                  pButton
-                  icon="pi pi-info-circle"
-                  text
-                  rounded
-                  styleClass="flat-button driver-actions__alert"
+                <span
+                  class="pi pi-info-circle driver-actions__alert"
                   [class.driver-actions__alert--expired]="driver.isExpired"
                   [class.driver-actions__alert--soon]="!driver.isExpired && driver.itExpiresSoon"
                   [pTooltip]="getExpirationAlertTooltip(driver)"
                   tooltipPosition="top"
-                  [ariaLabel]="getExpirationAlertTooltip(driver)"
-                ></button>
+                  tabindex="0"
+                  role="img"
+                  [attr.aria-label]="getExpirationAlertTooltip(driver)"
+                ></span>
               }
             </div>
           </td>
