@@ -80,13 +80,10 @@ export class ImportPaymentsComponent {
 
   constructor() {
     effect(() => {
-      this.importId();
+      const id = this.importId();
       this.resetPaymentForm();
       this.loadDocumentTypeOptions();
-    });
-
-    effect(() => {
-      this.payments.set(this.importItem().payments);
+      this.loadInitialPayments(id);
     });
 
     effect(() => {
@@ -256,16 +253,20 @@ export class ImportPaymentsComponent {
       });
   }
 
+  private loadInitialPayments(id: string): void {
+    this.importsService.getPayments(id).subscribe((response) => {
+      this.payments.set(response.data ?? []);
+    });
+  }
+
   private refreshPayments(id: string): void {
     this.importsService.getPayments(id).subscribe((response) => {
-      if (!response.data) {
-        return;
-      }
+      const payments = response.data ?? [];
 
-      this.payments.set(response.data);
+      this.payments.set(payments);
       this.importChanged.emit({
         ...this.importItem(),
-        payments: response.data
+        payments
       });
     });
   }

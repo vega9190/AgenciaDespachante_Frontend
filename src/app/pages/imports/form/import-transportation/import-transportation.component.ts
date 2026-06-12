@@ -7,19 +7,21 @@ import { DatePickerModule } from 'primeng/datepicker';
 import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
 import { TableModule } from 'primeng/table';
+import { TooltipModule } from 'primeng/tooltip';
 
 import { ApiResult, ApiResultOf } from '@models/api.types';
 import { formatDateForBackend } from '../../../../functions/common.function';
 import { AppToastService } from '@services/common/app-toast.service';
 import { UiBlockService } from '@services/common/ui-block.service';
+import { isReadOnlyImportStatus } from '@services/imports/import-status.constants';
 import {
-  ImportDetailDto,
   SaveTransportationRequest,
   SaveTransportationTrackingRequest,
   TransportationDto,
   TransportationTrackingDto,
   TransportationTrackingType
 } from '@services/imports/imports.types';
+import { DriverDetailDto } from '@services/drivers/drivers.types';
 import { ImportsService } from '@services/imports/imports.service';
 
 interface TransportationStatusOption {
@@ -42,7 +44,7 @@ interface TransportationTrackingFormModel {
 
 @Component({
   selector: 'app-import-transportation',
-  imports: [ReactiveFormsModule, ButtonModule, DatePickerModule, InputTextModule, SelectModule, TableModule],
+  imports: [ReactiveFormsModule, ButtonModule, DatePickerModule, InputTextModule, SelectModule, TableModule, TooltipModule],
   templateUrl: './import-transportation.component.html',
   styleUrl: './import-transportation.component.css'
 })
@@ -53,9 +55,11 @@ export class ImportTransportationComponent {
   private readonly uiBlockService = inject(UiBlockService);
 
   readonly importId = input.required<string>();
-  readonly importItem = input.required<ImportDetailDto>();
+  readonly importStatusId = input.required<string>();
+  readonly driver = input<DriverDetailDto | null>(null);
 
   readonly tracking = signal<TransportationTrackingDto[]>([]);
+  readonly isLoadingTransportation = signal(false);
   readonly isLoadingTracking = signal(false);
   readonly isSavingTransportation = signal(false);
   readonly isSavingTracking = signal(false);
@@ -65,7 +69,7 @@ export class ImportTransportationComponent {
   readonly transportationTimelineSteps = TRANSPORTATION_STATUS_FLOW;
   readonly canSaveTracking = computed(() => {
     const startDate = this.transportationForm.controls.startDate.value;
-    return !!startDate && !this.isSavingTracking();
+    return !!startDate && !this.isSavingTracking() && !this.isReadOnly();
   });
 
   readonly statusOptions = computed(() => this.buildStatusOptions(this.savedTransportationStatusId()));
@@ -81,6 +85,7 @@ export class ImportTransportationComponent {
     const currentStatusId = this.savedTransportationStatusId().toLowerCase();
     return currentStatusId === TRANSPORTATION_STATUS_IDS.finalizado.toLowerCase();
   });
+  readonly isReadOnly = computed(() => isReadOnlyImportStatus(this.importStatusId()));
 
   readonly transportationForm: FormGroup = this.formBuilder.group({
     startDate: this.formBuilder.control<Date | null>(null, [Validators.required]),
@@ -94,9 +99,8 @@ export class ImportTransportationComponent {
   constructor() {
     effect(() => {
       const importId = this.importId();
-      const transportation = this.importItem().transportation;
 
-      this.syncTransportationForm(transportation);
+      this.loadTransportation(importId);
       this.loadTracking(importId);
     });
 
@@ -107,7 +111,7 @@ export class ImportTransportationComponent {
   }
 
   onSaveTransportation(): void {
-    if (this.isSavingTransportation() || this.transportationForm.invalid || this.isTransportationLocked()) {
+    if (this.isSavingTransportation() || this.transportationForm.invalid || this.isTransportationLocked() || this.isReadOnly()) {
       this.transportationForm.markAllAsTouched();
       return;
     }
@@ -140,6 +144,7 @@ export class ImportTransportationComponent {
 
         this.savedTransportationStatusId.set(normalizedStatusId);
         this.transportationForm.controls.statusId.setValue(normalizedStatusId, { emitEvent: false });
+        this.loadTransportation(this.importId());
         this.loadTracking(this.importId());
       });
   }
@@ -255,6 +260,20 @@ export class ImportTransportationComponent {
     return currentStepIndex > stepIndex ? 'completed' : 'pending';
   }
 
+  hasDriverWhatsappPhone(): boolean {
+    return !!this.getDriverWhatsappPhone();
+  }
+
+  openDriverWhatsapp(): void {
+    const phoneNumber = this.getDriverWhatsappPhone();
+
+    if (!phoneNumber) {
+      return;
+    }
+
+    window.open(`https://wa.me/${phoneNumber}`, '_blank', 'noopener,noreferrer');
+  }
+
   private syncTransportationForm(transportation: TransportationDto | null | undefined): void {
     const normalizedStatusId = this.normalizeTransportationStatusId(transportation?.statusId);
 
@@ -267,7 +286,7 @@ export class ImportTransportationComponent {
   }
 
   private syncTransportationFormDisabledState(): void {
-    if (this.isSavingTransportation() || this.isTransportationLocked()) {
+    if (this.isLoadingTransportation() || this.isSavingTransportation() || this.isTransportationLocked() || this.isReadOnly()) {
       this.transportationForm.disable({ emitEvent: false });
       return;
     }
@@ -276,7 +295,7 @@ export class ImportTransportationComponent {
   }
 
   private syncTrackingFormDisabledState(): void {
-    if (this.isSavingTracking()) {
+    if (this.isSavingTracking() || this.isReadOnly()) {
       this.trackingForm.disable({ emitEvent: false });
       return;
     }
@@ -307,7 +326,18 @@ export class ImportTransportationComponent {
       .subscribe((response) => {
         this.tracking.set(response.data ?? []);
       });
-  } 
+  }
+
+  private loadTransportation(importId: string): void {
+    this.isLoadingTransportation.set(true);
+
+    this.importsService
+      .getTransportation(importId)
+      .pipe(finalize(() => this.isLoadingTransportation.set(false)))
+      .subscribe((response) => {
+        this.syncTransportationForm(response.data);
+      });
+  }
 
   private buildStatusOptions(savedStatusId: string): TransportationStatusOption[] {
     const normalizedSavedStatusId = this.normalizeTransportationStatusId(savedStatusId).toLowerCase();
@@ -337,6 +367,25 @@ export class ImportTransportationComponent {
 
     const [, year, month, day] = match;
     return new Date(Number(year), Number(month) - 1, Number(day));
+  }
+
+  private getDriverWhatsappPhone(): string | null {
+    return this.normalizeWhatsappPhone(this.driver()?.phoneNumber);
+  }
+
+  private normalizeWhatsappPhone(phoneNumber: string | null | undefined): string | null {
+    const digitsOnly = (phoneNumber ?? '').replace(/\D/g, '');
+
+    if (!digitsOnly) {
+      return null;
+    }
+
+    const digitsWithoutInternationalPrefix = digitsOnly.replace(/^00/, '');
+    const normalizedPhoneNumber = digitsWithoutInternationalPrefix.startsWith('591')
+      ? digitsWithoutInternationalPrefix
+      : `591${digitsWithoutInternationalPrefix.replace(/^0+/, '')}`;
+
+    return normalizedPhoneNumber.length > 3 ? normalizedPhoneNumber : null;
   }
 
   private normalizeTransportationStatusId(statusId: string | null | undefined): string {

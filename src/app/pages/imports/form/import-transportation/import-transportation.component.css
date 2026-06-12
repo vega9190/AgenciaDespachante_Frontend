@@ -51,6 +51,44 @@
   color: var(--p-text-color);
 }
 
+.transportation-readonly-field--with-action {
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.transportation-whatsapp-button {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border: 0;
+  border-radius: 9999px;
+  background: color-mix(in srgb, var(--tenant-success-color) 16%, white);
+  color: var(--tenant-success-color);
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease,
+    opacity 0.2s ease;
+}
+
+.transportation-whatsapp-button:hover:not(:disabled) {
+  background: var(--tenant-success-color);
+  color: white;
+}
+
+.transportation-whatsapp-button:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--tenant-success-color) 30%, transparent);
+  outline-offset: 2px;
+}
+
+.transportation-whatsapp-button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
 .transportation-tracking-section {
   margin-top: 2rem;
   padding-top: 2rem;

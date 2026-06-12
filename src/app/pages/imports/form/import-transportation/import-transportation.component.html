@@ -8,12 +8,25 @@
       <div class="transportation-driver-grid">
         <div class="flex flex-col gap-2">
           <label class="font-semibold">Nombre</label>
-          <div class="transportation-readonly-field">{{ importItem().driver?.fullName || '-' }}</div>
+          <div class="transportation-readonly-field">{{ driver()?.fullName || '-' }}</div>
         </div>
 
         <div class="flex flex-col gap-2">
           <label class="font-semibold">Teléfono</label>
-          <div class="transportation-readonly-field">{{ importItem().driver?.phoneNumber || '-' }}</div>
+          <div class="transportation-readonly-field transportation-readonly-field--with-action">
+            <span>{{ driver()?.phoneNumber || '-' }}</span>
+            <button
+              type="button"
+              class="transportation-whatsapp-button"
+              aria-label="Enviar Whatsapp"
+              [pTooltip]="'Enviar Whatsapp'"
+              tooltipPosition="top"
+              [disabled]="!hasDriverWhatsappPhone()"
+              (click)="openDriverWhatsapp()"
+            >
+              <i class="pi pi-whatsapp" aria-hidden="true"></i>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -58,7 +71,7 @@
         label="Guardar"
         icon="pi pi-save"
         styleClass="flat-button"
-        [disabled]="isSavingTransportation() || isTransportationLocked()"
+        [disabled]="isLoadingTransportation() || isSavingTransportation() || isTransportationLocked() || isReadOnly()"
         (click)="onSaveTransportation()"
       ></button>
     </div>

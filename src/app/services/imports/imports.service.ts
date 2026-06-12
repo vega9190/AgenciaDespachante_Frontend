@@ -26,6 +26,7 @@ import {
   SaveImportPaymentRequest,
   SaveTransportationRequest,
   SaveTransportationTrackingRequest,
+  TransportationDto,
   TransportationTrackingDto,
   UpdateImportRequest,
   UpdateImportStatusRequest
@@ -58,6 +59,10 @@ export class ImportsService {
 
   getById(id: string) {
     return this.httpClient.get<ApiResultOf<ImportDetailDto>>(`${this.importsUrl}/${id}`);
+  }
+
+  getTransportation(id: string) {
+    return this.httpClient.get<ApiResultOf<TransportationDto | null>>(`${this.importsUrl}/${id}/transportation`);
   }
 
   getTransportationTracking(id: string) {

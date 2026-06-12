@@ -188,7 +188,8 @@
           <p-tabpanel value="transportation">
             <app-import-transportation
               [importId]="currentImport.id"
-              [importItem]="currentImport"
+              [importStatusId]="currentImport.statusId"
+              [driver]="currentImport.driver"
             />
           </p-tabpanel>
         }
