@@ -14,19 +14,19 @@
 >
   <ng-template #header>
     <tr>
+      <th>Fecha</th>
       <th>Mensaje</th>
       <th>Acción</th>
-      <th>Usuario</th>
-      <th>Fecha</th>
+      <th>Usuario</th>      
     </tr>
   </ng-template>
 
   <ng-template #body let-log>
     <tr>
+      <td>{{ log.occurredAt | date: 'dd/MM/yy HH:mm' }}</td>
       <td>{{ log.message }}</td>
       <td>{{ log.action }}</td>
-      <td>{{ log.userName || '-' }}</td>
-      <td>{{ log.occurredAt | date: 'dd/MM/yy HH:mm' }}</td>
+      <td>{{ log.userName || '-' }}</td>      
     </tr>
   </ng-template>
 

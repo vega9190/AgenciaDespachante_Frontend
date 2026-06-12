@@ -20,10 +20,11 @@ import { ImportDetailsComponent } from './import-details/import-details.componen
 import { ImportDocumentsComponent } from './import-documents/import-documents.component';
 import { ImportLogsComponent } from './import-logs/import-logs.component';
 import { ImportPaymentsComponent } from './import-payments/import-payments.component';
+import { ImportTransportationComponent } from './import-transportation/import-transportation.component';
 
 @Component({
   selector: 'app-import-form',
-  imports: [ButtonModule, DatePipe, CardModule, ConfirmDialogModule, Tabs, TabList, Tab, TabPanels, TabPanel, TooltipModule, ImportDetailsComponent, ImportDocumentsComponent, ImportPaymentsComponent, ImportLogsComponent],
+  imports: [ButtonModule, DatePipe, CardModule, ConfirmDialogModule, Tabs, TabList, Tab, TabPanels, TabPanel, TooltipModule, ImportDetailsComponent, ImportDocumentsComponent, ImportPaymentsComponent, ImportLogsComponent, ImportTransportationComponent],
   templateUrl: './import-form.component.html',
   styleUrl: './import-form.component.css'
 })
@@ -70,6 +71,7 @@ export class ImportFormComponent {
       .map((requiredDocumentType) => documentTypeOptionsById.get(requiredDocumentType.importDocumentTypeId))
       .filter((documentName): documentName is string => !!documentName);
   });
+  readonly timelineLegendPrefix = 'Para avanzar:';
   readonly timelineLegend = computed(() => {
     const currentImport = this.importItem();
 
@@ -84,13 +86,13 @@ export class ImportFormComponent {
     }
 
     if (normalizedStatusId === IMPORT_STATUS_IDS.nuevo.toLowerCase()) {
-      return 'Para avanzar: Subir un documento';
+      return 'Subir un documento';
     }
 
     if (this.requiresDocumentApprovalLegend(normalizedStatusId)) {
       const documentNames = this.requiredTimelineDocumentNames().join(', ');
 
-      return documentNames ? `Para avanzar: Aprobar los documentos ${documentNames}` : 'Para avanzar: Aprobar los documentos';
+      return documentNames ? `Aprobar los documentos ${documentNames}` : 'Aprobar los documentos';
     }
 
     return null;

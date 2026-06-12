@@ -1,0 +1,329 @@
+.transportation-layout {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.transportation-panel {
+  min-height: 100%;
+  border: 1px solid var(--tenant-layout-border);
+  border-radius: 1rem;
+  padding: 1.25rem;
+}
+
+.transportation-panel--form {
+  display: flex;
+  flex-direction: column;
+}
+
+.transportation-panel__title {
+  margin: 0;
+  color: var(--tenant-secondary);
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+
+.transportation-panel__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.transportation-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.transportation-driver-grid {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.transportation-readonly-field {
+  min-height: 2.75rem;
+  display: flex;
+  align-items: center;
+  padding: 0.75rem 0.875rem;
+  border: 1px solid var(--tenant-layout-border);
+  border-radius: 0.75rem;
+  background-color: var(--p-surface-50);
+  color: var(--p-text-color);
+}
+
+.transportation-tracking-section {
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--tenant-layout-border);
+}
+
+.transportation-timeline-card {
+  border: 1px solid var(--tenant-layout-border);
+  border-radius: 1rem;
+  background: color-mix(in srgb, var(--tenant-content-background) 88%, white);
+  padding: 1.25rem;
+  margin-bottom: 2rem;
+}
+
+.transportation-timeline-section {
+  display: grid;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.transportation-timeline-card__main {
+  min-width: 0;
+}
+
+.transportation-timeline {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.transportation-timeline__legend {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  margin: 1rem 0 0;
+  color: var(--p-text-muted-color);
+  font-size: 0.95rem;
+  font-weight: 600;
+  font-style: italic;
+  line-height: 1.4;
+  text-align: center;
+}
+
+.transportation-timeline__legend-icon {
+  flex: 0 0 auto;
+  font-size: 0.95rem;
+}
+
+.transportation-timeline__item {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+  text-align: center;
+}
+
+.transportation-timeline__marker {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  width: 2.5rem;
+  height: 2.5rem;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--p-content-border-color);
+  border-radius: 9999px;
+  background: var(--p-surface-0);
+  color: var(--p-text-muted-color, var(--p-text-secondary-color));
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.transportation-timeline__marker--completed {
+  border-color: var(--p-green-500);
+  background: var(--p-green-500);
+  color: white;
+}
+
+.transportation-timeline__marker--current {
+  border-width: 2px;
+  border-color: var(--tenant-secondary);
+  color: var(--tenant-secondary);
+  box-shadow: 0 0 0 0.22rem color-mix(in srgb, var(--tenant-secondary) 18%, transparent);
+}
+
+.transportation-timeline__marker--finalized {
+  border-width: 2px;
+  border-color: var(--tenant-success-color);
+  background: var(--tenant-success-surface);
+  color: var(--tenant-success-color);
+  box-shadow: 0 0 0 0.22rem color-mix(in srgb, var(--p-green-500) 18%, transparent);
+}
+
+.transportation-timeline__connector {
+  position: absolute;
+  top: 1.25rem;
+  left: calc(50% + 1.5rem);
+  width: calc(100% - 3rem);
+  height: 2px;
+  background: var(--p-content-border-color);
+}
+
+.transportation-timeline__connector--completed {
+  background: var(--tenant-success-color);
+}
+
+.transportation-timeline__label {
+  color: var(--p-text-secondary-color);
+  font-size: 0.95rem;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.transportation-timeline__label--active {
+  color: var(--p-text-color);
+}
+
+.transportation-transit-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  min-height: 100%;
+  padding: 1.1rem;
+  border: 1px solid var(--tenant-layout-border);
+  border-radius: 1rem;
+  background: var(--p-surface-0);
+}
+
+.transportation-transit-card__icon {
+  flex: 0 0 auto;
+  display: inline-flex;
+  width: 3rem;
+  height: 3rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.9rem;
+  background: color-mix(in srgb, var(--tenant-secondary) 14%, white);
+  color: var(--tenant-secondary);
+  font-size: 1.1rem;
+}
+
+.transportation-transit-card__content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-width: 0;
+}
+
+.transportation-transit-card__label {
+  color: var(--p-text-secondary-color);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.transportation-transit-card__value {
+  color: var(--p-text-color);
+  font-size: 1.8rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.transportation-text-wrap {
+  display: inline-block;
+  min-width: 0;
+  white-space: normal;
+  word-break: break-word;
+}
+
+.transportation-table__date-column {
+  width: 9rem;
+}
+
+.transportation-table__type-column,
+.transportation-table__user-column {
+  width: 10rem;
+}
+
+.field-error {
+  color: var(--p-red-500);
+}
+
+.form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+:host ::ng-deep .transportation-driver-grid .p-select,
+:host ::ng-deep .transportation-driver-grid .p-select-label,
+:host ::ng-deep .transportation-driver-grid .p-datepicker,
+:host ::ng-deep .transportation-driver-grid .p-datepicker-input {
+  width: 100%;
+}
+
+:host ::ng-deep .transportation-table .p-datatable-table {
+  table-layout: auto;
+  width: 100%;
+}
+
+:host ::ng-deep .transportation-table .p-datatable-thead > tr > th,
+:host ::ng-deep .transportation-table .p-datatable-tbody > tr > td {
+  vertical-align: middle;
+  white-space: normal;
+}
+
+@media screen and (min-width: 768px) {
+  .transportation-layout {
+    grid-template-columns: minmax(0, 4fr) minmax(18rem, 8fr);
+    align-items: stretch;
+  }
+
+  .transportation-driver-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .transportation-timeline-section {
+    grid-template-columns: minmax(0, 10fr) minmax(10rem, 2fr);
+    align-items: stretch;
+  }
+
+  .transportation-timeline-card {
+    margin-bottom: 0;
+  }
+}
+
+@media screen and (max-width: 767px) {
+  .transportation-timeline-section {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .transportation-timeline {
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+    gap: 1rem;
+  }
+
+  .transportation-timeline__item {
+    display: grid;
+    grid-template-columns: 2.5rem 1fr;
+    align-items: center;
+    justify-items: start;
+    column-gap: 0.9rem;
+    text-align: left;
+  }
+
+  .transportation-timeline__connector {
+    top: calc(100% - 0.15rem);
+    left: 1.2rem;
+    width: 2px;
+    height: 1rem;
+  }
+
+  .transportation-timeline__label {
+    min-height: 2.5rem;
+    display: flex;
+    align-items: center;
+  }
+
+  .transportation-timeline__legend {
+    align-items: flex-start;
+    justify-content: flex-start;
+    text-align: left;
+  }
+
+  .transportation-transit-card {
+    min-height: auto;
+  }
+
+  .form-actions {
+    flex-direction: column;
+  }
+}

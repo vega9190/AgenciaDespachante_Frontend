@@ -24,6 +24,9 @@ import {
   SaveImportDocumentRequest,
   SaveImportDocumentResponse,
   SaveImportPaymentRequest,
+  SaveTransportationRequest,
+  SaveTransportationTrackingRequest,
+  TransportationTrackingDto,
   UpdateImportRequest,
   UpdateImportStatusRequest
 } from './imports.types';
@@ -55,6 +58,10 @@ export class ImportsService {
 
   getById(id: string) {
     return this.httpClient.get<ApiResultOf<ImportDetailDto>>(`${this.importsUrl}/${id}`);
+  }
+
+  getTransportationTracking(id: string) {
+    return this.httpClient.get<ApiResultOf<TransportationTrackingDto[]>>(`${this.importsUrl}/${id}/transportation/tracking`);
   }
 
   getDocuments(id: string, category?: ImportDocumentCategory) {
@@ -118,6 +125,14 @@ export class ImportsService {
     }
 
     return this.httpClient.post<ApiResultOf<string>>(`${this.importsUrl}/${id}/payments`, formData);
+  }
+
+  saveTransportation(id: string, request: SaveTransportationRequest) {
+    return this.httpClient.post<ApiResultOf<string>>(`${this.importsUrl}/${id}/transportation`, request);
+  }
+
+  saveTransportationTracking(id: string, request: SaveTransportationTrackingRequest) {
+    return this.httpClient.post<ApiResultOf<string>>(`${this.importsUrl}/${id}/transportation/tracking`, request);
   }
 
   downloadDocument(documentId: string) {

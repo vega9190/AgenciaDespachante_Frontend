@@ -1,3 +1,5 @@
+import { DriverDetailDto } from '../drivers/drivers.types';
+
 export interface ImportsListQuery {
   page?: number;
   pageSize?: number;
@@ -33,6 +35,7 @@ export interface ImportListItemDto {
   clientTaxId?: string | null;
   statusId: string;
   statusName: string;
+  charge: number;
   createdUtc: string;
   totalPaymentsAmount: number;
 }
@@ -45,13 +48,41 @@ export interface ImportDetailDto {
   clientId: string;
   clientFullName: string;
   clientTaxId?: string | null;
+  driverId?: string | null;
+  driver?: DriverDetailDto | null;
   statusId: string;
   statusName: string;
+  charge: number;
   createdUtc: string;
+  transportation?: TransportationDto | null;
   documents: ImportDocumentDto[];
   importDocumentTypeRequireds: ImportDocumentTypeRequiredDto[];
   payments: ImportPaymentDto[];
   importLogs: ImportLogDto[];
+}
+
+export interface TransportationDto {
+  id: string;
+  importId: string;
+  statusId: string;
+  statusName: string;
+  startDate: string;
+  transitDays: number;
+}
+
+export enum TransportationTrackingType {
+  Seguimiento = 1,
+  Estado = 2
+}
+
+export interface TransportationTrackingDto {
+  id: string;
+  transportationId: string;
+  message: string;
+  userId: string;
+  username: string;
+  occurredAt: string;
+  type: TransportationTrackingType;
 }
 
 export interface ImportDocumentDto {
@@ -131,6 +162,7 @@ export interface CreateImportRequest {
 
 export interface UpdateImportRequest {
   clientId: string;
+  driverId: string | null;
   containerNumber: string;
   containerType: number;
 }
@@ -165,6 +197,17 @@ export interface SaveImportPaymentRequest {
   notes?: string;
   importDocumentTypeId?: string;
   document?: File;
+}
+
+export interface SaveTransportationRequest {
+  statusId: string;
+  startDate: string;
+  transitDays: number;
+}
+
+export interface SaveTransportationTrackingRequest {
+  message: string;
+  type: TransportationTrackingType;
 }
 
 export interface ContainerTypeOption {

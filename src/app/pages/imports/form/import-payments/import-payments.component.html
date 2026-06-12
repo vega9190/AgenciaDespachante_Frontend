@@ -99,8 +99,8 @@
       <p-table class="payments-table" [value]="payments()">
         <ng-template #header>
           <tr>
-            <th>Tipo</th>
             <th class="payments-table__date-column">Fecha Pago</th>
+            <th>Tipo</th>            
             <th class="payments-table__amount-column text-right">Monto</th>
             <th>Notas</th>
             <th>Tipo Doc.</th>
@@ -112,8 +112,8 @@
 
         <ng-template #body let-payment>
           <tr>
-            <td>{{ getPaymentTypeLabel(payment.type) }}</td>
             <td>{{ formatPaymentDate(payment.paymentDate) }}</td>
+            <td>{{ getPaymentTypeLabel(payment.type) }}</td>            
             <td class="payments-table__amount-column text-right whitespace-nowrap">{{ formatAmount(payment.amount) }}</td>
             <td>
               <span class="payment-text-wrap">{{ payment.notes || '-' }}</span>

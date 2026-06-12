@@ -19,13 +19,31 @@
       }
     </div>
 
+    @if (importId()) {
+      <div class="flex flex-col gap-2">
+        <label id="driverLabel" class="font-semibold">Chofer</label>
+        <p-autocomplete
+          inputId="driver"
+          ariaLabelledBy="driverLabel"
+          formControlName="driver"
+          [suggestions]="driverSuggestions()"
+          optionLabel="fullName"
+          [dropdown]="true"
+          [forceSelection]="true"
+          placeholder="Buscar chofer"
+          (completeMethod)="onDriverSearch($event)"
+          (onDropdownClick)="onDriverDropdownClick()"
+        />
+      </div>
+    }
+
     <div class="flex flex-col gap-2">
       <label for="containerNumber" class="font-semibold">Nro. Contenedor</label>
       <input id="containerNumber" type="text" pInputText formControlName="containerNumber" maxlength="50" />
       @if (getFieldError('containerNumber')) {
         <small class="field-error">{{ getFieldError('containerNumber') }}</small>
       }
-    </div>
+    </div>    
 
     <div class="flex flex-col gap-2">
       <label id="containerTypeLabel" class="font-semibold">Tipo Contenedor</label>

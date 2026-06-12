@@ -1,4 +1,4 @@
-import { Component, computed, effect, inject, input, output, signal } from '@angular/core';
+import { Component, computed, effect, inject, input, output, signal, untracked } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { finalize } from 'rxjs';
@@ -14,6 +14,8 @@ import { ApiResult, ApiResultOf } from '@models/api.types';
 import { ClientsService } from '@services/clients/clients.service';
 import { ClientOptionDto } from '@services/clients/clients.types';
 import { AppToastService } from '@services/common/app-toast.service';
+import { DriverService } from '@services/drivers/driver.service';
+import { DriverOptionDto } from '@services/drivers/drivers.types';
 import { UiBlockService } from '@services/common/ui-block.service';
 import { isReadOnlyImportStatus } from '@services/imports/import-status.constants';
 import { ContainerTypeOption, CreateImportRequest, ImportDetailDto, UpdateImportRequest } from '@services/imports/imports.types';
@@ -29,6 +31,7 @@ export class ImportDetailsComponent {
   private readonly formBuilder = inject(FormBuilder);
   private readonly importsService = inject(ImportsService);
   private readonly clientsService = inject(ClientsService);
+  private readonly driverService = inject(DriverService);
   private readonly router = inject(Router);
   private readonly appToastService = inject(AppToastService);
   private readonly uiBlockService = inject(UiBlockService);
@@ -42,11 +45,14 @@ export class ImportDetailsComponent {
 
   readonly isSaving = signal(false);
   readonly isLoadingClients = signal(false);
+  readonly isLoadingDrivers = signal(false);
   readonly clientSuggestions = signal<ClientOptionDto[]>([]);
+  readonly driverSuggestions = signal<DriverOptionDto[]>([]);
   readonly isReadOnly = computed(() => isReadOnlyImportStatus(this.importItem()?.statusId));
 
   readonly importForm: FormGroup<ImportDetailsFormModel> = this.formBuilder.group({
     client: this.formBuilder.control<ClientOptionDto | null>(null, [Validators.required]),
+    driver: this.formBuilder.control<DriverOptionDto | null>(null),
     containerNumber: this.formBuilder.nonNullable.control('', [Validators.required, Validators.maxLength(50)]),
     containerType: this.formBuilder.control<number | null>(null, [Validators.required])
   });
@@ -59,6 +65,7 @@ export class ImportDetailsComponent {
       if (!importId) {
         this.importForm.reset({
           client: null,
+          driver: null,
           containerNumber: '',
           containerType: null
         });
@@ -71,10 +78,16 @@ export class ImportDetailsComponent {
       }
 
       const selectedClient = this.mapImportClient(currentImport);
-      this.clientSuggestions.set(this.mergeClientOption(selectedClient, this.clientSuggestions()));
+      const selectedDriver = this.mapImportDriver(currentImport);
+      const currentClientSuggestions = untracked(() => this.clientSuggestions());
+      const currentDriverSuggestions = untracked(() => this.driverSuggestions());
+
+      this.clientSuggestions.set(this.mergeClientOption(selectedClient, currentClientSuggestions));
+      this.driverSuggestions.set(this.mergeDriverOption(selectedDriver, currentDriverSuggestions));
 
       this.importForm.reset({
         client: selectedClient,
+        driver: selectedDriver,
         containerNumber: currentImport.containerNumber,
         containerType: currentImport.containerType
       });
@@ -110,6 +123,28 @@ export class ImportDetailsComponent {
     }
 
     this.loadClientSuggestions();
+  }
+
+  onDriverSearch(event: AutoCompleteCompleteEvent): void {
+    if (this.isReadOnly() || !this.importId()) {
+      return;
+    }
+
+    const search = typeof event.query === 'string' ? event.query.trim() : '';
+
+    if (search.length > 0 && search.length < 3) {
+      return;
+    }
+
+    this.loadDriverSuggestions(search || undefined);
+  }
+
+  onDriverDropdownClick(): void {
+    if (this.isReadOnly() || !this.importId()) {
+      return;
+    }
+
+    this.loadDriverSuggestions();
   }
 
   onCancel(): void {
@@ -232,7 +267,16 @@ export class ImportDetailsComponent {
   }
 
   private buildUpdateRequest(): UpdateImportRequest | null {
-    return this.buildCreateRequest();
+    const request = this.buildCreateRequest();
+
+    if (!request) {
+      return null;
+    }
+
+    return {
+      ...request,
+      driverId: this.importForm.controls.driver.value?.id ?? null
+    };
   }
 
   private loadClientSuggestions(search?: string): void {
@@ -255,6 +299,29 @@ export class ImportDetailsComponent {
     };
   }
 
+  private loadDriverSuggestions(search?: string): void {
+    this.isLoadingDrivers.set(true);
+
+    this.driverService
+      .getOptions(search)
+      .pipe(finalize(() => this.isLoadingDrivers.set(false)))
+      .subscribe((response) => {
+        const selectedDriver = this.importForm.controls.driver.value;
+        this.driverSuggestions.set(this.mergeDriverOption(selectedDriver, response.data ?? []));
+      });
+  }
+
+  private mapImportDriver(importItem: ImportDetailDto): DriverOptionDto | null {
+    if (!importItem.driverId || !importItem.driver) {
+      return null;
+    }
+
+    return {
+      id: importItem.driverId,
+      fullName: importItem.driver.fullName
+    };
+  }
+
   private mergeClientOption(selectedClient: ClientOptionDto | null, options: ClientOptionDto[]): ClientOptionDto[] {
     if (!selectedClient) {
       return options;
@@ -267,6 +334,20 @@ export class ImportDetailsComponent {
     }
 
     return [selectedClient, ...options];
+  }
+
+  private mergeDriverOption(selectedDriver: DriverOptionDto | null, options: DriverOptionDto[]): DriverOptionDto[] {
+    if (!selectedDriver) {
+      return options;
+    }
+
+    const hasSelectedDriver = options.some((option) => option.id === selectedDriver.id);
+
+    if (hasSelectedDriver) {
+      return options;
+    }
+
+    return [selectedDriver, ...options];
   }
 
   private isSuccessfulResponse<T>(response: ApiResultOf<T> | ApiResult | null | undefined): response is ApiResult {

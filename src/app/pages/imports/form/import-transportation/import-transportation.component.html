@@ -1,0 +1,188 @@
+<div class="transportation-layout">
+  <section class="transportation-panel transportation-panel--form">
+    <div class="flex items-center justify-between gap-3">
+      <h2 class="transportation-panel__title">Chofer</h2>
+    </div>
+
+    <div class="transportation-form pt-2" [formGroup]="transportationForm">
+      <div class="transportation-driver-grid">
+        <div class="flex flex-col gap-2">
+          <label class="font-semibold">Nombre</label>
+          <div class="transportation-readonly-field">{{ importItem().driver?.fullName || '-' }}</div>
+        </div>
+
+        <div class="flex flex-col gap-2">
+          <label class="font-semibold">Teléfono</label>
+          <div class="transportation-readonly-field">{{ importItem().driver?.phoneNumber || '-' }}</div>
+        </div>
+      </div>
+
+      <div class="transportation-driver-grid">
+        <div class="flex flex-col gap-2">
+          <label id="transportationStartDateLabel" class="font-semibold">Fecha Inicio del Transporte</label>
+          <p-datepicker
+            inputId="transportationStartDate"
+            ariaLabelledBy="transportationStartDateLabel"
+            formControlName="startDate"
+            dateFormat="dd/mm/yy"
+            [iconDisplay]="'input'"
+            [showIcon]="true"
+            [readonlyInput]="true"
+          />
+          @if (getTransportationFieldError('startDate')) {
+            <small class="field-error">{{ getTransportationFieldError('startDate') }}</small>
+          }
+        </div>
+
+        <div class="flex flex-col gap-2">
+          <label class="font-semibold">Estado del Transporte</label>
+          <p-select
+            inputId="transportationStatus"
+            formControlName="statusId"
+            [options]="statusOptions()"
+            optionLabel="label"
+            optionValue="value"
+            placeholder="Seleccionar"
+          />
+          @if (getTransportationFieldError('statusId')) {
+            <small class="field-error">{{ getTransportationFieldError('statusId') }}</small>
+          }
+        </div>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button
+        type="button"
+        pButton
+        label="Guardar"
+        icon="pi pi-save"
+        styleClass="flat-button"
+        [disabled]="isSavingTransportation() || isTransportationLocked()"
+        (click)="onSaveTransportation()"
+      ></button>
+    </div>
+
+    <div class="transportation-tracking-section">
+      <div class="flex items-center justify-between gap-3">
+        <h2 class="transportation-panel__title">Nuevo Seguimiento</h2>
+      </div>
+
+      <div class="transportation-form pt-2" [formGroup]="trackingForm">
+        <div class="flex flex-col gap-2">
+          <label for="trackingMessage" class="font-semibold">Mensaje</label>
+          <textarea id="trackingMessage" pInputText formControlName="message" rows="3" maxlength="500"></textarea>
+          @if (getTrackingFieldError('message')) {
+            <small class="field-error">{{ getTrackingFieldError('message') }}</small>
+          }
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button
+          type="button"
+          pButton
+          label="Guardar"
+          icon="pi pi-save"
+          styleClass="flat-button"
+          [disabled]="!canSaveTracking()"
+          (click)="onSaveTracking()"
+        ></button>
+      </div>
+    </div>
+  </section>
+
+  <section class="transportation-panel transportation-panel--next">
+    @let currentTimelineStepIndex = transportationTimelineStepIndex();
+
+    <div class="transportation-timeline-section">
+      <div class="transportation-timeline-card">
+        <div class="transportation-timeline-card__main">
+          <div class="transportation-timeline">
+            @for (step of transportationTimelineSteps; track step.value; let stepIndex = $index) {
+              <div class="transportation-timeline__item">
+                <div
+                  class="transportation-timeline__marker"
+                  [class.transportation-timeline__marker--completed]="isCompletedTimelineStep(stepIndex, currentTimelineStepIndex)"
+                  [class.transportation-timeline__marker--current]="isCurrentTimelineStep(stepIndex, currentTimelineStepIndex)"
+                  [class.transportation-timeline__marker--finalized]="isFinalizedTimelineStep(stepIndex, currentTimelineStepIndex)"
+                >
+                  @if (stepIndex === transportationTimelineSteps.length - 1) {
+                    <i class="pi pi-flag"></i>
+                  } @else if (isCompletedTimelineStep(stepIndex, currentTimelineStepIndex)) {
+                    <i class="pi pi-check"></i>
+                  } @else {
+                    <span>{{ stepIndex + 1 }}</span>
+                  }
+                </div>
+
+                @if (stepIndex < transportationTimelineSteps.length - 1) {
+                  <div
+                    class="transportation-timeline__connector"
+                    [class.transportation-timeline__connector--completed]="getTimelineConnectorState(stepIndex, currentTimelineStepIndex) === 'completed'"
+                  ></div>
+                }
+
+                <span
+                  class="transportation-timeline__label"
+                  [class.transportation-timeline__label--active]="isCompletedTimelineStep(stepIndex, currentTimelineStepIndex) || isCurrentTimelineStep(stepIndex, currentTimelineStepIndex)"
+                >
+                  {{ step.label }}
+                </span>
+              </div>
+            }
+          </div>
+
+          @if (transportationTimelineLegend(); as legend) {
+            <div class="transportation-timeline__legend" role="note" aria-label="Estado del transporte">
+              <i class="pi pi-info-circle transportation-timeline__legend-icon" aria-hidden="true"></i>
+              <span>{{ legend }}</span>
+            </div>
+          }
+        </div>
+      </div>
+
+      <div class="transportation-transit-card" aria-label="Días de tránsito">
+        <div class="transportation-transit-card__icon" aria-hidden="true">
+          <i class="pi pi-truck"></i>
+        </div>
+        <div class="transportation-transit-card__content">
+          <span class="transportation-transit-card__label">DÍAS DE TRÁNSITO</span>
+          <strong class="transportation-transit-card__value">{{ transitDays() }}</strong>
+        </div>
+      </div>
+    </div>
+
+    <div class="transportation-panel__header mb-4">
+      <h2 class="transportation-panel__title">Seguimiento</h2>
+    </div>
+
+    <p-table class="transportation-table" [value]="tracking()">
+      <ng-template #header>
+        <tr>
+          <th class="transportation-table__date-column">Fecha</th>
+          <th class="transportation-table__type-column">Tipo</th>
+          <th>Mensaje</th>
+          <th class="transportation-table__user-column">Usuario</th>
+        </tr>
+      </ng-template>
+
+      <ng-template #body let-item>
+        <tr>
+          <td>{{ formatOccurredAt(item.occurredAt) }}</td>
+          <td>{{ getTrackingTypeLabel(item.type) }}</td>
+          <td><span class="transportation-text-wrap">{{ item.message || '-' }}</span></td>
+          <td>{{ item.username || '-' }}</td>
+        </tr>
+      </ng-template>
+
+      <ng-template #emptymessage>
+        <tr>
+          <td colspan="4" class="py-6 text-center text-surface-500">
+            {{ isLoadingTracking() ? 'Cargando seguimiento...' : 'No hay seguimiento registrado.' }}
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </section>
+</div>

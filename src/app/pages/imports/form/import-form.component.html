@@ -112,7 +112,8 @@
       @if (timelineLegend(); as legend) {
         <div class="import-timeline__legend" role="note" aria-label="Siguiente paso">
           <i class="pi pi-info-circle import-timeline__legend-icon" aria-hidden="true"></i>
-          <span>{{ legend }}</span>
+          <span>{{ timelineLegendPrefix }}</span>
+          <span class="import-timeline__legend-detail">{{ legend }}</span>
         </div>
       }
     </div>
@@ -137,6 +138,14 @@
             <span>Registro de Pagos</span>
           </span>
         </p-tab>
+        @if (currentImport.driver) {
+          <p-tab value="transportation">
+            <span class="import-tab-label">
+              <i class="pi pi-truck"></i>
+              <span>Transporte</span>
+            </span>
+          </p-tab>
+        }
         <p-tab value="logs">
           <span class="import-tab-label">
             <i class="pi pi-history"></i>
@@ -174,6 +183,15 @@
             (importChanged)="onImportChanged($event)"
           />
         </p-tabpanel>
+
+        @if (currentImport.driver) {
+          <p-tabpanel value="transportation">
+            <app-import-transportation
+              [importId]="currentImport.id"
+              [importItem]="currentImport"
+            />
+          </p-tabpanel>
+        }
 
         <p-tabpanel value="logs">
           <app-import-logs [importId]="currentImport.id" [refreshVersion]="logsRefreshVersion()" />
