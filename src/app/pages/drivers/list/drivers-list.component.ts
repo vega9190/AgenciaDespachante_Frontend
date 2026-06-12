@@ -65,8 +65,7 @@ export class DriversListComponent {
     isExternal: this.formBuilder.control<boolean | null>(null)
   });
 
-  constructor() {
-    this.loadDrivers();
+  constructor() {    
   }
 
   onSearch(): void {

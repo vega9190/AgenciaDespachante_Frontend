@@ -265,8 +265,7 @@ export class ImportPaymentsComponent {
 
       this.payments.set(payments);
       this.importChanged.emit({
-        ...this.importItem(),
-        payments
+        ...this.importItem()        
       });
     });
   }

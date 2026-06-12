@@ -71,8 +71,7 @@ export class ImportsListComponent {
   });
 
   constructor() {
-    this.loadFilterOptions();
-    this.loadImports();
+    this.loadFilterOptions();    
   }
 
   onSearch(): void {

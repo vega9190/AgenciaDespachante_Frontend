@@ -120,10 +120,14 @@ export class ImportDocumentsComponent {
 
   constructor() {
     effect(() => {
-      const currentImport = this.importItem();
-      this.documents.set(currentImport.documents);
-      this.requiredDocumentTypes.set(currentImport.importDocumentTypeRequireds);
+      const id = this.importId();
       this.resetDocumentForm();
+      this.refreshDocuments(id, false);
+    });
+
+    effect(() => {
+      const currentImport = this.importItem();
+      this.requiredDocumentTypes.set(currentImport.importDocumentTypeRequireds);
     });
   }
 
@@ -328,9 +332,20 @@ export class ImportDocumentsComponent {
     });
   }
 
-  private refreshDocuments(id: string): void {
+  private refreshDocuments(id: string, syncParent = true): void {
     this.importsService.getDocuments(id, ImportDocumentCategory.Gestion).subscribe((response) => {
-      this.documents.set(response.data ?? []);
+      const documents = response.data ?? [];
+
+      this.documents.set(documents);
+
+      if (!syncParent) {
+        return;
+      }
+
+      this.importChanged.emit({
+        ...this.importItem(),
+        importDocumentTypeRequireds: this.requiredDocumentTypes()
+      });
     });
   }
 

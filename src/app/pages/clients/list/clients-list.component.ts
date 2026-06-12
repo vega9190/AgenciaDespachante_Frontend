@@ -60,8 +60,7 @@ export class ClientsListComponent {
     isActive: this.formBuilder.control<boolean | null>(null)
   });
 
-  constructor() {
-    this.loadClients();
+  constructor() {    
   }
 
   onSearch(): void {

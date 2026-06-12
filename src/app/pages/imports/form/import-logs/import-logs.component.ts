@@ -32,7 +32,6 @@ export class ImportLogsComponent {
       this.importId();
       this.refreshVersion();
       this.page.set(1);
-      this.loadLogs();
     });
   }
 

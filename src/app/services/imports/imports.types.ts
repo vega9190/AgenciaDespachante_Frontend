@@ -54,11 +54,7 @@ export interface ImportDetailDto {
   statusName: string;
   charge: number;
   createdUtc: string;
-  transportation?: TransportationDto | null;
-  documents: ImportDocumentDto[];
-  importDocumentTypeRequireds: ImportDocumentTypeRequiredDto[];
-  payments: ImportPaymentDto[];
-  importLogs: ImportLogDto[];
+  importDocumentTypeRequireds: ImportDocumentTypeRequiredDto[];  
 }
 
 export interface TransportationDto {
