@@ -9,6 +9,7 @@ import {
   TenantIdentityDto,
   TenantSettingsDto,
   UpdateTenantSettingsRequest,
+  UploadTenantFavIcoRequest,
   UploadTenantLogoRequest
 } from './tenant-settings.types';
 
@@ -40,5 +41,16 @@ export class TenantSettingsService {
 
   deleteLogo() {
     return this.httpClient.delete<ApiResultOf<null>>(`${this.tenantUrl}/settings/logo`);
+  }
+
+  uploadFavIco(request: UploadTenantFavIcoRequest) {
+    const formData = new FormData();
+    formData.set('favIco', request.favIco);
+
+    return this.httpClient.put<ApiResultOf<null>>(`${this.tenantUrl}/settings/favico`, formData);
+  }
+
+  deleteFavIco() {
+    return this.httpClient.delete<ApiResultOf<null>>(`${this.tenantUrl}/settings/favico`);
   }
 }

@@ -5,16 +5,27 @@ export interface TenantIdentityDto {
 }
 
 export interface TenantSettingsDto {
-  displayName: string;
-  exchangeRate: number;
-  logoDataUrl: string | null;
+  officialExchangeRate: number;
+  parallelExchangeRate: number;
+  defaultImportCharge: number;
+  insuranceRate: number;
+  iva: number;
+  ice: number;
 }
 
 export interface UpdateTenantSettingsRequest {
-  displayName: string;
-  exchangeRate: number;
+  officialExchangeRate: number;
+  parallelExchangeRate: number;
+  defaultImportCharge: number;
+  insuranceRate: number;
+  iva: number;
+  ice: number;
 }
 
 export interface UploadTenantLogoRequest {
   logo: File;
+}
+
+export interface UploadTenantFavIcoRequest {
+  favIco: File;
 }
