@@ -25,3 +25,12 @@ export interface DocumentSectionVm {
   isApproveConfirmOpen: boolean;
   isApproving: boolean;
 }
+
+export interface DocumentPhotoGalleryItem {
+  id: string;
+  name: string;
+  imageSrc: string;
+  thumbnailImageSrc: string;
+  sizeLabel: string;
+  uploadedAtLabel: string;
+}

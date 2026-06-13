@@ -6,6 +6,7 @@ import { AccordionModule } from 'primeng/accordion';
 import { ConfirmationService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
+import { GalleriaModule } from 'primeng/galleria';
 import { SelectModule } from 'primeng/select';
 import { TagModule } from 'primeng/tag';
 import { TooltipModule } from 'primeng/tooltip';
@@ -19,13 +20,14 @@ import {
   ImportDetailDto,
   ImportDocumentCategory,
   ImportDocumentDto,
+  ImportPhotoDto,
   ImportDocumentTypeOptionDto,
   ImportDocumentTypeRequiredDto
 } from '@services/imports/imports.types';
 import { ImportsService } from '@services/imports/imports.service';
 
 import { IMPORT_DOCUMENT_TYPE_IDS } from '../../models/import-document-type.constants';
-import { DocumentSectionItem, DocumentSectionVm } from '../import-form.types';
+import { DocumentPhotoGalleryItem, DocumentSectionItem, DocumentSectionVm } from '../import-form.types';
 
 const DOCUMENT_STATUS = {
   aprobado: 1,
@@ -40,7 +42,7 @@ const IMAGE_DOCUMENT_FILE_HELPER_TEXT = 'Formatos permitidos: JPG, JPEG y PNG. T
 
 @Component({
   selector: 'app-import-documents',
-  imports: [FormsModule, AccordionModule, ButtonModule, CardModule, SelectModule, TagModule, TooltipModule, FileSelectorComponent],
+  imports: [FormsModule, AccordionModule, ButtonModule, CardModule, GalleriaModule, SelectModule, TagModule, TooltipModule, FileSelectorComponent],
   templateUrl: './import-documents.component.html',
   styleUrl: './import-documents.component.css'
 })
@@ -60,11 +62,13 @@ export class ImportDocumentsComponent {
 
   readonly isSavingDocument = signal(false);
   readonly documents = signal<ImportDocumentDto[]>([]);
+  readonly photos = signal<ImportPhotoDto[]>([]);
   readonly requiredDocumentTypes = signal<ImportDocumentTypeRequiredDto[]>([]);
   readonly selectedDocumentTypeId = signal<string | null>(null);
   readonly selectedDocumentFile = signal<File | null>(null);
   readonly approveConfirmDocumentTypeId = signal<string | null>(null);
   readonly approvingDocumentTypeId = signal<string | null>(null);
+  readonly activeImageIndex = signal(0);
   readonly isReadOnly = computed(() => isReadOnlyImportStatus(this.importItem().statusId));
 
   readonly canSaveDocument = computed(
@@ -88,13 +92,27 @@ export class ImportDocumentsComponent {
   readonly documentFileHelperText = computed(() =>
     this.isSelectedDocumentTypeImagesOnly() ? IMAGE_DOCUMENT_FILE_HELPER_TEXT : DEFAULT_DOCUMENT_FILE_HELPER_TEXT
   );
+  readonly imageGalleryItems = computed<DocumentPhotoGalleryItem[]>(() =>
+    this.photos().map((photo) => ({
+      id: photo.id,
+      name: photo.originalName,
+      imageSrc: photo.url,
+      thumbnailImageSrc: photo.url,
+      sizeLabel: this.getDocumentSizeLabel(photo.filesize),
+      uploadedAtLabel: this.getDocumentDateLabel(photo.createdUtc)
+    }))
+  );
+  
+  readonly selectedImageGalleryItem = computed(() => this.imageGalleryItems()[this.activeImageIndex()] ?? null);
   readonly documentSections = computed<DocumentSectionVm[]>(() => {
     const currentDocuments = this.documents();
+    const currentPhotos = this.photos();
     const currentRequiredDocumentTypes = this.requiredDocumentTypes();
     const approveConfirmDocumentTypeId = this.approveConfirmDocumentTypeId();
     const approvingDocumentTypeId = this.approvingDocumentTypeId();
 
     return this.getSortedRequiredDocumentTypes(currentRequiredDocumentTypes).map((required) => {
+      const isPhotosSection = this.isPhotosDocumentType(required.importDocumentTypeId);
       const documents = currentDocuments
         .filter((document) => document.importDocumentTypeId === required.importDocumentTypeId)
         .map((document) => ({
@@ -106,7 +124,7 @@ export class ImportDocumentsComponent {
           uploadedAtLabel: this.getDocumentDateLabel(document.createdUtc)
         }));
 
-      const documentsCount = documents.length;
+      const documentsCount = isPhotosSection ? currentPhotos.length : documents.length;
       const isApproved = required.status === DOCUMENT_STATUS.aprobado;
       const canApprove = required.status === DOCUMENT_STATUS.enRevision && !this.isReadOnly();
 
@@ -118,7 +136,7 @@ export class ImportDocumentsComponent {
         statusSeverity: this.getDocumentStatusSeverity(required.status),
         statusIcon: this.getDocumentStatusIcon(required.status),
         documentsCount,
-        documentsCountLabel: this.getDocumentCountLabel(documentsCount),
+        documentsCountLabel: this.getDocumentCountLabel(documentsCount, isPhotosSection),
         documents,
         isDisabled: documentsCount === 0,
         showRequiredText: required.isRequired && documentsCount === 0,
@@ -261,6 +279,18 @@ export class ImportDocumentsComponent {
     });
   }
 
+  onImageActiveIndexChange(index: number): void {
+    this.activeImageIndex.set(index);
+  }
+
+  onPhotoDownload(photo: DocumentPhotoGalleryItem): void {
+    this.onDocumentDownload(this.mapPhotoToDocument(photo));
+  }
+
+  onPhotoDelete(photo: DocumentPhotoGalleryItem): void {
+    this.onDocumentDelete(this.mapPhotoToDocument(photo));
+  }
+
   onApproveBadgeClick(importDocumentTypeId: string, canApprove: boolean, event: Event): void {
     event.stopPropagation();
 
@@ -354,8 +384,11 @@ export class ImportDocumentsComponent {
   private refreshDocuments(id: string, syncParent = true): void {
     this.importsService.getDocuments(id, ImportDocumentCategory.Gestion).subscribe((response) => {
       const documents = response.data?.documents ?? [];
+      const photos = response.data?.photos ?? [];
 
       this.documents.set(documents);
+      this.photos.set(photos);
+      this.activeImageIndex.update((current) => (photos.length === 0 || current >= photos.length ? 0 : current));
 
       if (!syncParent) {
         return;
@@ -421,8 +454,27 @@ export class ImportDocumentsComponent {
     }
   }
 
-  private getDocumentCountLabel(count: number): string {
+  private getDocumentCountLabel(count: number, isPhotosSection = false): string {
+    if (isPhotosSection) {
+      return count === 1 ? '1 foto' : `${count} fotos`;
+    }
+
     return count === 1 ? '1 archivo' : `${count} archivos`;
+  }
+
+  private isPhotosDocumentType(importDocumentTypeId: string): boolean {
+    return importDocumentTypeId.toLowerCase() === IMPORT_DOCUMENT_TYPE_IDS.fotos.toLowerCase();
+  }
+
+  private mapPhotoToDocument(photo: DocumentPhotoGalleryItem): DocumentSectionItem {
+    return {
+      id: photo.id,
+      name: photo.name,
+      icon: 'pi pi-image',
+      importDocumentTypeId: IMPORT_DOCUMENT_TYPE_IDS.fotos,
+      sizeLabel: photo.sizeLabel,
+      uploadedAtLabel: photo.uploadedAtLabel
+    };
   }
 
   private getDocumentFileIcon(fileName: string): string {

@@ -135,55 +135,136 @@
               </p-accordion-header>
 
               <p-accordion-content>
-                <div class="flex flex-col">
-                  @for (document of section.documents; track trackByDocumentItem($index, document)) {
-                    <div class="document-item-row grid grid-cols-1 gap-2 py-4 first:pt-0 last:pb-0 md:grid-cols-[minmax(0,1fr)_auto_auto] md:items-center md:gap-4">
-                      <div class="flex min-w-0 items-center gap-3">
-                        <i [class]="document.icon"></i>
-                          <button
-                            type="button"
-                            class="min-w-0 overflow-hidden text-ellipsis whitespace-nowrap border-none bg-transparent p-0 text-left font-inherit cursor-pointer hover:underline"
-                            [style.color]="'var(--tenant-secondary)'"
-                            (click)="onDocumentDownload(document)"
-                          >
-                            {{ document.name }}
-                          </button>
-                       </div>
+                @if (section.importDocumentTypeId.toLowerCase() === 'da481e50-5e18-4d90-84f2-4050f67e6995') {
+                  @if (imageGalleryItems().length > 0) {
+                    <div class="documents-gallery">
+                      <!-- <p-galleria
+                        [value]="imageGalleryItems()"
+                        [activeIndex]="activeImageIndex()"                        
+                        [showThumbnails]="imageGalleryItems().length > 1"                        
+                        [showThumbnailNavigators]="imageGalleryItems().length > 1"
+                        [showItemNavigators]="imageGalleryItems().length > 1"
+                        [circular]="imageGalleryItems().length > 1"
+                        [numVisible]="3"
+                        [containerStyle]="{ 'max-width': '100%' }"
+                        (activeIndexChange)="onImageActiveIndexChange($event)"
+                      >                                             -->
+                      <p-galleria
+                        [value]="imageGalleryItems()"
+                        [activeIndex]="activeImageIndex()"                        
+                        [showIndicators]="imageGalleryItems().length > 1"   
+                        [showThumbnails]="false"                                             
+                        [showItemNavigators]="imageGalleryItems().length > 1"
+                        [circular]="imageGalleryItems().length > 1"                        
+                        [containerStyle]="{ 'max-width': '100%' }"
+                        (activeIndexChange)="onImageActiveIndexChange($event)"
+                      >
+                        <ng-template #item let-photo>
+                          <div class="documents-gallery__image-wrap">
+                            <img [src]="photo.imageSrc" [alt]="photo.name" class="documents-gallery__image" />
+                          </div>
+                        </ng-template>
 
-                      <div class="flex items-center justify-between gap-4 whitespace-nowrap text-sm text-color-secondary md:justify-start">
-                        <span>{{ document.sizeLabel }}</span>
-                        <span>{{ document.uploadedAtLabel }}</span>
-                      </div>
+                        <ng-template #thumbnail let-photo>
+                          <div class="documents-gallery__thumbnail-wrap">
+                            <img [src]="photo.imageSrc" [alt]="photo.name" class="documents-gallery__thumbnail" />
+                          </div>
+                        </ng-template>
+                      </p-galleria>
 
-                      <div class="flex items-center justify-end gap-1">
-                        <button
-                          type="button"
-                          pButton
-                          [text]="true"
-                          rounded="true"
-                          icon="pi pi-download"
-                          [pTooltip]="'Descargar'"
-                          tooltipPosition="top"
-                          aria-label="Descargar documento"
-                          (click)="onDocumentDownload(document)"
-                        ></button>
-                        @if (!section.isApproved && !isReadOnly()) {
+                      @if (selectedImageGalleryItem(); as selectedPhoto) {
+                        <div class="documents-gallery__footer">
+                          <div class="min-w-0">                            
+                            <button
+                              type="button"
+                              class="min-w-0 overflow-hidden text-ellipsis whitespace-nowrap border-none bg-transparent p-0 text-left font-inherit cursor-pointer hover:underline"
+                              [style.color]="'var(--tenant-secondary)'"
+                              (click)="onPhotoDownload(selectedPhoto)"
+                            >
+                              {{ selectedPhoto.name }}
+                            </button>
+                            <div class="documents-gallery__meta">{{ selectedPhoto.sizeLabel }} | {{ selectedPhoto.uploadedAtLabel }}</div>
+                          </div>
+
+                          <div class="documents-gallery__actions">
+                            <button
+                              type="button"
+                              pButton
+                              icon="pi pi-download"
+                              label="Descargar"
+                              size="small"
+                              [text]="true"
+                              (click)="onPhotoDownload(selectedPhoto)"
+                            ></button>
+
+                            @if (!section.isApproved && !isReadOnly()) {
+                              <button
+                                type="button"
+                                pButton
+                                icon="pi pi-trash"
+                                label="Eliminar"
+                                size="small"
+                                severity="danger"
+                                [text]="true"
+                                (click)="onPhotoDelete(selectedPhoto)"
+                              ></button>
+                            }
+                          </div>
+                        </div>
+                      }
+                    </div>
+                  }
+                } @else {
+                  <div class="flex flex-col">
+                    @for (document of section.documents; track trackByDocumentItem($index, document)) {
+                      <div class="document-item-row grid grid-cols-1 gap-2 py-4 first:pt-0 last:pb-0 md:grid-cols-[minmax(0,1fr)_auto_auto] md:items-center md:gap-4">
+                        <div class="flex min-w-0 items-center gap-3">
+                          <i [class]="document.icon"></i>
+                            <button
+                              type="button"
+                              class="min-w-0 overflow-hidden text-ellipsis whitespace-nowrap border-none bg-transparent p-0 text-left font-inherit cursor-pointer hover:underline"
+                              [style.color]="'var(--tenant-secondary)'"
+                              (click)="onDocumentDownload(document)"
+                            >
+                              {{ document.name }}
+                            </button>
+                         </div>
+
+                        <div class="flex items-center justify-between gap-4 whitespace-nowrap text-sm text-color-secondary md:justify-start">
+                          <span>{{ document.sizeLabel }}</span>
+                          <span>{{ document.uploadedAtLabel }}</span>
+                        </div>
+
+                        <div class="flex items-center justify-end gap-1">
                           <button
                             type="button"
                             pButton
                             [text]="true"
                             rounded="true"
-                            icon="pi pi-trash"
-                            [pTooltip]="'Eliminar'"
+                            icon="pi pi-download"
+                            [pTooltip]="'Descargar'"
                             tooltipPosition="top"
-                            aria-label="Eliminar documento"
-                            (click)="onDocumentDelete(document)"
+                            aria-label="Descargar documento"
+                            (click)="onDocumentDownload(document)"
                           ></button>
-                        }
+                          @if (!section.isApproved && !isReadOnly()) {
+                            <button
+                              type="button"
+                              pButton
+                              [text]="true"
+                              rounded="true"
+                              icon="pi pi-trash"
+                              [pTooltip]="'Eliminar'"
+                              tooltipPosition="top"
+                              aria-label="Eliminar documento"
+                              (click)="onDocumentDelete(document)"
+                            ></button>
+                          }
+                        </div>
                       </div>
-                    </div>
-                  }
-                </div>
+                    }
+                  </div>
+                }
               </p-accordion-content>
             </p-accordion-panel>
           }
