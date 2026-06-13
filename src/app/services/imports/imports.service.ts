@@ -10,9 +10,9 @@ import {
   ApproveImportDocumentTypeResponse,
   CreateImportRequest,
   DeleteImportDocumentResponse,
+  GetImportDocumentsResponseDto,
   ImportDetailDto,
   ImportDocumentCategory,
-  ImportDocumentDto,
   ImportLogListItemDto,
   ImportLogsQuery,
   ImportDocumentTypeOptionDto,
@@ -70,7 +70,7 @@ export class ImportsService {
   }
 
   getDocuments(id: string, category?: ImportDocumentCategory) {
-    return this.httpClient.get<ApiResultOf<ImportDocumentDto[]>>(`${this.importsUrl}/${id}/documents`, {
+    return this.httpClient.get<ApiResultOf<GetImportDocumentsResponseDto>>(`${this.importsUrl}/${id}/documents`, {
       params: buildHttpParams({ category })
     });
   }

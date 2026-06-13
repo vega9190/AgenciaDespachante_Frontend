@@ -80,7 +80,7 @@ export class ImportDocumentsComponent {
     () => this.documentTypeOptions().find((documentType) => documentType.id === this.selectedDocumentTypeId()) ?? null
   );
   readonly isSelectedDocumentTypeImagesOnly = computed(
-    () => this.selectedDocumentType()?.id.toLowerCase() === IMPORT_DOCUMENT_TYPE_IDS.imagenes.toLowerCase()
+    () => this.selectedDocumentType()?.id.toLowerCase() === IMPORT_DOCUMENT_TYPE_IDS.fotos.toLowerCase()
   );
   readonly documentFileAccept = computed(() =>
     this.isSelectedDocumentTypeImagesOnly() ? IMAGE_DOCUMENT_FILE_ACCEPT : DEFAULT_DOCUMENT_FILE_ACCEPT
@@ -353,7 +353,7 @@ export class ImportDocumentsComponent {
 
   private refreshDocuments(id: string, syncParent = true): void {
     this.importsService.getDocuments(id, ImportDocumentCategory.Gestion).subscribe((response) => {
-      const documents = response.data ?? [];
+      const documents = response.data?.documents ?? [];
 
       this.documents.set(documents);
 

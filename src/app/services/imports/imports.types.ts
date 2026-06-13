@@ -90,6 +90,19 @@ export interface ImportDocumentDto {
   createdUtc: string;
 }
 
+export interface ImportPhotoDto {
+  id: string;
+  originalName: string;
+  url: string;
+  filesize: number;
+  createdUtc: string;
+}
+
+export interface GetImportDocumentsResponseDto {
+  documents: ImportDocumentDto[];
+  photos: ImportPhotoDto[];
+}
+
 export interface ImportDocumentTypeRequiredDto {
   importDocumentTypeId: string;
   importDocumentTypeName: string;
