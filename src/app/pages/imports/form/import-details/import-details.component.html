@@ -11,8 +11,7 @@
         [dropdown]="true"
         [forceSelection]="true"
         placeholder="Buscar cliente"
-        (completeMethod)="onClientSearch($event)"
-        (onDropdownClick)="onClientDropdownClick()"
+        (completeMethod)="onClientSearch($event)"        
       />
       @if (getFieldError('client')) {
         <small class="field-error">{{ getFieldError('client') }}</small>
@@ -32,7 +31,6 @@
           [forceSelection]="true"
           placeholder="Buscar chofer"
           (completeMethod)="onDriverSearch($event)"
-          (onDropdownClick)="onDriverDropdownClick()"
         />
       </div>
     }

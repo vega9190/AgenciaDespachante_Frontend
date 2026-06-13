@@ -24,6 +24,7 @@ import {
 } from '@services/imports/imports.types';
 import { ImportsService } from '@services/imports/imports.service';
 
+import { IMPORT_DOCUMENT_TYPE_IDS } from '../../models/import-document-type.constants';
 import { DocumentSectionItem, DocumentSectionVm } from '../import-form.types';
 
 const DOCUMENT_STATUS = {
@@ -31,6 +32,11 @@ const DOCUMENT_STATUS = {
   enRevision: 2,
   faltante: 3
 } as const;
+
+const DEFAULT_DOCUMENT_FILE_ACCEPT = '.pdf,.xls,.xlsx,.jpg,.jpeg,.png';
+const DEFAULT_DOCUMENT_FILE_HELPER_TEXT = 'Formatos permitidos: PDF, XLS, XLSX, JPG y PNG. Tamaño maximo: 5 MB.';
+const IMAGE_DOCUMENT_FILE_ACCEPT = '.jpg,.jpeg,.png';
+const IMAGE_DOCUMENT_FILE_HELPER_TEXT = 'Formatos permitidos: JPG, JPEG y PNG. Tamaño maximo: 5 MB.';
 
 @Component({
   selector: 'app-import-documents',
@@ -70,6 +76,18 @@ export class ImportDocumentsComponent {
       !this.isLoadingDocumentTypes() &&
       !this.isReadOnly()
   );
+  readonly selectedDocumentType = computed(
+    () => this.documentTypeOptions().find((documentType) => documentType.id === this.selectedDocumentTypeId()) ?? null
+  );
+  readonly isSelectedDocumentTypeImagesOnly = computed(
+    () => this.selectedDocumentType()?.id.toLowerCase() === IMPORT_DOCUMENT_TYPE_IDS.imagenes.toLowerCase()
+  );
+  readonly documentFileAccept = computed(() =>
+    this.isSelectedDocumentTypeImagesOnly() ? IMAGE_DOCUMENT_FILE_ACCEPT : DEFAULT_DOCUMENT_FILE_ACCEPT
+  );
+  readonly documentFileHelperText = computed(() =>
+    this.isSelectedDocumentTypeImagesOnly() ? IMAGE_DOCUMENT_FILE_HELPER_TEXT : DEFAULT_DOCUMENT_FILE_HELPER_TEXT
+  );
   readonly documentSections = computed<DocumentSectionVm[]>(() => {
     const currentDocuments = this.documents();
     const currentRequiredDocumentTypes = this.requiredDocumentTypes();
@@ -104,7 +122,7 @@ export class ImportDocumentsComponent {
         documents,
         isDisabled: documentsCount === 0,
         showRequiredText: required.isRequired && documentsCount === 0,
-        showStatus: required.status !== DOCUMENT_STATUS.faltante || required.isRequired,
+        showStatus: required.isRequired,
         isApproved,
         canApprove,
         isApproveConfirmOpen: approveConfirmDocumentTypeId === required.importDocumentTypeId,
@@ -137,6 +155,7 @@ export class ImportDocumentsComponent {
     }
 
     this.selectedDocumentTypeId.set(documentTypeId);
+    this.selectedDocumentFile.set(null);
   }
 
   onDocumentFileSelected(file: File): void {

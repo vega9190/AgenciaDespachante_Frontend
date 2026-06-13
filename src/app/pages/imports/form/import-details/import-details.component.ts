@@ -117,14 +117,6 @@ export class ImportDetailsComponent {
     this.loadClientSuggestions(search || undefined);
   }
 
-  onClientDropdownClick(): void {
-    if (this.isReadOnly()) {
-      return;
-    }
-
-    this.loadClientSuggestions();
-  }
-
   onDriverSearch(event: AutoCompleteCompleteEvent): void {
     if (this.isReadOnly() || !this.importId()) {
       return;
@@ -138,14 +130,7 @@ export class ImportDetailsComponent {
 
     this.loadDriverSuggestions(search || undefined);
   }
-
-  onDriverDropdownClick(): void {
-    if (this.isReadOnly() || !this.importId()) {
-      return;
-    }
-
-    this.loadDriverSuggestions();
-  }
+ 
 
   onCancel(): void {
     void this.router.navigate(['/imports']);
