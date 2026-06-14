@@ -65,6 +65,11 @@ export class AppMenuComponent {
           routerLink: ['/tools', 'tariff-item']
         }
       ]
+    },
+    {
+      label: 'Configuración',
+      icon: 'pi pi-cog',
+      routerLink: ['/settings']
     }
   ];
 

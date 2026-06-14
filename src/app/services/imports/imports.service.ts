@@ -10,6 +10,7 @@ import {
   ApproveImportDocumentTypeResponse,
   CreateImportRequest,
   DeleteImportDocumentResponse,
+  DispatchFormDto,
   GetImportDocumentsResponseDto,
   ImportDetailDto,
   ImportDocumentCategory,
@@ -23,6 +24,7 @@ import {
   PagedResult,
   SaveImportDocumentRequest,
   SaveImportDocumentResponse,
+  SaveDispatchFormRequest,
   SaveImportPaymentRequest,
   SaveTransportationRequest,
   SaveTransportationTrackingRequest,
@@ -63,6 +65,10 @@ export class ImportsService {
 
   getTransportation(id: string) {
     return this.httpClient.get<ApiResultOf<TransportationDto | null>>(`${this.importsUrl}/${id}/transportation`);
+  }
+
+  getDispatchForm(id: string) {
+    return this.httpClient.get<ApiResultOf<DispatchFormDto>>(`${this.importsUrl}/${id}/dispatch-form`);
   }
 
   getTransportationTracking(id: string) {
@@ -134,6 +140,10 @@ export class ImportsService {
 
   saveTransportation(id: string, request: SaveTransportationRequest) {
     return this.httpClient.post<ApiResultOf<string>>(`${this.importsUrl}/${id}/transportation`, request);
+  }
+
+  saveDispatchForm(id: string, request: SaveDispatchFormRequest) {
+    return this.httpClient.post<ApiResultOf<string>>(`${this.importsUrl}/${id}/dispatch-form`, request);
   }
 
   saveTransportationTracking(id: string, request: SaveTransportationTrackingRequest) {

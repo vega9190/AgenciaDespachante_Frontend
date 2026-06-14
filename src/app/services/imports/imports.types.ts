@@ -81,6 +81,32 @@ export interface TransportationTrackingDto {
   type: TransportationTrackingType;
 }
 
+export interface DispatchItemDto {
+  id: string;
+  description: string;
+  amount: number;
+  isTractor: boolean;
+  dim?: string | null;
+  taxAmount?: number | null;
+  storageAmount?: number | null;
+  isMainCharge: boolean;
+}
+
+export interface DispatchFormDto {
+  id: string;
+  importId: string;
+  dispatchNit?: string | null;
+  date?: string | null;
+  dim?: string | null;
+  agency?: string | null;
+  destination?: string | null;
+  commodity?: string | null;
+  client: string;
+  clientNit?: string | null;
+  driver?: string | null;
+  items: DispatchItemDto[];
+}
+
 export interface ImportDocumentDto {
   id: string;
   importDocumentTypeId: string;
@@ -212,6 +238,26 @@ export interface SaveTransportationRequest {
   statusId: string;
   startDate: string;
   transitDays: number;
+}
+
+export interface DispatchItemRequest {
+  description: string;
+  amount: number;
+  isTractor: boolean;
+  dim?: string | null;
+  taxAmount?: number | null;
+  storageAmount?: number | null;
+  isMainCharge: boolean;
+}
+
+export interface SaveDispatchFormRequest {
+  nit?: string | null;
+  date?: string | null;
+  dim?: string | null;
+  agency?: string | null;
+  destination?: string | null;
+  commodity?: string | null;
+  items: DispatchItemRequest[];
 }
 
 export interface SaveTransportationTrackingRequest {

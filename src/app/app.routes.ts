@@ -72,7 +72,7 @@ export const routes: Routes = [
             loadComponent: () => import('@pages/drivers/form/driver-form.component').then((m) => m.DriverFormComponent)
           }
         ]
-      },
+      },      
       {
         path: 'tools',
         children: [
@@ -85,6 +85,10 @@ export const routes: Routes = [
             loadComponent: () => import('@pages/tools/tariff-item/tariff-item.component').then((m) => m.TariffItemComponent)
           }
         ]
+      },
+      {
+        path: 'settings',
+        loadComponent: () => import('@pages/settings/settings.component').then((m) => m.SettingsComponent)
       }
     ]
   },

@@ -1,0 +1,296 @@
+<div class="settings-page flex flex-col gap-6">
+  <div>
+    <h1 class="page-title">Configuración</h1>
+  </div>
+
+  <p-card>
+    <div class="settings-sections" [formGroup]="settingsForm">
+      <section class="settings-panel">
+        <div class="settings-panel__header">
+          <h2 class="settings-panel__title">TASAS DE CAMBIO</h2>
+        </div>
+
+        <div class="settings-panel__body">
+          <div class="flex flex-col gap-2">
+            <label id="officialExchangeRateLabel" class="font-semibold">Tasa Oficial</label>
+            <p-inputgroup>
+              <p-inputnumber
+                inputId="officialExchangeRate"
+                ariaLabelledBy="officialExchangeRateLabel"
+                formControlName="officialExchangeRate"
+                mode="decimal"                
+                [max]="maxExchangeValue"
+                [minFractionDigits]="2"
+                [maxFractionDigits]="2"
+                [step]="decimalStep"
+                inputStyleClass="w-full"
+                styleClass="w-full"
+              />
+              <p-inputgroup-addon>Bs</p-inputgroup-addon>
+            </p-inputgroup>
+            @if (getSettingsFieldError('officialExchangeRate', maxExchangeValue, 'Bs.')) {
+              <small class="field-error">{{ getSettingsFieldError('officialExchangeRate', maxExchangeValue, 'Bs.') }}</small>
+            }
+          </div>
+
+          <div class="flex flex-col gap-2">
+            <label id="parallelExchangeRateLabel" class="font-semibold">Tasa Paralela</label>
+            <p-inputgroup>
+              <p-inputnumber
+                inputId="parallelExchangeRate"
+                ariaLabelledBy="parallelExchangeRateLabel"
+                formControlName="parallelExchangeRate"
+                mode="decimal"
+                [min]="minPositiveValue"
+                [max]="maxExchangeValue"
+                [minFractionDigits]="2"
+                [maxFractionDigits]="2"
+                [step]="decimalStep"
+                inputStyleClass="w-full"
+                styleClass="w-full"
+              />
+              <p-inputgroup-addon>Bs</p-inputgroup-addon>
+            </p-inputgroup>
+            @if (getSettingsFieldError('parallelExchangeRate', maxExchangeValue, 'Bs.')) {
+              <small class="field-error">{{ getSettingsFieldError('parallelExchangeRate', maxExchangeValue, 'Bs.') }}</small>
+            }
+          </div>
+        </div>
+      </section>
+
+      <section class="settings-panel">
+        <div class="settings-panel__header">
+          <h2 class="settings-panel__title">PARÁMETROS DE IMPORTACIÓN</h2>
+        </div>
+
+        <div class="settings-panel__body">
+          <div class="flex flex-col gap-2">
+            <label id="defaultImportChargeLabel" class="font-semibold">Costo de Importación por Defecto</label>
+            <p-inputgroup>
+              <p-inputnumber
+                inputId="defaultImportCharge"
+                ariaLabelledBy="defaultImportChargeLabel"
+                formControlName="defaultImportCharge"
+                mode="decimal"
+                [min]="minPositiveValue"
+                [max]="maxCurrencyValue"
+                [minFractionDigits]="2"
+                [maxFractionDigits]="2"
+                [step]="decimalStep"
+                inputStyleClass="w-full"
+                styleClass="w-full"
+              />
+              <p-inputgroup-addon>USD</p-inputgroup-addon>
+            </p-inputgroup>
+            @if (getSettingsFieldError('defaultImportCharge', maxCurrencyValue, 'USD')) {
+              <small class="field-error">{{ getSettingsFieldError('defaultImportCharge', maxCurrencyValue, 'USD') }}</small>
+            }
+          </div>
+
+          <div class="flex flex-col gap-2">
+            <label id="insuranceRateLabel" class="font-semibold">Seguro</label>
+            <p-inputgroup>
+              <p-inputnumber
+                inputId="insuranceRate"
+                ariaLabelledBy="insuranceRateLabel"
+                formControlName="insuranceRate"
+                mode="decimal"
+                [min]="minPositiveValue"
+                [max]="maxPercentageValue"
+                [minFractionDigits]="2"
+                [maxFractionDigits]="2"
+                [step]="decimalStep"
+                inputStyleClass="w-full"
+                styleClass="w-full"
+              />
+              <p-inputgroup-addon>%</p-inputgroup-addon>
+            </p-inputgroup>
+            @if (getSettingsFieldError('insuranceRate', maxPercentageValue, '%')) {
+              <small class="field-error">{{ getSettingsFieldError('insuranceRate', maxPercentageValue, '%') }}</small>
+            }
+          </div>
+        </div>
+      </section>
+
+      <section class="settings-panel">
+        <div class="settings-panel__header">
+          <h2 class="settings-panel__title">IMPUESTOS</h2>
+        </div>
+
+        <div class="settings-panel__body">
+          <div class="flex flex-col gap-2">
+            <label id="ivaLabel" class="font-semibold">IVA</label>
+            <p-inputgroup>
+              <p-inputnumber
+                inputId="iva"
+                ariaLabelledBy="ivaLabel"
+                formControlName="iva"
+                mode="decimal"
+                [min]="minPositiveValue"
+                [max]="maxPercentageValue"
+                [minFractionDigits]="2"
+                [maxFractionDigits]="2"
+                [step]="decimalStep"
+                inputStyleClass="w-full"
+                styleClass="w-full"
+              />
+              <p-inputgroup-addon>%</p-inputgroup-addon>
+            </p-inputgroup>
+            @if (getSettingsFieldError('iva', maxPercentageValue, '%')) {
+              <small class="field-error">{{ getSettingsFieldError('iva', maxPercentageValue, '%') }}</small>
+            }
+          </div>
+
+          <div class="flex flex-col gap-2">
+            <label id="iceLabel" class="font-semibold">ICE</label>
+            <p-inputgroup>
+              <p-inputnumber
+                inputId="ice"
+                ariaLabelledBy="iceLabel"
+                formControlName="ice"
+                mode="decimal"
+                [min]="minPositiveValue"
+                [max]="maxPercentageValue"
+                [minFractionDigits]="2"
+                [maxFractionDigits]="2"
+                [step]="decimalStep"
+                inputStyleClass="w-full"
+                styleClass="w-full"
+              />
+              <p-inputgroup-addon>%</p-inputgroup-addon>
+            </p-inputgroup>
+            @if (getSettingsFieldError('ice', maxPercentageValue, '%')) {
+              <small class="field-error">{{ getSettingsFieldError('ice', maxPercentageValue, '%') }}</small>
+            }
+          </div>
+        </div>
+      </section>
+    </div>
+
+    @if (isLoading()) {
+      <div class="form-loading">Cargando configuración...</div>
+    }
+
+    <div class="form-actions settings-form-actions">
+      <button
+        type="button"
+        pButton
+        label="Guardar"
+        icon="pi pi-save"
+        styleClass="flat-button"
+        [disabled]="isLoading() || isSaving()"
+        (click)="onSaveSettings()"
+      ></button>
+    </div>
+  </p-card>
+
+  <p-card>
+    <div class="list-header settings-list-header">
+      <div>
+        <h2 class="settings-panel__title">NIT PRESTADOS</h2>
+      </div>
+      <div class="pt-4">
+        <button         
+          type="button"
+          pButton
+          label="Nuevo"
+          icon="pi pi-plus"
+          styleClass="flat-button"        
+          ariaLabel="Agregar nuevo NIT prestado"
+          (click)="onCreateBorrowedNit()"
+        ></button>
+      </div>
+    </div>
+
+    <p-table class="mt-4" [value]="borrowedNits()" [loading]="isBorrowedNitsLoading()" responsiveLayout="scroll">
+      <ng-template #header>
+        <tr>
+          <th>Nombre</th>
+          <th>Nit</th>
+          <th>Estado</th>
+          <th class="text-center">Acciones</th>
+        </tr>
+      </ng-template>
+
+      <ng-template #body let-item>
+        <tr>
+          <td>{{ item.name }}</td>
+          <td>{{ item.nit }}</td>
+          <td>
+            <p-tag [value]="getStatusLabel(item.isActive)" [severity]="getStatusSeverity(item.isActive)" />
+          </td>
+          <td class="text-center">
+            <button
+              type="button"
+              pButton
+              icon="pi pi-pencil"
+              text
+              rounded
+              styleClass="flat-button"
+              [pTooltip]="'Editar'"
+              tooltipPosition="top"
+              ariaLabel="Editar NIT prestado"
+              (click)="onEditBorrowedNit(item)"
+            ></button>
+          </td>
+        </tr>
+      </ng-template>
+
+      <ng-template #emptymessage>
+        <tr>
+          <td colspan="4" class="py-6 text-center text-surface-500">No se encontraron NIT prestados.</td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </p-card>
+</div>
+
+<p-dialog
+  [visible]="borrowedNitDialogVisible()"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [closable]="!isBorrowedNitSaving()"
+  [dismissableMask]="false"
+  [style]="{ width: 'min(540px, 96vw)' }"
+  header="{{ borrowedNitDialogTitle() }}"
+  styleClass="borrowed-nit-dialog"
+  (onHide)="onBorrowedNitDialogHide()"
+>
+  <form class="borrowed-nit-dialog__form" [formGroup]="borrowedNitForm">
+    <div class="flex flex-col gap-2">
+      <label for="borrowedNitName" class="font-semibold">Nombre</label>
+      <input id="borrowedNitName" type="text" pInputText formControlName="name" maxlength="150" />
+      @if (getBorrowedNitFieldError('name')) {
+        <small class="field-error">{{ getBorrowedNitFieldError('name') }}</small>
+      }
+    </div>
+
+    <div class="flex flex-col gap-2">
+      <label for="borrowedNitValue" class="font-semibold">Nit</label>
+      <input id="borrowedNitValue" type="text" pInputText formControlName="nit" maxlength="20" />
+      @if (getBorrowedNitFieldError('nit')) {
+        <small class="field-error">{{ getBorrowedNitFieldError('nit') }}</small>
+      }
+    </div>
+
+    @if (isEditBorrowedNitMode()) {
+      <div class="borrowed-nit-dialog__status">
+        <div class="borrowed-nit-dialog__status-copy">
+          <span class="font-semibold">Estado</span>
+          <small class="text-surface-500">Cambiar disponibilidad de este NIT prestado.</small>
+        </div>
+
+        <div class="borrowed-nit-dialog__status-toggle">
+          <strong>{{ borrowedNitForm.controls.isActive.value ? 'Activo' : 'Inactivo' }}</strong>
+          <p-toggleswitch inputId="borrowedNitIsActive" [formControl]="borrowedNitForm.controls.isActive" />
+        </div>
+      </div>
+    }
+
+    <div class="form-actions borrowed-nit-dialog__actions">
+      <button type="button" pButton label="Cancelar" severity="secondary" styleClass="flat-button" [disabled]="isBorrowedNitSaving()" (click)="onCancelBorrowedNitDialog()"></button>
+      <button type="button" pButton label="Guardar" icon="pi pi-save" styleClass="flat-button" [disabled]="isBorrowedNitSaving()" (click)="onSaveBorrowedNit()"></button>
+    </div>
+  </form>
+</p-dialog>
