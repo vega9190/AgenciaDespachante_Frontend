@@ -146,6 +146,12 @@
             </span>
           </p-tab>
         }
+        <p-tab value="dispatchs">
+          <span class="import-tab-label">
+            <i class="pi pi-send"></i>
+            <span>Despacho</span>
+          </span>
+        </p-tab>
         <p-tab value="logs">
           <span class="import-tab-label">
             <i class="pi pi-history"></i>
@@ -193,6 +199,10 @@
             />
           </p-tabpanel>
         }
+
+        <p-tabpanel value="dispatchs">
+          <app-import-dispatchs />
+        </p-tabpanel>
 
         <p-tabpanel value="logs">
           <app-import-logs [importId]="currentImport.id" [refreshVersion]="logsRefreshVersion()" />

@@ -18,13 +18,14 @@ import { CONTAINER_TYPE_OPTIONS, ImportDetailDto, ImportDocumentTypeOptionDto } 
 import { ImportsService } from '@services/imports/imports.service';
 import { ImportDetailsComponent } from './import-details/import-details.component';
 import { ImportDocumentsComponent } from './import-documents/import-documents.component';
+import { ImportDispatchsComponent } from './import-dispatchs/import-dispatchs.component';
 import { ImportLogsComponent } from './import-logs/import-logs.component';
 import { ImportPaymentsComponent } from './import-payments/import-payments.component';
 import { ImportTransportationComponent } from './import-transportation/import-transportation.component';
 
 @Component({
   selector: 'app-import-form',
-  imports: [ButtonModule, DatePipe, CardModule, ConfirmDialogModule, Tabs, TabList, Tab, TabPanels, TabPanel, TooltipModule, ImportDetailsComponent, ImportDocumentsComponent, ImportPaymentsComponent, ImportLogsComponent, ImportTransportationComponent],
+  imports: [ButtonModule, DatePipe, CardModule, ConfirmDialogModule, Tabs, TabList, Tab, TabPanels, TabPanel, TooltipModule, ImportDetailsComponent, ImportDocumentsComponent, ImportPaymentsComponent, ImportDispatchsComponent, ImportLogsComponent, ImportTransportationComponent],
   templateUrl: './import-form.component.html',
   styleUrl: './import-form.component.css'
 })
