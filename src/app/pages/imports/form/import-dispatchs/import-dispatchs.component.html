@@ -184,5 +184,102 @@
       <span>Total despacho</span>
       <strong>{{ totalCosts() | currency:'USD':'symbol':'1.2-2' }}</strong>
     </div>
+
+    <div class="costs-section-title">
+      Tractores Adicionales
+    </div>
+
+    <div class="costs-table">
+      <div class="tractors-row tractors-row--header">
+        <span>Tractor / referencia</span>
+        <span>DIM</span>
+        <span>Impuestos</span>
+        <span>Almacenaje</span>
+        <span></span>
+      </div>
+
+      @for (t of tractors(); track $index) {
+        <div class="tractors-row">
+          <input
+            pInputText
+            type="text"
+            [value]="t.description"
+            (input)="updateTractorField($index, 'description', $any($event.target).value)"
+            placeholder="Tractor / ref."
+            [disabled]="isReadOnly()"
+          />
+          <input
+            pInputText
+            type="text"
+            [value]="t.dim ?? ''"
+            (input)="updateTractorField($index, 'dim', $any($event.target).value || null)"
+            placeholder="DIM"
+            [disabled]="isReadOnly()"
+          />
+          <p-inputgroup>
+            <p-inputnumber
+              [ngModel]="t.taxAmount"
+              (ngModelChange)="updateTractorField($index, 'taxAmount', $event)"
+              mode="decimal"
+              [min]="0"
+              [max]="maxCostAmount"
+              [minFractionDigits]="2"
+              [maxFractionDigits]="2"
+              [step]="0"
+              [disabled]="isReadOnly()"
+              inputStyleClass="w-full"
+              styleClass="w-full"
+            />
+            <p-inputgroup-addon>USD</p-inputgroup-addon>
+          </p-inputgroup>
+          <p-inputgroup>
+            <p-inputnumber
+              [ngModel]="t.storageAmount"
+              (ngModelChange)="updateTractorField($index, 'storageAmount', $event)"
+              mode="decimal"
+              [min]="0"
+              [max]="maxCostAmount"
+              [minFractionDigits]="2"
+              [maxFractionDigits]="2"
+              [step]="0"
+              [disabled]="isReadOnly()"
+              inputStyleClass="w-full"
+              styleClass="w-full"
+            />
+            <p-inputgroup-addon>USD</p-inputgroup-addon>
+          </p-inputgroup>
+          <button
+            pButton
+            type="button"
+            [text]="true"
+            icon="pi pi-times"
+            severity="danger"
+            [disabled]="isReadOnly()"
+            (click)="removeTractor($index)"
+          ></button>
+        </div>
+      }
+
+      <button
+        pButton
+        type="button"
+        [text]="true"
+        icon="pi pi-plus"
+        label="Agregar tractor"
+        class="add-cost-btn"
+        [disabled]="isReadOnly()"
+        (click)="addTractor()"
+      ></button>
+    </div>
+
+    <div class="costs-total">
+      <span>Total tractores</span>
+      <strong>{{ totalTractors() | currency:'USD':'symbol':'1.2-2' }}</strong>
+    </div>
+
+    <div class="costs-total costs-total--grand">
+      <span>Costo Total</span>
+      <strong>{{ totalAll() | currency:'USD':'symbol':'1.2-2' }}</strong>
+    </div>
   </section>
 </div>

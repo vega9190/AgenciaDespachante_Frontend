@@ -1,4 +1,4 @@
-import { Component, HostListener, OnInit, computed, inject, input, signal } from '@angular/core';
+import { Component, HostListener, OnInit, computed, effect, inject, input, signal } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CurrencyPipe } from '@angular/common';
 
@@ -10,7 +10,7 @@ import { InputNumberModule } from 'primeng/inputnumber';
 import { InputTextModule } from 'primeng/inputtext';
 import { TooltipModule } from 'primeng/tooltip';
 
-import { DispatchCostItem, ImportDispatchFormModel } from '../../models/import-form.models';
+import { DispatchCostItem, ImportDispatchFormModel, TractorItem } from '../../models/import-form.models';
 import { isReadOnlyImportStatus } from '@services/imports/import-status.constants';
 import { ImportDetailDto } from '@services/imports/imports.types';
 import { BorrowedNitsService } from '@services/borrowed-nits/borrowed-nits.service';
@@ -45,6 +45,13 @@ export class ImportDispatchsComponent implements OnInit {
   readonly importItem = input<ImportDetailDto | null>(null);
   readonly isReadOnly = computed(() => isReadOnlyImportStatus(this.importItem()?.statusId));
 
+  constructor() {
+    effect(() => {
+      const nit = this.importItem()?.clientTaxId ?? '';
+      this.dispatchForm.controls.nit.setValue(nit, { emitEvent: false });
+    });
+  }
+
   readonly maxCostAmount = MAX_COST_AMOUNT;
 
   readonly costs = signal<DispatchCostItem[]>([
@@ -56,6 +63,12 @@ export class ImportDispatchsComponent implements OnInit {
   readonly totalCosts = computed(() =>
     this.costs().reduce((sum, c) => sum + (c.amount ?? 0), 0)
   );
+
+  readonly tractors = signal<TractorItem[]>([]);
+  readonly totalTractors = computed(() =>
+    this.tractors().reduce((sum, t) => sum + (t.taxAmount ?? 0) + (t.storageAmount ?? 0), 0)
+  );
+  readonly totalAll = computed(() => this.totalCosts() + this.totalTractors());
 
   readonly borrowedNits = signal<BorrowedNitListItemDto[]>([]);
   readonly borrowedNitPopoverVisible = signal(false);
@@ -133,8 +146,22 @@ export class ImportDispatchsComponent implements OnInit {
     );
   }
 
+  addTractor(): void {
+    this.tractors.update(list => [...list, { description: '', dim: null, taxAmount: null, storageAmount: null }]);
+  }
+
+  removeTractor(index: number): void {
+    this.tractors.update(list => list.filter((_, i) => i !== index));
+  }
+
+  updateTractorField(index: number, field: keyof TractorItem, value: string | number | null): void {
+    this.tractors.update(list =>
+      list.map((item, i) => i === index ? { ...item, [field]: value } : item)
+    );
+  }
+
   getDispatchItems() {
-    return this.costs().map((item, i) => ({
+    const costs = this.costs().map((item, i) => ({
       description: item.description,
       amount: item.amount ?? 0,
       isTractor: false,
@@ -143,6 +170,18 @@ export class ImportDispatchsComponent implements OnInit {
       taxAmount: null,
       storageAmount: null
     }));
+
+    const tractors = this.tractors().map(t => ({
+      description: t.description,
+      amount: (t.taxAmount ?? 0) + (t.storageAmount ?? 0),
+      isTractor: true,
+      isMainCharge: false,
+      dim: t.dim,
+      taxAmount: t.taxAmount,
+      storageAmount: t.storageAmount
+    }));
+
+    return [...costs, ...tractors];
   }
 
   getDispatchFieldError(controlName: keyof ImportDispatchFormModel): string {

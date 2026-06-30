@@ -25,6 +25,13 @@ export interface DispatchCostItem {
   amount: number | null;
 }
 
+export interface TractorItem {
+  description: string;
+  dim: string | null;
+  taxAmount: number | null;
+  storageAmount: number | null;
+}
+
 export interface ImportPaymentsFormModel {
   type: FormControl<ImportPaymentType | null>;
   amount: FormControl<number | null>;
