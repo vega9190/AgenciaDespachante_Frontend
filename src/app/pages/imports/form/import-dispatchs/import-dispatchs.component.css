@@ -1,0 +1,76 @@
+.dispatchs-layout {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.dispatchs-panel {
+  min-height: 100%;
+  border: 1px solid var(--tenant-layout-border);
+  border-radius: 1rem;
+  padding: 1.25rem;
+}
+
+.dispatchs-panel--form {
+  display: flex;
+  flex-direction: column;
+}
+
+.dispatchs-panel__title {
+  margin: 0 0 0.5rem;
+  color: var(--tenant-secondary);
+  font-size: 1.15rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.dispatchs-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  padding-top: 0.5rem;
+}
+
+.dispatchs-form-grid-row {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.field-error {
+  color: var(--p-red-500);
+}
+
+.form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+:host ::ng-deep .dispatchs-form-grid-row .p-datepicker,
+:host ::ng-deep .dispatchs-form-grid-row .p-datepicker-input {
+  width: 100%;
+}
+
+@media screen and (min-width: 768px) {
+  .dispatchs-layout {
+    grid-template-columns: minmax(0, 4fr) minmax(18rem, 8fr);
+    align-items: stretch;
+  }
+
+  .dispatchs-form-grid-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .dispatchs-form-grid-row--3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media screen and (max-width: 767px) {
+  .form-actions {
+    flex-direction: column;
+  }
+}

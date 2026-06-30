@@ -1,1 +1,96 @@
-<p>Hola Mundo</p>
+<div class="dispatchs-layout">
+  <section class="dispatchs-panel dispatchs-panel--form">
+    <h2 class="dispatchs-panel__title">
+      Datos del Cliente
+    </h2>
+
+    <div class="dispatchs-form" [formGroup]="dispatchForm">
+      <div class="dispatchs-form-grid-row">
+        <div class="flex flex-col gap-2">
+          <label for="dispatchsNombre" class="font-semibold">Nombre</label>
+          <input id="dispatchsNombre" type="text" pInputText [value]="importItem()?.clientFullName || ''" disabled />
+        </div>
+
+        <div class="flex flex-col gap-2">
+          <label for="dispatchsNit" class="font-semibold">NIT</label>
+          <input id="dispatchsNit" type="text" pInputText [value]="importItem()?.clientTaxId || ''"/>
+        </div>
+      </div>
+
+      <div class="dispatchs-form-grid-row">
+        <div class="flex flex-col gap-2">
+          <label for="dispatchsChofer" class="font-semibold">Chofer</label>
+          <input id="dispatchsChofer" type="text" pInputText [value]="importItem()?.driver?.fullName || ''" disabled />
+        </div>
+
+        <div class="flex flex-col gap-2">
+          <label for="dispatchsContenedor" class="font-semibold">Contenedor</label>
+          <input id="dispatchsContenedor" type="text" pInputText [value]="importItem()?.containerNumber || ''" disabled />
+        </div>
+      </div>
+
+      <div class="dispatchs-form-grid-row">
+        <div class="flex flex-col gap-2">
+          <label for="dispatchsMercaderia" class="font-semibold">Mercadería</label>
+          <input id="dispatchsMercaderia" type="text" pInputText formControlName="mercaderia" maxlength="100" />
+          @if (getDispatchFieldError('mercaderia')) {
+            <small class="field-error">{{ getDispatchFieldError('mercaderia') }}</small>
+          }
+        </div>
+
+        <div class="flex flex-col gap-2">
+          <label for="dispatchsAgencia" class="font-semibold">Agencia</label>
+          <input id="dispatchsAgencia" type="text" pInputText formControlName="agencia" maxlength="50" />
+          @if (getDispatchFieldError('agencia')) {
+            <small class="field-error">{{ getDispatchFieldError('agencia') }}</small>
+          }
+        </div>
+      </div>
+
+      <div class="flex flex-col gap-2">
+        <label for="dispatchsDestino" class="font-semibold">Destino</label>
+        <input id="dispatchsDestino" type="text" pInputText formControlName="destino" maxlength="100" />
+        @if (getDispatchFieldError('destino')) {
+          <small class="field-error">{{ getDispatchFieldError('destino') }}</small>
+        }
+      </div>
+
+      <div class="dispatchs-form-grid-row">
+        <div class="flex flex-col gap-2">
+          <label id="dispatchsFechaLabel" class="font-semibold">Fecha</label>
+          <p-datepicker
+            inputId="dispatchsFecha"
+            ariaLabelledBy="dispatchsFechaLabel"
+            formControlName="fecha"
+            dateFormat="dd/mm/yy"
+            [iconDisplay]="'input'"
+            [showIcon]="true"
+            [readonlyInput]="true"
+          />
+        </div>
+
+        <div class="flex flex-col gap-2">
+          <label for="dispatchsDim" class="font-semibold">DIM</label>
+          <input id="dispatchsDim" type="text" pInputText formControlName="dim" maxlength="50" />
+          @if (getDispatchFieldError('dim')) {
+            <small class="field-error">{{ getDispatchFieldError('dim') }}</small>
+          }
+        </div>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button
+        type="button"
+        pButton
+        label="Guardar"
+        icon="pi pi-save"
+        styleClass="flat-button"
+        [disabled]="isReadOnly()"
+      ></button>
+    </div>
+  </section>
+
+  <section class="dispatchs-panel dispatchs-panel--side">
+  </section>
+</div>

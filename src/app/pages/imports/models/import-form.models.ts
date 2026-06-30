@@ -11,6 +11,14 @@ export interface ImportDetailsFormModel {
   containerType: FormControl<number | null>;
 }
 
+export interface ImportDispatchFormModel {
+  mercaderia: FormControl<string>;
+  destino: FormControl<string>;
+  fecha: FormControl<Date | null>;
+  dim: FormControl<string>;
+  agencia: FormControl<string>;
+}
+
 export interface ImportPaymentsFormModel {
   type: FormControl<ImportPaymentType | null>;
   amount: FormControl<number | null>;
