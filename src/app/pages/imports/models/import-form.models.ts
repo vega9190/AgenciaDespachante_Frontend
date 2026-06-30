@@ -20,6 +20,11 @@ export interface ImportDispatchFormModel {
   nit: FormControl<string>;
 }
 
+export interface DispatchCostItem {
+  description: string;
+  amount: number | null;
+}
+
 export interface ImportPaymentsFormModel {
   type: FormControl<ImportPaymentType | null>;
   amount: FormControl<number | null>;

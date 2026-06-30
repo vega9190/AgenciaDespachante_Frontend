@@ -120,5 +120,69 @@
   </section>
 
   <section class="dispatchs-panel dispatchs-panel--side">
+    <h2 class="dispatchs-panel__title">Costos del despacho</h2>
+
+    <div class="costs-table">
+      <div class="costs-row costs-row--header">
+        <span>Concepto</span>
+        <span>Monto (USD)</span>
+        <span></span>
+      </div>
+
+      @for (item of costs(); track $index) {
+        <div class="costs-row">
+          <input
+            pInputText
+            type="text"
+            [value]="item.description"
+            (input)="updateCostDescription($index, $any($event.target).value)"
+            placeholder="Concepto"
+            [disabled]="isReadOnly() || $index === 0"
+          />
+          <p-inputgroup>
+            <p-inputnumber
+              [ngModel]="item.amount"
+              (ngModelChange)="updateCostAmount($index, $event)"
+              mode="decimal"
+              [min]="0"
+              [max]="maxCostAmount"
+              [minFractionDigits]="2"
+              [maxFractionDigits]="2"
+              [step]="0"
+              [disabled]="isReadOnly()"
+              inputStyleClass="w-full"
+              styleClass="w-full"
+            />
+            <p-inputgroup-addon>USD</p-inputgroup-addon>
+          </p-inputgroup>
+          <button
+            pButton
+            type="button"
+            [text]="true"
+            icon="pi pi-times"
+            severity="danger"
+            [disabled]="isReadOnly()"
+            [style.visibility]="$index === 0 ? 'hidden' : 'visible'"
+            (click)="removeCost($index)"
+          ></button>
+        </div>
+      }
+
+      <button
+        pButton
+        type="button"
+        [text]="true"
+        icon="pi pi-plus"
+        label="Agregar concepto"
+        class="add-cost-btn"
+        [disabled]="isReadOnly()"
+        (click)="addCost()"
+      ></button>
+    </div>
+
+    <div class="costs-total">
+      <span>Total despacho</span>
+      <strong>{{ totalCosts() | currency:'USD':'symbol':'1.2-2' }}</strong>
+    </div>
   </section>
 </div>

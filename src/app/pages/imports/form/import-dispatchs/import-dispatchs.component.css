@@ -104,6 +104,50 @@
   width: 100%;
 }
 
+.dispatchs-panel--side {
+  display: flex;
+  flex-direction: column;
+}
+
+.costs-table {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding-top: 0.5rem;
+}
+
+.costs-row {
+  display: grid;
+  grid-template-columns: 1fr 9rem 2.5rem;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.costs-row--header {
+  font-weight: 600;
+  font-size: 0.85rem;
+  padding: 0 0.25rem;
+}
+
+.add-cost-btn {
+  width: 100%;
+  justify-content: center;
+  margin-top: 0.25rem;
+  border: 1px dashed var(--p-surface-300) !important;
+  border-radius: 0.5rem !important;
+}
+
+.costs-total {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid var(--tenant-layout-border);
+  padding-top: 0.75rem;
+  margin-top: 1rem;
+  font-size: 1rem;
+}
+
 @media screen and (min-width: 768px) {
   .dispatchs-layout {
     grid-template-columns: minmax(0, 4fr) minmax(18rem, 8fr);
