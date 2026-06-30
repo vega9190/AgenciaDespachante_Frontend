@@ -17,6 +17,7 @@ export interface ImportDispatchFormModel {
   fecha: FormControl<Date | null>;
   dim: FormControl<string>;
   agencia: FormControl<string>;
+  nit: FormControl<string>;
 }
 
 export interface ImportPaymentsFormModel {
