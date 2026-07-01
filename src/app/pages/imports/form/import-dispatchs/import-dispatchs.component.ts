@@ -1,6 +1,7 @@
 import { Component, HostListener, OnInit, computed, effect, inject, input, signal } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CurrencyPipe } from '@angular/common';
+import { finalize } from 'rxjs';
 
 import { ButtonModule } from 'primeng/button';
 import { DatePickerModule } from 'primeng/datepicker';
@@ -8,14 +9,17 @@ import { InputGroup } from 'primeng/inputgroup';
 import { InputGroupAddonModule } from 'primeng/inputgroupaddon';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { InputTextModule } from 'primeng/inputtext';
+import { MessageService } from 'primeng/api';
 import { TooltipModule } from 'primeng/tooltip';
 
 import { DispatchCostItem, ImportDispatchFormModel, TractorItem } from '../../models/import-form.models';
 import { isReadOnlyImportStatus } from '@services/imports/import-status.constants';
-import { ImportDetailDto } from '@services/imports/imports.types';
+import { ImportDetailDto, SaveDispatchFormRequest } from '@services/imports/imports.types';
+import { ImportsService } from '@services/imports/imports.service';
 import { BorrowedNitsService } from '@services/borrowed-nits/borrowed-nits.service';
 import { BorrowedNitListItemDto } from '@services/borrowed-nits/borrowed-nits.types';
 import { TenantSettingsService } from '@services/tenant/tenant-settings.service';
+import { UiBlockService } from '@services/common/ui-block.service';
 
 const MAX_COST_AMOUNT = 99999.99;
 const MAIN_CHARGE_DESCRIPTION = 'Gestión Operativa';
@@ -39,6 +43,9 @@ const MAIN_CHARGE_DESCRIPTION = 'Gestión Operativa';
 })
 export class ImportDispatchsComponent implements OnInit {
   private readonly formBuilder = inject(FormBuilder);
+  private readonly importsService = inject(ImportsService);
+  private readonly uiBlockService = inject(UiBlockService);
+  private readonly messageService = inject(MessageService);
   private readonly borrowedNitsService = inject(BorrowedNitsService);
   private readonly tenantSettingsService = inject(TenantSettingsService);
 
@@ -47,8 +54,9 @@ export class ImportDispatchsComponent implements OnInit {
 
   constructor() {
     effect(() => {
-      const nit = this.importItem()?.clientTaxId ?? '';
-      this.dispatchForm.controls.nit.setValue(nit, { emitEvent: false });
+      const item = this.importItem();
+      if (!item?.id) return;
+      this.loadDispatchForm(item.id);
     });
   }
 
@@ -70,6 +78,10 @@ export class ImportDispatchsComponent implements OnInit {
   );
   readonly totalAll = computed(() => this.totalCosts() + this.totalTractors());
 
+  readonly isSaving = signal(false);
+  readonly isLoadingDispatch = signal(false);
+  readonly showItemErrors = signal(false);
+
   readonly borrowedNits = signal<BorrowedNitListItemDto[]>([]);
   readonly borrowedNitPopoverVisible = signal(false);
   readonly loadingBorrowedNits = signal(false);
@@ -77,7 +89,7 @@ export class ImportDispatchsComponent implements OnInit {
   readonly dispatchForm: FormGroup<ImportDispatchFormModel> = this.formBuilder.group({
     mercaderia: this.formBuilder.nonNullable.control('', [Validators.maxLength(100)]),
     destino: this.formBuilder.nonNullable.control('', [Validators.maxLength(100)]),
-    fecha: this.formBuilder.control<Date | null>(null),
+    fecha: this.formBuilder.control<Date | null>(new Date()),
     dim: this.formBuilder.nonNullable.control('', [Validators.maxLength(50)]),
     agencia: this.formBuilder.nonNullable.control('', [Validators.maxLength(50)]),
     nit: this.formBuilder.nonNullable.control('', [Validators.maxLength(50)])
@@ -182,6 +194,115 @@ export class ImportDispatchsComponent implements OnInit {
     }));
 
     return [...costs, ...tractors];
+  }
+
+  saveDispatchForm(): void {
+    const importId = this.importItem()?.id;
+    if (!importId) return;
+
+    if (!this.dispatchForm.controls.fecha.value) {
+      this.dispatchForm.controls.fecha.setValue(new Date());
+    }
+
+    const validationError = this.validateDispatchItems();
+    if (validationError) {
+      this.showItemErrors.set(true);
+      this.messageService.add({ severity: 'warn', summary: 'Validación', detail: validationError });
+      return;
+    }
+
+    this.showItemErrors.set(false);
+
+    const { nit, fecha, dim, agencia, destino, mercaderia } = this.dispatchForm.getRawValue();
+
+    const request: SaveDispatchFormRequest = {
+      nit: nit || null,
+      date: fecha ? this.toLocalDateString(fecha) : null,
+      dim: dim || null,
+      agency: agencia || null,
+      destination: destino || null,
+      commodity: mercaderia || null,
+      items: this.getDispatchItems()
+    };
+
+    this.isSaving.set(true);
+    this.uiBlockService.block();
+
+    this.importsService.saveDispatchForm(importId, request)
+      .pipe(
+        finalize(() => {
+          this.isSaving.set(false);
+          this.uiBlockService.unblock();
+        })
+      )
+      .subscribe({
+        next: () => {
+          this.messageService.add({ severity: 'success', summary: 'Guardado', detail: 'Despacho guardado correctamente.' });
+        },
+        error: () => {
+          this.messageService.add({ severity: 'error', summary: 'Error', detail: 'No se pudo guardar el despacho.' });
+        }
+      });
+  }
+
+  private parseDateLocal(dateStr: string | Date): Date {
+    const s = typeof dateStr === 'string' ? dateStr : dateStr.toISOString();
+    const [year, month, day] = s.substring(0, 10).split('-').map(Number);
+    return new Date(year, month - 1, day);
+  }
+
+  private toLocalDateString(date: Date): string {
+    const pad = (n: number) => String(n).padStart(2, '0');
+    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+  }
+
+  private validateDispatchItems(): string | null {
+    for (const [i, c] of this.costs().entries()) {
+      if (!c.description.trim() || c.amount === null) {
+        return `El concepto #${i + 1} del despacho requiere Concepto y Monto.`;
+      }
+    }
+    for (const [i, t] of this.tractors().entries()) {
+      if (!t.description.trim() || !t.dim?.trim() || t.taxAmount === null || t.storageAmount === null) {
+        return `El tractor #${i + 1} requiere Tractor/referencia, DIM, Impuestos y Almacenaje.`;
+      }
+    }
+    return null;
+  }
+
+  private loadDispatchForm(importId: string): void {
+    this.isLoadingDispatch.set(true);
+    this.importsService.getDispatchForm(importId).pipe(
+      finalize(() => this.isLoadingDispatch.set(false))
+    ).subscribe({
+      next: (result) => {
+        const dto = result.data;
+        if (!dto) {
+          const fallbackNit = this.importItem()?.clientTaxId ?? '';
+          this.dispatchForm.controls.nit.setValue(fallbackNit, { emitEvent: false });
+          return;
+        }
+
+        this.dispatchForm.patchValue({
+          nit: dto.dispatchNit ?? '',
+          fecha: dto.date ? this.parseDateLocal(dto.date) : new Date(),
+          dim: dto.dim ?? '',
+          agencia: dto.agency ?? '',
+          destino: dto.destination ?? '',
+          mercaderia: dto.commodity ?? ''
+        }, { emitEvent: false });
+
+        const costItems = dto.items
+          .filter(i => !i.isTractor)
+          .map(i => ({ description: i.description, amount: i.amount }));
+        if (costItems.length) this.costs.set(costItems);
+
+        const tractorItems = dto.items
+          .filter(i => i.isTractor)
+          .map(i => ({ description: i.description, dim: i.dim ?? null, taxAmount: i.taxAmount ?? null, storageAmount: i.storageAmount ?? null }));
+        if (tractorItems.length) this.tractors.set(tractorItems);
+      }
+    });
   }
 
   getDispatchFieldError(controlName: keyof ImportDispatchFormModel): string {

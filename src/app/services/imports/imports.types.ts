@@ -96,7 +96,7 @@ export interface DispatchFormDto {
   id: string;
   importId: string;
   dispatchNit?: string | null;
-  date?: string | null;
+  date?: Date | null;
   dim?: string | null;
   agency?: string | null;
   destination?: string | null;
