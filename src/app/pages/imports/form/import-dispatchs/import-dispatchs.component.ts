@@ -20,6 +20,7 @@ import { BorrowedNitsService } from '@services/borrowed-nits/borrowed-nits.servi
 import { BorrowedNitListItemDto } from '@services/borrowed-nits/borrowed-nits.types';
 import { TenantSettingsService } from '@services/tenant/tenant-settings.service';
 import { UiBlockService } from '@services/common/ui-block.service';
+import { ReportsService } from '@services/reports/reports.service';
 
 const MAX_COST_AMOUNT = 99999.99;
 const MAIN_CHARGE_DESCRIPTION = 'Gestión Operativa';
@@ -48,6 +49,7 @@ export class ImportDispatchsComponent implements OnInit {
   private readonly messageService = inject(MessageService);
   private readonly borrowedNitsService = inject(BorrowedNitsService);
   private readonly tenantSettingsService = inject(TenantSettingsService);
+  private readonly reportsService = inject(ReportsService);
 
   readonly importItem = input<ImportDetailDto | null>(null);
   readonly isReadOnly = computed(() => isReadOnlyImportStatus(this.importItem()?.statusId));
@@ -243,6 +245,42 @@ export class ImportDispatchsComponent implements OnInit {
           this.messageService.add({ severity: 'error', summary: 'Error', detail: 'No se pudo guardar el despacho.' });
         }
       });
+  }
+
+  downloadReport(): void {
+    const importId = this.importItem()?.id;
+    if (!importId) return;
+
+    this.uiBlockService.block();
+    this.reportsService.downloadDispatchForm(importId)
+      .pipe(finalize(() => this.uiBlockService.unblock()))
+      .subscribe({
+        next: (response) => {
+          const blob = response.body;
+          if (!blob) return;
+
+          const fileName = this.getReportFileName(response.headers.get('content-disposition'));
+          const objectUrl = URL.createObjectURL(blob);
+          const link = globalThis.document.createElement('a');
+
+          link.href = objectUrl;
+          link.download = fileName;
+          link.click();
+
+          URL.revokeObjectURL(objectUrl);
+        },
+        error: () => {
+          this.messageService.add({ severity: 'error', summary: 'Error', detail: 'No se pudo descargar el reporte.' });
+        }
+      });
+  }
+
+  private getReportFileName(contentDisposition: string | null): string {
+    const encoded = contentDisposition?.match(/filename\*=UTF-8''([^;]+)/i)?.[1];
+    if (encoded) return decodeURIComponent(encoded);
+
+    const plain = contentDisposition?.match(/filename="?([^";]+)"?/i)?.[1]?.trim();
+    return plain ?? 'formulario-despacho.pdf';
   }
 
   private parseDateLocal(dateStr: string | Date): Date {

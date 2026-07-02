@@ -122,7 +122,19 @@
   </section>
 
   <section class="dispatchs-panel dispatchs-panel--side">
-    <h2 class="dispatchs-panel__title">Costos del despacho</h2>
+    <div class="flex items-center justify-between gap-3">
+      <h2 class="dispatchs-panel__title">Costos del despacho</h2>
+      <button
+        type="button"
+        pButton
+        label="Descargar"
+        icon="pi pi-file-pdf"
+        styleClass="flat-button"
+        pTooltip="Descargar reporte de despacho"
+        tooltipPosition="top"
+        (click)="downloadReport()"
+      ></button>
+    </div>
 
     <div class="costs-table">
       <div class="costs-row costs-row--header">
