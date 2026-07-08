@@ -29,3 +29,12 @@ export interface UploadTenantLogoRequest {
 export interface UploadTenantFavIcoRequest {
   favIco: File;
 }
+
+export interface DolarApiRateDto {
+  moneda: string;
+  casa: string;
+  nombre: string;
+  compra: number;
+  venta: number;
+  fechaActualizacion: string;
+}

@@ -42,6 +42,38 @@
   gap: 1rem;
 }
 
+.exchange-rate-panel__body {
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+}
+
+.exchange-rate-reference {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding-right: 1.5rem;
+  border-right: 1px solid var(--p-content-border-color);
+}
+
+.exchange-rate-reference__item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.exchange-rate-reference__value {
+  color: var(--p-text-muted-color);
+  font-size: 0.9rem;
+}
+
+.exchange-rate-reference__updated {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: -0.25rem;
+}
+
 :host ::ng-deep .settings-panel__body .p-inputgroup,
 :host ::ng-deep .settings-panel__body .p-inputnumber,
 :host ::ng-deep .settings-panel__body .p-inputnumber-input {
@@ -100,6 +132,19 @@
 @media (max-width: 1024px) {
   .settings-sections {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .exchange-rate-panel__body {
+    grid-template-columns: 1fr;
+  }
+
+  .exchange-rate-reference {
+    padding-right: 0;
+    padding-bottom: 1rem;
+    border-right: none;
+    border-bottom: 1px solid var(--p-content-border-color);
   }
 }
 

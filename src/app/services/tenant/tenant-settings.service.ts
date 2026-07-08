@@ -6,6 +6,7 @@ import { ApiResultOf } from '@models/api.types';
 import { environment } from '../../../environments/environment';
 
 import {
+  DolarApiRateDto,
   TenantIdentityDto,
   TenantSettingsDto,
   UpdateTenantSettingsRequest,
@@ -52,5 +53,13 @@ export class TenantSettingsService {
 
   deleteFavIco() {
     return this.httpClient.delete<ApiResultOf<null>>(`${this.tenantUrl}/settings/favico`);
+  }
+
+  getOfficialDollar() {
+    return this.httpClient.get<DolarApiRateDto>(`${this.tenantUrl}/official-dollar`);
+  }
+
+  getParallelDollar() {
+    return this.httpClient.get<DolarApiRateDto>(`${this.tenantUrl}/parallel-dollar`);
   }
 }

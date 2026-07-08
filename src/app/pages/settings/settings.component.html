@@ -10,50 +10,91 @@
           <h2 class="settings-panel__title">TASAS DE CAMBIO</h2>
         </div>
 
-        <div class="settings-panel__body">
-          <div class="flex flex-col gap-2">
-            <label id="officialExchangeRateLabel" class="font-semibold">Tasa Oficial</label>
-            <p-inputgroup>
-              <p-inputnumber
-                inputId="officialExchangeRate"
-                ariaLabelledBy="officialExchangeRateLabel"
-                formControlName="officialExchangeRate"
-                mode="decimal"                
-                [max]="maxExchangeValue"
-                [minFractionDigits]="2"
-                [maxFractionDigits]="2"
-                [step]="decimalStep"
-                inputStyleClass="w-full"
-                styleClass="w-full"
-              />
-              <p-inputgroup-addon>Bs</p-inputgroup-addon>
-            </p-inputgroup>
-            @if (getSettingsFieldError('officialExchangeRate', maxExchangeValue, 'Bs.')) {
-              <small class="field-error">{{ getSettingsFieldError('officialExchangeRate', maxExchangeValue, 'Bs.') }}</small>
-            }
+        <div class="exchange-rate-panel__body">
+          <div class="exchange-rate-reference">
+            <div class="exchange-rate-reference__item">
+              <span class="font-semibold">Tasa Oficial</span>
+              <span class="exchange-rate-reference__value">
+                Compra: {{ tasaOficialApi()?.compra ?? '—' }} Bs · Venta: {{ tasaOficialApi()?.venta ?? '—' }} Bs
+              </span>
+            </div>
+
+            <div class="exchange-rate-reference__item">
+              <span class="font-semibold">Tasa Paralela</span>
+              <span class="exchange-rate-reference__value">
+                Compra: {{ tasaParalelaApi()?.compra ?? '—' }} Bs · Venta: {{ tasaParalelaApi()?.venta ?? '—' }} Bs
+              </span>
+            </div>
+
+            <div class="exchange-rate-reference__updated">
+              <small class="text-surface-500">
+                @if (ratesFetchedAt()) {
+                  Actualizado: {{ ratesFetchedAt() | date: 'dd/MM/yyyy HH:mm' }}
+                } @else {
+                  Actualizado: —
+                }
+              </small>
+              <button
+                type="button"
+                pButton
+                [icon]="isLoadingExternalRates() ? 'pi pi-spin pi-refresh' : 'pi pi-refresh'"
+                text
+                rounded
+                styleClass="flat-button"
+                [disabled]="isLoadingExternalRates()"
+                [pTooltip]="'Actualizar'"
+                tooltipPosition="top"
+                ariaLabel="Actualizar tasas de cambio"
+                (click)="onRefreshExternalRates()"
+              ></button>
+            </div>
           </div>
 
-          <div class="flex flex-col gap-2">
-            <label id="parallelExchangeRateLabel" class="font-semibold">Tasa Paralela</label>
-            <p-inputgroup>
-              <p-inputnumber
-                inputId="parallelExchangeRate"
-                ariaLabelledBy="parallelExchangeRateLabel"
-                formControlName="parallelExchangeRate"
-                mode="decimal"
-                [min]="minPositiveValue"
-                [max]="maxExchangeValue"
-                [minFractionDigits]="2"
-                [maxFractionDigits]="2"
-                [step]="decimalStep"
-                inputStyleClass="w-full"
-                styleClass="w-full"
-              />
-              <p-inputgroup-addon>Bs</p-inputgroup-addon>
-            </p-inputgroup>
-            @if (getSettingsFieldError('parallelExchangeRate', maxExchangeValue, 'Bs.')) {
-              <small class="field-error">{{ getSettingsFieldError('parallelExchangeRate', maxExchangeValue, 'Bs.') }}</small>
-            }
+          <div class="settings-panel__body">
+            <div class="flex flex-col gap-2">
+              <label id="officialExchangeRateLabel" class="font-semibold">Tasa Oficial</label>
+              <p-inputgroup>
+                <p-inputnumber
+                  inputId="officialExchangeRate"
+                  ariaLabelledBy="officialExchangeRateLabel"
+                  formControlName="officialExchangeRate"
+                  mode="decimal"
+                  [max]="maxExchangeValue"
+                  [minFractionDigits]="2"
+                  [maxFractionDigits]="2"
+                  [step]="decimalStep"
+                  inputStyleClass="w-full"
+                  styleClass="w-full"
+                />
+                <p-inputgroup-addon>Bs</p-inputgroup-addon>
+              </p-inputgroup>
+              @if (getSettingsFieldError('officialExchangeRate', maxExchangeValue, 'Bs.')) {
+                <small class="field-error">{{ getSettingsFieldError('officialExchangeRate', maxExchangeValue, 'Bs.') }}</small>
+              }
+            </div>
+
+            <div class="flex flex-col gap-2">
+              <label id="parallelExchangeRateLabel" class="font-semibold">Tasa Paralela</label>
+              <p-inputgroup>
+                <p-inputnumber
+                  inputId="parallelExchangeRate"
+                  ariaLabelledBy="parallelExchangeRateLabel"
+                  formControlName="parallelExchangeRate"
+                  mode="decimal"
+                  [min]="minPositiveValue"
+                  [max]="maxExchangeValue"
+                  [minFractionDigits]="2"
+                  [maxFractionDigits]="2"
+                  [step]="decimalStep"
+                  inputStyleClass="w-full"
+                  styleClass="w-full"
+                />
+                <p-inputgroup-addon>Bs</p-inputgroup-addon>
+              </p-inputgroup>
+              @if (getSettingsFieldError('parallelExchangeRate', maxExchangeValue, 'Bs.')) {
+                <small class="field-error">{{ getSettingsFieldError('parallelExchangeRate', maxExchangeValue, 'Bs.') }}</small>
+              }
+            </div>
           </div>
         </div>
       </section>

@@ -1,5 +1,6 @@
+import { DatePipe } from '@angular/common';
 import { Component, computed, inject, signal } from '@angular/core';
-import { finalize } from 'rxjs';
+import { catchError, finalize, forkJoin, of } from 'rxjs';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, ValidatorFn, Validators } from '@angular/forms';
 
 import { ButtonModule } from 'primeng/button';
@@ -19,7 +20,7 @@ import { BorrowedNitListItemDto, BorrowedNitRequest } from '@services/borrowed-n
 import { AppToastService } from '@services/common/app-toast.service';
 import { UiBlockService } from '@services/common/ui-block.service';
 import { TenantSettingsService } from '@services/tenant/tenant-settings.service';
-import { UpdateTenantSettingsRequest } from '@services/tenant/tenant-settings.types';
+import { DolarApiRateDto, UpdateTenantSettingsRequest } from '@services/tenant/tenant-settings.types';
 
 interface SettingsForm {
   officialExchangeRate: FormControl<number | null>;
@@ -45,6 +46,7 @@ const MIN_POSITIVE_VALUE = 0;
 @Component({
   selector: 'app-settings',
   imports: [
+    DatePipe,
     ReactiveFormsModule,
     ButtonModule,
     CardModule,
@@ -83,6 +85,10 @@ export class SettingsComponent {
   readonly editingBorrowedNit = signal<BorrowedNitListItemDto | null>(null);
   readonly isEditBorrowedNitMode = computed(() => this.editingBorrowedNit() !== null);
   readonly borrowedNitDialogTitle = computed(() => (this.isEditBorrowedNitMode() ? 'Editar NIT Prestado' : 'Agregar NIT Prestado'));
+  readonly tasaOficialApi = signal<DolarApiRateDto | null>(null);
+  readonly tasaParalelaApi = signal<DolarApiRateDto | null>(null);
+  readonly isLoadingExternalRates = signal(false);
+  readonly ratesFetchedAt = signal<Date | null>(null);
 
   readonly settingsForm: FormGroup<SettingsForm> = this.formBuilder.group({
     officialExchangeRate: this.formBuilder.control<number | null>(null, this.requiredPositiveDecimalValidators(MAX_CURRENCY_VALUE)),
@@ -260,6 +266,26 @@ export class SettingsComponent {
       });
 
     this.loadBorrowedNits();
+    this.loadExternalRates();
+  }
+
+  onRefreshExternalRates(): void {
+    this.loadExternalRates();
+  }
+
+  private loadExternalRates(): void {
+    this.isLoadingExternalRates.set(true);
+
+    forkJoin({
+      oficial: this.tenantSettingsService.getOfficialDollar().pipe(catchError(() => of(null))),
+      paralela: this.tenantSettingsService.getParallelDollar().pipe(catchError(() => of(null)))
+    })
+      .pipe(finalize(() => this.isLoadingExternalRates.set(false)))
+      .subscribe(({ oficial, paralela }) => {
+        this.tasaOficialApi.set(oficial);
+        this.tasaParalelaApi.set(paralela);
+        this.ratesFetchedAt.set(new Date());
+      });
   }
 
   private loadBorrowedNits(): void {
