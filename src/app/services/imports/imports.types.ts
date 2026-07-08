@@ -79,6 +79,8 @@ export interface TransportationTrackingDto {
   username: string;
   occurredAt: string;
   type: TransportationTrackingType;
+  latitude?: number | null;
+  longitude?: number | null;
 }
 
 export interface DispatchItemDto {
@@ -263,6 +265,7 @@ export interface SaveDispatchFormRequest {
 export interface SaveTransportationTrackingRequest {
   message: string;
   type: TransportationTrackingType;
+  ubicacion?: string | null;
 }
 
 export interface ContainerTypeOption {

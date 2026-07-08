@@ -89,6 +89,20 @@
             <small class="field-error">{{ getTrackingFieldError('message') }}</small>
           }
         </div>
+
+        <div class="flex flex-col gap-2">
+          <label for="trackingUbicacion" class="font-semibold">Ubicación</label>
+          <input
+            id="trackingUbicacion"
+            type="text"
+            pInputText
+            formControlName="ubicacion"
+            placeholder="Enlace de Google Maps (https://...)"
+          />
+          @if (getTrackingFieldError('ubicacion')) {
+            <small class="field-error">{{ getTrackingFieldError('ubicacion') }}</small>
+          }
+        </div>
       </div>
 
       <div class="form-actions">
@@ -176,6 +190,7 @@
           <th class="transportation-table__date-column">Fecha</th>
           <th class="transportation-table__type-column">Tipo</th>
           <th>Mensaje</th>
+          <th class="transportation-table__location-column">Ubicación</th>
           <th class="transportation-table__user-column">Usuario</th>
         </tr>
       </ng-template>
@@ -185,13 +200,27 @@
           <td>{{ formatOccurredAt(item.occurredAt) }}</td>
           <td>{{ getTrackingTypeLabel(item.type) }}</td>
           <td><span class="transportation-text-wrap">{{ item.message || '-' }}</span></td>
+          <td>
+            @if (hasCoordinates(item)) {
+              <button
+                type="button"
+                class="transportation-map-button"
+                aria-label="Ver ubicación"
+                [pTooltip]="'Ver ubicación'"
+                tooltipPosition="top"
+                (click)="openMapDialog(item)"
+              >
+                <i class="pi pi-map-marker" aria-hidden="true"></i>
+              </button>
+            }
+          </td>
           <td>{{ item.username || '-' }}</td>
         </tr>
       </ng-template>
 
       <ng-template #emptymessage>
         <tr>
-          <td colspan="4" class="py-6 text-center text-surface-500">
+          <td colspan="5" class="py-6 text-center text-surface-500">
             {{ isLoadingTracking() ? 'Cargando seguimiento...' : 'No hay seguimiento registrado.' }}
           </td>
         </tr>
@@ -199,3 +228,30 @@
     </p-table>
   </section>
 </div>
+
+<p-dialog
+  [visible]="mapDialogVisible()"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [dismissableMask]="true"
+  [style]="{ width: 'min(560px, 96vw)' }"
+  header="Ubicación"
+  styleClass="tracking-map-dialog"
+  (onHide)="onMapDialogHide()"
+>
+  @if (mapDialogEmbedUrl()) {
+    <iframe
+      class="tracking-map-dialog__frame"
+      [src]="mapDialogEmbedUrl()"
+      loading="lazy"
+      referrerpolicy="no-referrer-when-downgrade"
+    ></iframe>
+  }
+
+  @if (mapDialogExternalUrl(); as externalUrl) {
+    <a class="tracking-map-dialog__link" [href]="externalUrl" target="_blank" rel="noopener">
+      Abrir en Google Maps
+    </a>
+  }
+</p-dialog>

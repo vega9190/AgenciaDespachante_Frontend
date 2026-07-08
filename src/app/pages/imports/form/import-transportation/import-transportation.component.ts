@@ -1,9 +1,11 @@
 import { Component, computed, effect, inject, input, signal } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { finalize } from 'rxjs';
 
 import { ButtonModule } from 'primeng/button';
 import { DatePickerModule } from 'primeng/datepicker';
+import { DialogModule } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
 import { TableModule } from 'primeng/table';
@@ -40,11 +42,21 @@ interface TransportationFormModel {
 
 interface TransportationTrackingFormModel {
   message: string;
+  ubicacion: string;
 }
 
 @Component({
   selector: 'app-import-transportation',
-  imports: [ReactiveFormsModule, ButtonModule, DatePickerModule, InputTextModule, SelectModule, TableModule, TooltipModule],
+  imports: [
+    ReactiveFormsModule,
+    ButtonModule,
+    DatePickerModule,
+    DialogModule,
+    InputTextModule,
+    SelectModule,
+    TableModule,
+    TooltipModule
+  ],
   templateUrl: './import-transportation.component.html',
   styleUrl: './import-transportation.component.css'
 })
@@ -53,6 +65,7 @@ export class ImportTransportationComponent {
   private readonly importsService = inject(ImportsService);
   private readonly appToastService = inject(AppToastService);
   private readonly uiBlockService = inject(UiBlockService);
+  private readonly sanitizer = inject(DomSanitizer);
 
   readonly importId = input.required<string>();
   readonly importStatusId = input.required<string>();
@@ -68,8 +81,7 @@ export class ImportTransportationComponent {
   readonly trackingType = TransportationTrackingType;
   readonly transportationTimelineSteps = TRANSPORTATION_STATUS_FLOW;
   readonly canSaveTracking = computed(() => {
-    const startDate = this.transportationForm.controls.startDate.value;
-    return !!startDate && !this.isSavingTracking() && !this.isReadOnly();
+    return !!this.transportationStartDate() && !this.isSavingTracking() && !this.isReadOnly();
   });
 
   readonly statusOptions = computed(() => this.buildStatusOptions(this.savedTransportationStatusId()));
@@ -87,13 +99,19 @@ export class ImportTransportationComponent {
   });
   readonly isReadOnly = computed(() => isReadOnlyImportStatus(this.importStatusId()));
 
+  readonly mapDialogVisible = signal(false);
+  readonly mapDialogEmbedUrl = signal<SafeResourceUrl | null>(null);
+  readonly mapDialogExternalUrl = signal<string | null>(null);
+  private readonly transportationStartDate = signal<Date | null>(null);
+
   readonly transportationForm: FormGroup = this.formBuilder.group({
     startDate: this.formBuilder.control<Date | null>(null, [Validators.required]),
     statusId: this.formBuilder.nonNullable.control(TRANSPORTATION_STATUS_IDS.enRutaAlDestino, [Validators.required])
   });
 
   readonly trackingForm: FormGroup = this.formBuilder.group({
-    message: this.formBuilder.nonNullable.control('', [Validators.required, Validators.maxLength(500)])
+    message: this.formBuilder.nonNullable.control('', [Validators.required, Validators.maxLength(500)]),
+    ubicacion: this.formBuilder.nonNullable.control('', [httpsUrlValidator])
   });
 
   constructor() {
@@ -107,6 +125,10 @@ export class ImportTransportationComponent {
     effect(() => {
       this.syncTransportationFormDisabledState();
       this.syncTrackingFormDisabledState();
+    });
+
+    this.transportationForm.controls.startDate.valueChanges.subscribe((value) => {
+      this.transportationStartDate.set(value);
     });
   }
 
@@ -159,9 +181,12 @@ export class ImportTransportationComponent {
       return;
     }
 
+    const rawUbicacion = this.trackingForm.controls.ubicacion.value?.trim();
+
     const request: SaveTransportationTrackingRequest = {
       message: this.trackingForm.controls.message.value.trim(),
-      type: TransportationTrackingType.Seguimiento
+      type: TransportationTrackingType.Seguimiento,
+      ubicacion: rawUbicacion ? rawUbicacion : null
     };
 
     this.isSavingTracking.set(true);
@@ -182,7 +207,7 @@ export class ImportTransportationComponent {
           return;
         }
 
-        this.trackingForm.reset({ message: '' });        
+        this.trackingForm.reset({ message: '', ubicacion: '' });
         this.loadTracking(this.importId());
       });
   }
@@ -220,7 +245,36 @@ export class ImportTransportationComponent {
       return 'Máximo 500 caracteres.';
     }
 
+    if (control.hasError('httpsUrl')) {
+      return 'Debe ser un enlace de Google Maps que comience con https.';
+    }
+
     return '';
+  }
+
+  hasCoordinates(item: TransportationTrackingDto): boolean {
+    return item.latitude != null && item.longitude != null;
+  }
+
+  openMapDialog(item: TransportationTrackingDto): void {
+    if (!this.hasCoordinates(item)) {
+      return;
+    }
+
+    const lat = item.latitude;
+    const lng = item.longitude;
+    const embedUrl = `https://maps.google.com/maps?q=${lat},${lng}&z=17&hl=es&output=embed`;
+    const externalUrl = `https://www.google.com/maps?q=${lat},${lng}&z=17&hl=es`;
+
+    this.mapDialogEmbedUrl.set(this.sanitizer.bypassSecurityTrustResourceUrl(embedUrl));
+    this.mapDialogExternalUrl.set(externalUrl);
+    this.mapDialogVisible.set(true);
+  }
+
+  onMapDialogHide(): void {
+    this.mapDialogVisible.set(false);
+    this.mapDialogEmbedUrl.set(null);
+    this.mapDialogExternalUrl.set(null);
   }
 
   formatOccurredAt(value: string): string {
@@ -233,7 +287,10 @@ export class ImportTransportationComponent {
     return new Intl.DateTimeFormat('es-BO', {
       day: '2-digit',
       month: '2-digit',
-      year: '2-digit'
+      year: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false
     }).format(date);
   }
 
@@ -276,13 +333,12 @@ export class ImportTransportationComponent {
 
   private syncTransportationForm(transportation: TransportationDto | null | undefined): void {
     const normalizedStatusId = this.normalizeTransportationStatusId(transportation?.statusId);
+    const startDate = this.parseDateOnly(transportation?.startDate ?? null);
 
     this.transitDays.set(transportation?.transitDays ?? 0);
     this.savedTransportationStatusId.set(normalizedStatusId);
-    this.transportationForm.reset({
-      startDate: this.parseDateOnly(transportation?.startDate ?? null),
-      statusId: normalizedStatusId
-    }, { emitEvent: false });
+    this.transportationForm.reset({ startDate, statusId: normalizedStatusId }, { emitEvent: false });
+    this.transportationStartDate.set(startDate);
   }
 
   private syncTransportationFormDisabledState(): void {
@@ -398,6 +454,16 @@ export class ImportTransportationComponent {
   private isSuccessfulResponse<T>(response: ApiResultOf<T> | ApiResult | null | undefined): response is ApiResult {
     return !!response?.isValid;
   }
+}
+
+function httpsUrlValidator(control: AbstractControl): ValidationErrors | null {
+  const value = (control.value ?? '').trim();
+
+  if (!value) {
+    return null;
+  }
+
+  return value.toLowerCase().startsWith('https') ? null : { httpsUrl: true };
 }
 
 const TRANSPORTATION_STATUS_IDS = {
