@@ -55,6 +55,11 @@ export class AppMenuComponent {
       icon: 'pi pi-wrench',
       items: [
         {
+          label: 'Cotización',
+          icon: 'pi pi-dollar',
+          routerLink: ['/tools', 'quotation']
+        },
+        {
           label: 'Generar DAM',
           icon: 'pi pi-file-edit',
           routerLink: ['/tools', 'generate-dam']

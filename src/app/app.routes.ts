@@ -77,6 +77,10 @@ export const routes: Routes = [
         path: 'tools',
         children: [
           {
+            path: 'quotation',
+            loadComponent: () => import('@pages/tools/quotation/quotation.component').then((m) => m.QuotationComponent)
+          },
+          {
             path: 'generate-dam',
             loadComponent: () => import('@pages/tools/generate-dam/generate-dam.component').then((m) => m.GenerateDamComponent)
           },

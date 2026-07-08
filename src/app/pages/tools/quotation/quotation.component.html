@@ -1,0 +1,245 @@
+<div class="quotation-page flex flex-col gap-6">
+  <div class="quotation-header">
+    <h1 class="page-title">Cotización de Importación</h1>
+    <span class="quotation-header__badge">FICHA DE CÁLCULO</span>
+  </div>
+
+  <div class="quotation-layout">
+    <!-- COLUMNA IZQUIERDA: FORM -->
+    <div class="quotation-form flex flex-col gap-6">
+      <section class="quotation-panel">
+        <div class="quotation-panel__header">
+          <h2 class="quotation-panel__title">DATOS DEL ÍTEM</h2>
+        </div>
+
+        <div class="quotation-panel__body">
+          <div class="flex flex-col gap-2 form-grid__full">
+            <label for="itemName" class="font-semibold">Nombre del Item</label>
+            <input
+              id="itemName"
+              type="text"
+              pInputText
+              placeholder="Ej. Motor eléctrico"
+              [ngModel]="itemName()"
+              (ngModelChange)="itemName.set($event)"
+            />
+          </div>
+
+          <div class="flex flex-col gap-2 form-grid__full">
+            <label for="tariffHeading" class="font-semibold">Partida Arancelaria</label>
+            <input
+              id="tariffHeading"
+              type="text"
+              pInputText
+              placeholder="Ej. 8501.52.00.00"
+              [ngModel]="tariffItem()"
+              (ngModelChange)="tariffItem.set($event)"
+            />
+          </div>
+
+          <div class="form-grid">
+            <div class="flex flex-col gap-2">
+              <label id="landFreightCostLabel" class="font-semibold">Costo Flete Terrestre</label>
+              <p-inputgroup>
+                <p-inputgroup-addon>$</p-inputgroup-addon>
+                <p-inputnumber
+                  inputId="landFreightCost"
+                  ariaLabelledBy="landFreightCostLabel"
+                  mode="decimal"
+                  [minFractionDigits]="2"
+                  [maxFractionDigits]="2"
+                  [ngModel]="landFreightCost()"
+                  (ngModelChange)="landFreightCost.set($event)"
+                  inputStyleClass="w-full"
+                  styleClass="w-full"
+                />
+              </p-inputgroup>
+            </div>
+
+            <div class="flex flex-col gap-2">
+              <label id="itemAmountLabel" class="font-semibold">Monto del Item</label>
+              <p-inputgroup>
+                <p-inputgroup-addon>$</p-inputgroup-addon>
+                <p-inputnumber
+                  inputId="itemAmount"
+                  ariaLabelledBy="itemAmountLabel"
+                  mode="decimal"
+                  [minFractionDigits]="2"
+                  [maxFractionDigits]="2"
+                  [ngModel]="itemAmount()"
+                  (ngModelChange)="itemAmount.set($event)"
+                  inputStyleClass="w-full"
+                  styleClass="w-full"
+                />
+              </p-inputgroup>
+            </div>
+          </div>
+
+          <div class="form-grid">
+            <div class="flex flex-col gap-2">
+              <label id="seaFreightCostLabel" class="font-semibold">Costo Flete Marítimo</label>
+              <p-inputgroup>
+                <p-inputgroup-addon>$</p-inputgroup-addon>
+                <p-inputnumber
+                  inputId="seaFreightCost"
+                  ariaLabelledBy="seaFreightCostLabel"
+                  mode="decimal"
+                  [minFractionDigits]="2"
+                  [maxFractionDigits]="2"
+                  [ngModel]="seaFreightCost()"
+                  (ngModelChange)="seaFreightCost.set($event)"
+                  inputStyleClass="w-full"
+                  styleClass="w-full"
+                />
+              </p-inputgroup>
+            </div>
+
+            <div class="flex flex-col gap-2">
+              <label id="insuranceRateLabel" class="font-semibold">Seguro</label>
+              <p-inputgroup>
+                <p-inputnumber
+                  inputId="insuranceRate"
+                  ariaLabelledBy="insuranceRateLabel"
+                  mode="decimal"
+                  [minFractionDigits]="2"
+                  [maxFractionDigits]="2"
+                  [ngModel]="insuranceRate()"
+                  (ngModelChange)="insuranceRate.set($event)"
+                  inputStyleClass="w-full"
+                  styleClass="w-full"
+                />
+                <p-inputgroup-addon>%</p-inputgroup-addon>
+              </p-inputgroup>
+              <small class="quotation-field-hint">% sobre el Monto del Item</small>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="quotation-panel">
+        <div class="quotation-panel__header">
+          <h2 class="quotation-panel__title">IMPUESTOS</h2>
+        </div>
+
+        <div class="quotation-panel__body">
+          <div class="form-grid">
+            <div class="flex flex-col gap-2">
+              <label id="generalTariffLabel" class="font-semibold">GA</label>
+              <p-inputgroup>
+                <p-inputnumber
+                  inputId="generalTariff"
+                  ariaLabelledBy="generalTariffLabel"
+                  mode="decimal"
+                  [minFractionDigits]="2"
+                  [maxFractionDigits]="2"
+                  [ngModel]="generalTariff()"
+                  (ngModelChange)="generalTariff.set($event)"
+                  inputStyleClass="w-full"
+                  styleClass="w-full"
+                />
+                <p-inputgroup-addon>%</p-inputgroup-addon>
+              </p-inputgroup>
+              <small class="quotation-field-hint">% sobre CIF</small>
+            </div>
+
+            <div class="flex flex-col gap-2">
+              <label id="ivaLabel" class="font-semibold">IVA</label>
+              <p-inputgroup>
+                <p-inputnumber
+                  inputId="iva"
+                  ariaLabelledBy="ivaLabel"
+                  mode="decimal"
+                  [minFractionDigits]="2"
+                  [maxFractionDigits]="2"
+                  [ngModel]="iva()"
+                  (ngModelChange)="iva.set($event)"
+                  inputStyleClass="w-full"
+                  styleClass="w-full"
+                />
+                <p-inputgroup-addon>%</p-inputgroup-addon>
+              </p-inputgroup>
+              <small class="quotation-field-hint">% sobre CIF</small>
+            </div>
+          </div>
+
+          <div class="quotation-toggle-row">
+            <div class="quotation-toggle-row__copy">
+              <strong>ICE</strong>
+              <small>Aplicar {{ iceRate() }}% sobre CIF</small>
+            </div>
+            <p-toggleswitch
+              inputId="applyIce"
+              [ngModel]="applyIce()"
+              (ngModelChange)="applyIce.set($event)"
+            />
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- COLUMNA DERECHA: RESUMEN -->
+    <div class="quotation-summary-column flex flex-col gap-6">
+      <section class="quotation-panel">
+        <div class="quotation-panel__header quotation-panel__header--actions">
+          <h2 class="quotation-panel__title">RESUMEN</h2>
+          <button
+            type="button"
+            pButton
+            label="Descargar Cotización"
+            icon="pi pi-file-pdf"
+            [disabled]="!canDownloadQuotation()"
+            (click)="downloadQuotation()"
+          ></button>
+        </div>
+
+        <!-- Precio del Item = espejo 1:1 de itemAmount ingresado a la izquierda -->
+        <div class="quotation-summary">
+          <div class="quotation-summary__row">
+            <span class="quotation-summary__label">Precio del Item</span>
+            <span class="quotation-summary__value">{{ money(itemPrice()) }}</span>
+          </div>
+
+          <div class="quotation-summary__row">
+            <span class="quotation-summary__label">Flete total</span>
+            <span class="quotation-summary__value">{{ money(totalFreight()) }}</span>
+          </div>
+
+          <div class="quotation-summary__row quotation-summary__row--muted">
+            <span class="quotation-summary__label">{{ insuranceRate() != null ? 'Seguro (' + insuranceRate() + '%)' : 'Seguro (no aplicado)' }}</span>
+            <span class="quotation-summary__value">{{ money(insuranceAmount()) }}</span>
+          </div>
+
+          <div class="quotation-summary__row quotation-summary__row--total">
+            <span class="quotation-summary__label">CIF</span>
+            <span class="quotation-summary__value">{{ money(cif()) }}</span>
+          </div>
+
+          <div class="quotation-summary__row quotation-summary__row--muted">
+            <span class="quotation-summary__label">{{ generalTariff() != null ? 'GA (' + generalTariff() + '%)' : 'GA (no aplicado)' }}</span>
+            <span class="quotation-summary__value">{{ money(gaAmount()) }}</span>
+          </div>
+
+          <div class="quotation-summary__row quotation-summary__row--muted">
+            <span class="quotation-summary__label">{{ iva() != null ? 'IVA (' + iva() + '%)' : 'IVA (no aplicado)' }}</span>
+            <span class="quotation-summary__value">{{ money(ivaAmount()) }}</span>
+          </div>
+
+          <div class="quotation-summary__row quotation-summary__row--muted">
+            <span class="quotation-summary__label">{{ applyIce() ? 'ICE (' + iceRate() + '%)' : 'ICE (no aplicado)' }}</span>
+            <span class="quotation-summary__value">{{ money(iceAmount()) }}</span>
+          </div>
+
+          <div class="quotation-summary__row quotation-summary__row--total">
+            <span class="quotation-summary__label">Impuestos</span>
+            <span class="quotation-summary__value">{{ money(totalTaxes()) }}</span>
+          </div>
+        </div>
+      </section>
+
+      <div class="quotation-estimated">
+        <span class="quotation-estimated__label">ESTIMADO</span>
+        <strong class="quotation-estimated__value">{{ money(estimated()) }}</strong>
+      </div>
+    </div>
+  </div>
+</div>
