@@ -1,7 +1,52 @@
 <p-card [header]="title()">
   @if (items().length === 0) {
-    <p class="text-surface-500 m-0 flex h-[320px] items-center justify-center">Sin datos</p>
+    <p class="text-surface-500 m-0 flex h-[220px] items-center justify-center">Sin datos</p>
+  } @else if (chartType() === 'pie') {
+    <div class="flex flex-col items-center gap-4 md:flex-row">
+      <div echarts [options]="chartOptions()" [loading]="loading()" class="h-[220px] w-full shrink-0 md:w-[45%]"></div>
+      <div class="flex w-full flex-col gap-2">
+        @for (row of rows(); track row.label) {
+          <div class="flex items-center gap-2 text-sm">
+            <span class="h-2.5 w-2.5 shrink-0 rounded-full" [style.background-color]="row.color"></span>
+            <span class="text-surface-700 flex-1">{{ row.label }}</span>
+            <span class="font-medium">{{ row.value | number: '1.0-0' }}</span>
+            <span class="text-surface-500 w-10 text-right">{{ row.percent }}%</span>
+          </div>
+        }
+        <div class="border-surface-200 mt-1 flex items-center justify-between border-t pt-2 text-sm font-semibold">
+          <span>Total</span>
+          <span>{{ totalValue() | number: '1.0-0' }}</span>
+        </div>
+      </div>
+    </div>
   } @else {
-    <div echarts [options]="chartOptions()" [loading]="loading()" style="height: 320px"></div>
+    <div class="flex flex-col gap-3">
+      @for (row of rows(); track row.label) {
+        <div class="flex flex-col gap-1">
+          <div class="flex items-center justify-between text-sm">
+            <span class="text-surface-700">{{ row.label }}</span>
+            <span class="flex items-center gap-2">
+              @if (valueFormat() === 'currency') {
+                <span class="font-medium">{{ row.value | currency: currencyCode() : 'symbol' : '1.2-2' }}</span>
+              } @else {
+                <span class="font-medium">{{ row.value | number: '1.0-0' }}</span>
+              }
+              <span class="text-surface-500 w-10 text-right">{{ row.percent }}%</span>
+            </span>
+          </div>
+          <div class="bg-surface-100 h-2 w-full overflow-hidden rounded-full">
+            <div class="h-full rounded-full" [style.width.%]="row.percent" [style.background-color]="row.color"></div>
+          </div>
+        </div>
+      }
+      <div class="border-surface-200 mt-1 flex items-center justify-between border-t pt-2 text-sm font-semibold">
+        <span>Total</span>
+        @if (valueFormat() === 'currency') {
+          <span>{{ totalValue() | currency: currencyCode() : 'symbol' : '1.2-2' }}</span>
+        } @else {
+          <span>{{ totalValue() | number: '1.0-0' }}</span>
+        }
+      </div>
+    </div>
   }
 </p-card>

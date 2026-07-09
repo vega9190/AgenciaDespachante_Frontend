@@ -18,27 +18,33 @@
 
   <section>
     <h2 class="mb-4 text-xl font-semibold">Resumen financiero</h2>
-    <div class="mb-6 grid gap-6 md:grid-cols-2 xl:grid-cols-4">
-      <app-kpi-stat-card label="Total facturado" [value]="financialSummary()?.totalCharged ?? 0" format="currency" icon="pi pi-file" />
+    <div class="mb-6 grid gap-6 md:grid-cols-2">
       <app-kpi-stat-card
         label="Total cobrado"
         [value]="financialSummary()?.totalCollected ?? 0"
         format="currency"
+        currencyCode="BOB "
         icon="pi pi-wallet"
+      />
+      <app-kpi-stat-card 
+        label="Ganancia" 
+        [value]="financialSummary()?.ganancia ?? 0" 
+        format="currency" 
+        currencyCode="$ "
+        icon="pi pi-chart-line"
         severity="success"
-      />
-      <app-kpi-stat-card
-        label="Total pendiente"
-        [value]="financialSummary()?.totalPending ?? 0"
-        format="currency"
-        icon="pi pi-clock"
-        severity="warn"
-      />
-      <app-kpi-stat-card label="Ganancia" [value]="financialSummary()?.ganancia ?? 0" format="currency" icon="pi pi-chart-line" />
+         />
     </div>
     <div class="grid gap-6 md:grid-cols-2">
       <app-status-breakdown-chart title="Importaciones por estado" [items]="importsByStatusItems()" chartType="pie" [loading]="isLoading()" />
-      <app-status-breakdown-chart title="Pagos por tipo" [items]="paymentsByTypeItems()" chartType="bar" [loading]="isLoading()" />
+      <app-status-breakdown-chart
+        title="Pagos por tipo"
+        [items]="paymentsByTypeItems()"
+        chartType="bar"
+        valueFormat="currency"
+        currencyCode="BOB "
+        [loading]="isLoading()"
+      />
     </div>
   </section>
 
