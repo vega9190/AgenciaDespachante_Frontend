@@ -1,13 +1,88 @@
-<div class="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-  <p-card header="Dashboard" subheader="Ready for tenant customization">
-    <p class="m-0 text-surface-600">This dashboard is intentionally empty so each tenant can define its own widgets, KPIs and workflows.</p>
-  </p-card>
+<div class="flex flex-col gap-8">
+  <div class="flex items-center justify-between gap-2">
+    <h1 class="page-title">Dashboard</h1>
+    <div class="flex items-center gap-2">
+      <label id="dashboardRangeLabel" class="font-semibold">Período</label>
+      <p-select
+        inputId="dashboardRange"
+        ariaLabelledBy="dashboardRangeLabel"
+        [options]="rangeOptions"
+        optionLabel="label"
+        optionValue="value"
+        [ngModel]="selectedMonths()"
+        (ngModelChange)="onRangeChange($event)"
+        [loading]="isLoading()"
+      />
+    </div>
+  </div>
 
-  <p-card header="Theme" subheader="Purple default palette">
-    <p class="m-0 text-surface-600">PrimeNG Aura is configured with a lilac palette and tenant stylesheet support.</p>
-  </p-card>
+  <section>
+    <h2 class="mb-4 text-xl font-semibold">Resumen financiero</h2>
+    <div class="mb-6 grid gap-6 md:grid-cols-2 xl:grid-cols-4">
+      <app-kpi-stat-card label="Total facturado" [value]="financialSummary()?.totalCharged ?? 0" format="currency" icon="pi pi-file" />
+      <app-kpi-stat-card
+        label="Total cobrado"
+        [value]="financialSummary()?.totalCollected ?? 0"
+        format="currency"
+        icon="pi pi-wallet"
+        severity="success"
+      />
+      <app-kpi-stat-card
+        label="Total pendiente"
+        [value]="financialSummary()?.totalPending ?? 0"
+        format="currency"
+        icon="pi pi-clock"
+        severity="warn"
+      />
+      <app-kpi-stat-card label="Ganancia" [value]="financialSummary()?.ganancia ?? 0" format="currency" icon="pi pi-chart-line" />
+    </div>
+    <div class="grid gap-6 md:grid-cols-2">
+      <app-status-breakdown-chart title="Importaciones por estado" [items]="importsByStatusItems()" chartType="pie" [loading]="isLoading()" />
+      <app-status-breakdown-chart title="Pagos por tipo" [items]="paymentsByTypeItems()" chartType="bar" [loading]="isLoading()" />
+    </div>
+  </section>
 
-  <p-card header="Authentication" subheader="Mock starter flow">
-    <p class="m-0 text-surface-600">The seed includes a local login flow for <code>admin</code> / <code>123</code>.</p>
-  </p-card>
+  <section>
+    <h2 class="mb-4 text-xl font-semibold">Resumen logístico</h2>
+    <div class="mb-6 grid gap-6 md:grid-cols-2 xl:grid-cols-4">
+      <app-kpi-stat-card
+        label="Días de tránsito promedio"
+        [value]="logisticsSummary()?.averageTransitDays ?? 0"
+        format="days"
+        icon="pi pi-truck"
+      />
+      <app-kpi-stat-card label="Choferes activos" [value]="logisticsSummary()?.activeDriversCount ?? 0" icon="pi pi-id-card" />
+      <app-kpi-stat-card label="Clientes nuevos" [value]="logisticsSummary()?.newClientsCount ?? 0" icon="pi pi-users" severity="success" />
+      <app-kpi-stat-card label="Choferes nuevos" [value]="logisticsSummary()?.newDriversCount ?? 0" icon="pi pi-user-plus" severity="success" />
+    </div>
+    <div class="grid gap-6 md:grid-cols-2">
+      <app-status-breakdown-chart title="Envíos por estado" [items]="shipmentsByStatusItems()" chartType="pie" [loading]="isLoading()" />
+
+      <p-card header="Vencimiento de tarjetas de transporte">
+        <p-table [value]="expiringDrivers()" [rows]="5" [paginator]="expiringDrivers().length > 5">
+          <ng-template #header>
+            <tr>
+              <th>Chofer</th>
+              <th>Vencimiento</th>
+              <th>Días restantes</th>
+            </tr>
+          </ng-template>
+          <ng-template #body let-driver>
+            <tr>
+              <td>{{ driver.name }} {{ driver.lastName }}</td>
+              <td>{{ driver.transportCardExpirationDate | date: 'dd/MM/yyyy' }}</td>
+              <td>
+                <p-tag [value]="driver.daysRemaining + ' días'" [severity]="driverExpirationSeverity(driver.daysRemaining)" />
+              </td>
+            </tr>
+          </ng-template>
+          <ng-template #emptymessage>
+            <tr>
+              <td colspan="3" class="py-6 text-center text-surface-500">No hay tarjetas próximas a vencer.</td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </p-card>
+    </div>
+  </section>
 </div>

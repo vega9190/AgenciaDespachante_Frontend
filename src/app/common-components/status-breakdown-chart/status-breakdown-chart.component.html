@@ -1,0 +1,7 @@
+<p-card [header]="title()">
+  @if (items().length === 0) {
+    <p class="text-surface-500 m-0 flex h-[320px] items-center justify-center">Sin datos</p>
+  } @else {
+    <div echarts [options]="chartOptions()" [loading]="loading()" style="height: 320px"></div>
+  }
+</p-card>

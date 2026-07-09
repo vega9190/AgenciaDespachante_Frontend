@@ -5,12 +5,14 @@ import { provideAnimationsAsync } from '@angular/platform-browser/animations/asy
 
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { providePrimeNG } from 'primeng/config';
+import { provideEchartsCore } from 'ngx-echarts';
 
 import { authInterceptor } from '@core/auth/auth.interceptor';
 import { ThemeConfigService } from '@core/theming/theme-config.service';
 import { TenantIdentityStoreService } from '@services/tenant/tenant-identity-store.service';
 import appTheme from './app.theme';
 import { routes } from './app.routes';
+import { echarts } from './echarts-setup';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -32,6 +34,7 @@ export const appConfig: ApplicationConfig = {
       theme: appTheme,
       ripple: true,
       inputStyle: 'outlined'
-    })
+    }),
+    provideEchartsCore({ echarts })
   ]
 };
