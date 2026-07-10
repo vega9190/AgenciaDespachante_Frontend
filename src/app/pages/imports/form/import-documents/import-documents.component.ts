@@ -16,6 +16,8 @@ import { ApiResult, ApiResultOf } from '@models/api.types';
 import { AppToastService } from '@services/common/app-toast.service';
 import { UiBlockService } from '@services/common/ui-block.service';
 import { isReadOnlyImportStatus } from '@services/imports/import-status.constants';
+import { AuthService } from '@core/auth/auth.service';
+import { RoleIds } from '@core/auth/role.constants';
 import {
   ImportDetailDto,
   ImportDocumentCategory,
@@ -51,6 +53,7 @@ export class ImportDocumentsComponent {
   private readonly confirmationService = inject(ConfirmationService);
   private readonly appToastService = inject(AppToastService);
   private readonly uiBlockService = inject(UiBlockService);
+  private readonly authService = inject(AuthService);
 
   readonly importId = input.required<string>();
   readonly importItem = input.required<ImportDetailDto>();
@@ -69,7 +72,9 @@ export class ImportDocumentsComponent {
   readonly approveConfirmDocumentTypeId = signal<string | null>(null);
   readonly approvingDocumentTypeId = signal<string | null>(null);
   readonly activeImageIndex = signal(0);
-  readonly isReadOnly = computed(() => isReadOnlyImportStatus(this.importItem().statusId));
+  readonly isReadOnly = computed(
+    () => isReadOnlyImportStatus(this.importItem().statusId) || !this.authService.hasRole(RoleIds.Administrator, RoleIds.Manager)
+  );
 
   readonly canSaveDocument = computed(
     () =>

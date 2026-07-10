@@ -11,6 +11,8 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { Tab, TabList, TabPanel, TabPanels, Tabs } from 'primeng/tabs';
 import { TooltipModule } from 'primeng/tooltip';
 
+import { AuthService } from '@core/auth/auth.service';
+import { RoleIds } from '@core/auth/role.constants';
 import { AppToastService } from '@services/common/app-toast.service';
 import { UiBlockService } from '@services/common/ui-block.service';
 import { IMPORT_STATUS_IDS, IMPORT_TIMELINE_STEPS, isCancelledImportStatus, isReadOnlyImportStatus } from '@services/imports/import-status.constants';
@@ -35,6 +37,7 @@ export class ImportFormComponent {
   private readonly appToastService = inject(AppToastService);
   private readonly uiBlockService = inject(UiBlockService);
   private readonly route = inject(ActivatedRoute);
+  private readonly authService = inject(AuthService);
 
   readonly isLoading = signal(false);
   readonly isUpdatingStatus = signal(false);
@@ -48,7 +51,8 @@ export class ImportFormComponent {
   readonly logsRefreshVersion = signal(0);
   readonly isEditMode = computed(() => this.importId() !== null);
   readonly isReadOnly = computed(() => isReadOnlyImportStatus(this.importItem()?.statusId));
-  readonly canCancelImport = computed(() => !!this.importItem() && !this.isReadOnly() && !this.isUpdatingStatus());
+  readonly canManageImports = computed(() => this.authService.hasRole(RoleIds.Administrator, RoleIds.Manager));
+  readonly canCancelImport = computed(() => this.canManageImports() && !!this.importItem() && !this.isReadOnly() && !this.isUpdatingStatus());
   readonly pageTitle = computed(() => {
     if (!this.isEditMode()) {
       return 'Crear Importación';

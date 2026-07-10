@@ -1,96 +1,98 @@
   <div class="payments-layout">
-    <section class="payments-panel payments-panel--form">
-      <div class="flex items-center justify-between gap-3">
-        <h2 class="payments-panel__title">Nuevo pago</h2>
-      </div>
+    @if (canManageImports()) {
+      <section class="payments-panel payments-panel--form">
+        <div class="flex items-center justify-between gap-3">
+          <h2 class="payments-panel__title">Nuevo pago</h2>
+        </div>
 
-      <div class="payments-form pt-2" [formGroup]="paymentForm">
-        <div class="payments-form__primary-grid">
+        <div class="payments-form pt-2" [formGroup]="paymentForm">
+          <div class="payments-form__primary-grid">
+            <div class="flex flex-col gap-2">
+              <label class="font-semibold">Tipo de Pago *</label>
+              <p-select
+                inputId="paymentType"
+                formControlName="type"
+                [options]="paymentTypeOptions()"
+                optionLabel="label"
+                optionValue="value"
+                placeholder="Seleccionar"
+              />
+              @if (getFieldError('type')) {
+                <small class="field-error">{{ getFieldError('type') }}</small>
+              }
+            </div>
+
+            <div class="flex flex-col gap-2">
+              <label for="paymentAmount" class="font-semibold">Monto *</label>
+              <p-inputnumber
+                inputId="paymentAmount"
+                formControlName="amount"
+                mode="currency"
+                currency="BOB"
+                locale="es-BO"
+                [min]="0"
+                [maxlength]="15"
+                [minFractionDigits]="2"
+                [maxFractionDigits]="2"
+                placeholder="0.00"
+              />
+              @if (getFieldError('amount')) {
+                <small class="field-error">{{ getFieldError('amount') }}</small>
+              }
+            </div>
+
+            <div class="flex flex-col gap-2">
+              <label id="paymentDateLabel" class="font-semibold">Fecha</label>
+              <p-datepicker inputId="paymentDate" ariaLabelledBy="paymentDateLabel" formControlName="paymentDate" dateFormat="dd/mm/yy" [iconDisplay]="'input'" [showIcon]="true" [readonlyInput]="true" />
+              @if (getFieldError('paymentDate')) {
+                <small class="field-error">{{ getFieldError('paymentDate') }}</small>
+              }
+            </div>
+          </div>
+
           <div class="flex flex-col gap-2">
-            <label class="font-semibold">Tipo de Pago *</label>
+            <label for="paymentNotes" class="font-semibold">Notas</label>
+            <textarea id="paymentNotes" pInputText formControlName="notes" rows="3" maxlength="250"></textarea>
+          </div>
+
+          <div class="flex flex-col gap-2">
+            <label class="font-semibold">Tipo de Documento</label>
             <p-select
-              inputId="paymentType"
-              formControlName="type"
-              [options]="paymentTypeOptions()"
-              optionLabel="label"
-              optionValue="value"
+              inputId="paymentDocumentType"
+              formControlName="importDocumentTypeId"
+              [options]="documentTypeOptions()"
+              optionLabel="name"
+              optionValue="id"
               placeholder="Seleccionar"
             />
-            @if (getFieldError('type')) {
-              <small class="field-error">{{ getFieldError('type') }}</small>
+            @if (getFieldError('importDocumentTypeId')) {
+              <small class="field-error">{{ getFieldError('importDocumentTypeId') }}</small>
             }
           </div>
 
           <div class="flex flex-col gap-2">
-            <label for="paymentAmount" class="font-semibold">Monto *</label>
-            <p-inputnumber
-              inputId="paymentAmount"
-              formControlName="amount"
-              mode="currency"
-              currency="BOB"
-              locale="es-BO"
-              [min]="0"
-              [maxlength]="15"
-              [minFractionDigits]="2"
-              [maxFractionDigits]="2"
-              placeholder="0.00"
+            <label class="font-semibold">Comprobante</label>
+            <app-file-selector
+              [selectedFile]="selectedDocumentFile()"
+              [disabled]="isSavingPayment() || isReadOnly()"
+              (fileSelected)="onDocumentFileSelected($event)"
+              (fileCleared)="onDocumentFileCleared()"
             />
-            @if (getFieldError('amount')) {
-              <small class="field-error">{{ getFieldError('amount') }}</small>
-            }
           </div>
 
-          <div class="flex flex-col gap-2">
-            <label id="paymentDateLabel" class="font-semibold">Fecha</label>
-            <p-datepicker inputId="paymentDate" ariaLabelledBy="paymentDateLabel" formControlName="paymentDate" dateFormat="dd/mm/yy" [iconDisplay]="'input'" [showIcon]="true" [readonlyInput]="true" />
-            @if (getFieldError('paymentDate')) {
-              <small class="field-error">{{ getFieldError('paymentDate') }}</small>
-            }
-          </div>
-        </div>
-
-        <div class="flex flex-col gap-2">
-          <label for="paymentNotes" class="font-semibold">Notas</label>
-          <textarea id="paymentNotes" pInputText formControlName="notes" rows="3" maxlength="250"></textarea>
-        </div>
-
-        <div class="flex flex-col gap-2">
-          <label class="font-semibold">Tipo de Documento</label>
-          <p-select
-            inputId="paymentDocumentType"
-            formControlName="importDocumentTypeId"
-            [options]="documentTypeOptions()"
-            optionLabel="name"
-            optionValue="id"
-            placeholder="Seleccionar"
-          />
-          @if (getFieldError('importDocumentTypeId')) {
-            <small class="field-error">{{ getFieldError('importDocumentTypeId') }}</small>
+          @if (isLoadingDocumentTypeOptions()) {
+            <div class="form-loading">Cargando tipos de documento...</div>
           }
         </div>
 
-        <div class="flex flex-col gap-2">
-          <label class="font-semibold">Comprobante</label>
-          <app-file-selector
-            [selectedFile]="selectedDocumentFile()"
-            [disabled]="isSavingPayment() || isReadOnly()"
-            (fileSelected)="onDocumentFileSelected($event)"
-            (fileCleared)="onDocumentFileCleared()"
-          />
+        <div class="form-actions mt-auto">
+          <button type="button" pButton label="Cancelar" severity="secondary" styleClass="flat-button" [disabled]="isSavingPayment() || isReadOnly()" (click)="onCancel()"></button>
+          <button type="button" pButton label="Guardar" icon="pi pi-save" styleClass="flat-button" [disabled]="isSavingPayment() || isReadOnly()" (click)="onSave()"></button>
         </div>
+      </section>
+    }
 
-        @if (isLoadingDocumentTypeOptions()) {
-          <div class="form-loading">Cargando tipos de documento...</div>
-        }
-      </div>
-
-      <div class="form-actions mt-auto">
-        <button type="button" pButton label="Cancelar" severity="secondary" styleClass="flat-button" [disabled]="isSavingPayment() || isReadOnly()" (click)="onCancel()"></button>
-        <button type="button" pButton label="Guardar" icon="pi pi-save" styleClass="flat-button" [disabled]="isSavingPayment() || isReadOnly()" (click)="onSave()"></button>
-      </div>
-    </section>
-
-    <section class="payments-panel payments-panel--next">
+    <section class="payments-panel payments-panel--next" [class.payments-panel--full]="!canManageImports()">
       <div class="payments-panel__header mb-4">
         <h2 class="payments-panel__title">Pagos</h2>
         <div class="payments-panel__total">Total Pagado: <span>{{ formatAmount(totalPaid()) }}</span></div>

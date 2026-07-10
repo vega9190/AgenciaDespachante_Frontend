@@ -1,6 +1,9 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { IsActiveMatchOptions, Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { TooltipModule } from 'primeng/tooltip';
+
+import { AuthService } from '@core/auth/auth.service';
+import { RoleIds } from '@core/auth/role.constants';
 
 import { LayoutService } from './service/app.layout.service';
 
@@ -9,6 +12,7 @@ interface MenuItemDto {
   icon: string;
   routerLink?: string[];
   items?: MenuItemDto[];
+  roles?: string[];
 }
 
 @Component({
@@ -18,6 +22,7 @@ interface MenuItemDto {
 })
 export class AppMenuComponent {
   readonly layoutService = inject(LayoutService);
+  private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
   private readonly expandedItems = signal<Record<string, boolean>>({});
   private readonly hoveredItemLabel = signal<string | null>(null);
@@ -29,21 +34,26 @@ export class AppMenuComponent {
     fragment: 'ignored'
   };
 
+  private readonly managerRoles = [RoleIds.Administrator, RoleIds.Manager];
+
   readonly menuItems: MenuItemDto[] = [
     {
       label: 'Dashboard',
       icon: 'pi pi-home',
-      routerLink: ['/dashboard']
+      routerLink: ['/dashboard'],
+      roles: [RoleIds.Administrator]
     },
     {
       label: 'Clientes',
       icon: 'pi pi-users',
-      routerLink: ['/clients']
+      routerLink: ['/clients'],
+      roles: this.managerRoles
     },
     {
       label: 'Choferes',
       icon: 'pi pi-id-card',
-      routerLink: ['/drivers']
+      routerLink: ['/drivers'],
+      roles: this.managerRoles
     },
     {
       label: 'Importaciones',
@@ -53,6 +63,7 @@ export class AppMenuComponent {
     {
       label: 'Herramientas',
       icon: 'pi pi-wrench',
+      roles: this.managerRoles,
       items: [
         {
           label: 'Cotización',
@@ -74,9 +85,12 @@ export class AppMenuComponent {
     {
       label: 'Configuración',
       icon: 'pi pi-cog',
-      routerLink: ['/settings']
+      routerLink: ['/settings'],
+      roles: this.managerRoles
     }
   ];
+
+  readonly visibleMenuItems = computed(() => this.menuItems.filter((item) => !item.roles || this.authService.hasRole(...item.roles)));
 
   isExpanded(item: MenuItemDto): boolean {
     if (this.layoutService.isDesktop()) {

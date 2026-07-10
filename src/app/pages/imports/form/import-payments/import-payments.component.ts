@@ -19,6 +19,8 @@ import { ApiResult, ApiResultOf } from '@models/api.types';
 import { AppToastService } from '@services/common/app-toast.service';
 import { UiBlockService } from '@services/common/ui-block.service';
 import { isReadOnlyImportStatus } from '@services/imports/import-status.constants';
+import { AuthService } from '@core/auth/auth.service';
+import { RoleIds } from '@core/auth/role.constants';
 import {
   IMPORT_PAYMENT_TYPE_OPTIONS,
   ImportDetailDto,
@@ -54,6 +56,7 @@ export class ImportPaymentsComponent {
   private readonly confirmationService = inject(ConfirmationService);
   private readonly appToastService = inject(AppToastService);
   private readonly uiBlockService = inject(UiBlockService);
+  private readonly authService = inject(AuthService);
 
   readonly importId = input.required<string>();
   readonly importItem = input.required<ImportDetailDto>();
@@ -68,7 +71,8 @@ export class ImportPaymentsComponent {
   readonly payments = signal<ImportPaymentDto[]>([]);
   readonly paymentTypeOptions = signal<ImportPaymentTypeOption[]>(IMPORT_PAYMENT_TYPE_OPTIONS);
   readonly totalPaid = computed(() => this.payments().reduce((sum, payment) => sum + payment.amount, 0));
-  readonly isReadOnly = computed(() => isReadOnlyImportStatus(this.importItem().statusId));
+  readonly canManageImports = computed(() => this.authService.hasRole(RoleIds.Administrator, RoleIds.Manager));
+  readonly isReadOnly = computed(() => isReadOnlyImportStatus(this.importItem().statusId) || !this.canManageImports());
 
   readonly paymentForm: FormGroup<ImportPaymentsFormModel> = this.formBuilder.group({
     type: this.formBuilder.control<ImportPaymentType | null>(null, [Validators.required]),

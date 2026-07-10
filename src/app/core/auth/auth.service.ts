@@ -6,6 +6,7 @@ import { AuthApiService } from '@services/auth/auth-api.service';
 import { LoginResponseDto } from '@services/auth/auth-api.types';
 
 import { LoginRequest, SessionIdentityDto } from './auth.types';
+import { ROLE_HOME_ROUTE } from './role.constants';
 
 @Injectable({
   providedIn: 'root'
@@ -43,6 +44,23 @@ export class AuthService {
 
   getAccessToken(): string | null {
     return this.getValidSession()?.accessToken ?? null;
+  }
+
+  hasRole(...roleIds: string[]): boolean {
+    const currentRoleId = this.getValidSession()?.roleId;
+
+    if (!currentRoleId) {
+      return false;
+    }
+
+    return roleIds.some((roleId) => roleId.toUpperCase() === currentRoleId.toUpperCase());
+  }
+
+  getHomeRoute(): string {
+    const currentRoleId = this.getValidSession()?.roleId;
+    const match = Object.keys(ROLE_HOME_ROUTE).find((roleId) => roleId.toUpperCase() === currentRoleId?.toUpperCase());
+
+    return match ? ROLE_HOME_ROUTE[match] : '/imports';
   }
 
   private persistSession(session: SessionIdentityDto): void {
@@ -109,6 +127,7 @@ export class AuthService {
       lastName: loginData.lastName,
       fullName: fullName || loginData.username,
       role: loginData.role,
+      roleId: loginData.roleId,
       initials: buildInitials(loginData.firstName, loginData.lastName, loginData.username)
     };
   }

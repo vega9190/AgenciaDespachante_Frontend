@@ -10,4 +10,5 @@ export interface LoginResponseDto {
   firstName: string;
   lastName: string;
   role: string;
+  roleId: string;
 }

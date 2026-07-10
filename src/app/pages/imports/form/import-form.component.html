@@ -146,18 +146,20 @@
             </span>
           </p-tab>
         }
-        <p-tab value="dispatchs">
-          <span class="import-tab-label">
-            <i class="pi pi-dollar"></i>
-            <span>Despacho</span>
-          </span>
-        </p-tab>
-        <p-tab value="logs">
-          <span class="import-tab-label">
-            <i class="pi pi-history"></i>
-            <span>Seguimientos</span>
-          </span>
-        </p-tab>
+        @if (canManageImports()) {
+          <p-tab value="dispatchs">
+            <span class="import-tab-label">
+              <i class="pi pi-dollar"></i>
+              <span>Despacho</span>
+            </span>
+          </p-tab>
+          <p-tab value="logs">
+            <span class="import-tab-label">
+              <i class="pi pi-history"></i>
+              <span>Seguimientos</span>
+            </span>
+          </p-tab>
+        }
       </p-tablist>
 
       <p-tabpanels>
@@ -200,13 +202,15 @@
           </p-tabpanel>
         }
 
-        <p-tabpanel value="dispatchs">
-          <app-import-dispatchs [importItem]="currentImport" />
-        </p-tabpanel>
+        @if (canManageImports()) {
+          <p-tabpanel value="dispatchs">
+            <app-import-dispatchs [importItem]="currentImport" />
+          </p-tabpanel>
 
-        <p-tabpanel value="logs">
-          <app-import-logs [importId]="currentImport.id" [refreshVersion]="logsRefreshVersion()" />
-        </p-tabpanel>
+          <p-tabpanel value="logs">
+            <app-import-logs [importId]="currentImport.id" [refreshVersion]="logsRefreshVersion()" />
+          </p-tabpanel>
+        }
       </p-tabpanels>
     </p-tabs>
   }

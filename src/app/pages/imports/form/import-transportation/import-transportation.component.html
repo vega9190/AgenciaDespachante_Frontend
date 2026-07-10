@@ -11,23 +11,25 @@
           <div class="transportation-readonly-field">{{ driver()?.fullName || '-' }}</div>
         </div>
 
-        <div class="flex flex-col gap-2">
-          <label class="font-semibold">Teléfono</label>
-          <div class="transportation-readonly-field transportation-readonly-field--with-action">
-            <span>{{ driver()?.phoneNumber || '-' }}</span>
-            <button
-              type="button"
-              class="transportation-whatsapp-button"
-              aria-label="Enviar Whatsapp"
-              [pTooltip]="'Enviar Whatsapp'"
-              tooltipPosition="top"
-              [disabled]="!hasDriverWhatsappPhone()"
-              (click)="openDriverWhatsapp()"
-            >
-              <i class="pi pi-whatsapp" aria-hidden="true"></i>
-            </button>
+        @if (canManageImports()) {
+          <div class="flex flex-col gap-2">
+            <label class="font-semibold">Teléfono</label>
+            <div class="transportation-readonly-field transportation-readonly-field--with-action">
+              <span>{{ driver()?.phoneNumber || '-' }}</span>
+              <button
+                type="button"
+                class="transportation-whatsapp-button"
+                aria-label="Enviar Whatsapp"
+                [pTooltip]="'Enviar Whatsapp'"
+                tooltipPosition="top"
+                [disabled]="!hasDriverWhatsappPhone()"
+                (click)="openDriverWhatsapp()"
+              >
+                <i class="pi pi-whatsapp" aria-hidden="true"></i>
+              </button>
+            </div>
           </div>
-        </div>
+        }
       </div>
 
       <div class="transportation-driver-grid">
@@ -76,47 +78,49 @@
       ></button>
     </div>
 
-    <div class="transportation-tracking-section">
-      <div class="flex items-center justify-between gap-3">
-        <h2 class="transportation-panel__title">Nuevo Seguimiento</h2>
-      </div>
-
-      <div class="transportation-form pt-2" [formGroup]="trackingForm">
-        <div class="flex flex-col gap-2">
-          <label for="trackingMessage" class="font-semibold">Mensaje</label>
-          <textarea id="trackingMessage" pInputText formControlName="message" rows="3" maxlength="500"></textarea>
-          @if (getTrackingFieldError('message')) {
-            <small class="field-error">{{ getTrackingFieldError('message') }}</small>
-          }
+    @if (canManageImports()) {
+      <div class="transportation-tracking-section">
+        <div class="flex items-center justify-between gap-3">
+          <h2 class="transportation-panel__title">Nuevo Seguimiento</h2>
         </div>
 
-        <div class="flex flex-col gap-2">
-          <label for="trackingUbicacion" class="font-semibold">Ubicación</label>
-          <input
-            id="trackingUbicacion"
-            type="text"
-            pInputText
-            formControlName="ubicacion"
-            placeholder="Enlace de Google Maps (https://...)"
-          />
-          @if (getTrackingFieldError('ubicacion')) {
-            <small class="field-error">{{ getTrackingFieldError('ubicacion') }}</small>
-          }
+        <div class="transportation-form pt-2" [formGroup]="trackingForm">
+          <div class="flex flex-col gap-2">
+            <label for="trackingMessage" class="font-semibold">Mensaje</label>
+            <textarea id="trackingMessage" pInputText formControlName="message" rows="3" maxlength="500"></textarea>
+            @if (getTrackingFieldError('message')) {
+              <small class="field-error">{{ getTrackingFieldError('message') }}</small>
+            }
+          </div>
+
+          <div class="flex flex-col gap-2">
+            <label for="trackingUbicacion" class="font-semibold">Ubicación</label>
+            <input
+              id="trackingUbicacion"
+              type="text"
+              pInputText
+              formControlName="ubicacion"
+              placeholder="Enlace de Google Maps (https://...)"
+            />
+            @if (getTrackingFieldError('ubicacion')) {
+              <small class="field-error">{{ getTrackingFieldError('ubicacion') }}</small>
+            }
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button
+            type="button"
+            pButton
+            label="Guardar"
+            icon="pi pi-save"
+            styleClass="flat-button"
+            [disabled]="!canSaveTracking()"
+            (click)="onSaveTracking()"
+          ></button>
         </div>
       </div>
-
-      <div class="form-actions">
-        <button
-          type="button"
-          pButton
-          label="Guardar"
-          icon="pi pi-save"
-          styleClass="flat-button"
-          [disabled]="!canSaveTracking()"
-          (click)="onSaveTracking()"
-        ></button>
-      </div>
-    </div>
+    }
   </section>
 
   <section class="transportation-panel transportation-panel--next">

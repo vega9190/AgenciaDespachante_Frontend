@@ -15,6 +15,8 @@ import { TableLazyLoadEvent, TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
 import { TooltipModule } from 'primeng/tooltip';
 
+import { AuthService } from '@core/auth/auth.service';
+import { RoleIds } from '@core/auth/role.constants';
 import { ClientsService } from '@services/clients/clients.service';
 import { ClientOptionDto } from '@services/clients/clients.types';
 import { AppToastService } from '@services/common/app-toast.service';
@@ -49,6 +51,7 @@ export class ImportsListComponent {
   private readonly appToastService = inject(AppToastService);
   private readonly uiBlockService = inject(UiBlockService);
   private readonly router = inject(Router);
+  private readonly authService = inject(AuthService);
 
   readonly pageSizeOptions = [10, 20, 50];
   readonly isLoading = signal(false);
@@ -62,6 +65,7 @@ export class ImportsListComponent {
   readonly clientSuggestions = signal<ClientOptionDto[]>([]);
   readonly statusOptions = signal<SelectOption[]>([{ label: 'Todos', value: null }]);
   readonly cancellingImportId = signal<string | null>(null);
+  readonly canManageImports = computed(() => this.authService.hasRole(RoleIds.Administrator, RoleIds.Manager));
 
   readonly filtersForm: FormGroup<ImportFiltersForm> = this.formBuilder.group({
     importNumber: this.formBuilder.nonNullable.control(''),
@@ -140,7 +144,7 @@ export class ImportsListComponent {
   }
 
   canCancelImport(statusId: string): boolean {
-    return !isReadOnlyImportStatus(statusId);
+    return this.canManageImports() && !isReadOnlyImportStatus(statusId);
   }
 
   getStatusSeverity(statusId: string): 'success' | 'warn' | 'danger' | 'info' | 'secondary' | 'contrast' {

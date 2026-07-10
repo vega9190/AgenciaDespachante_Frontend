@@ -39,7 +39,7 @@ export class LoginComponent {
 
   constructor() {
     if (this.authService.isAuthenticated()) {
-      this.router.navigate(['/dashboard']);
+      this.router.navigate([this.authService.getHomeRoute()]);
     }
   }
 
@@ -61,7 +61,7 @@ export class LoginComponent {
     }
 
     this.isUnauthorized.set(false);
-    await this.router.navigate(['/dashboard']);
+    await this.router.navigate([this.authService.getHomeRoute()]);
     this.isSubmitting.set(false);
   }
 }

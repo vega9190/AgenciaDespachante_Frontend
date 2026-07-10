@@ -6,6 +6,7 @@ export interface SessionIdentityDto {
   lastName: string;
   fullName: string;
   role: string;
+  roleId: string;
   initials: string;
 }
 

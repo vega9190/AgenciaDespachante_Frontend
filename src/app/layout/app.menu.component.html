@@ -1,5 +1,5 @@
 <ul class="layout-menu">
-  @for (item of menuItems; track item.label) {
+  @for (item of visibleMenuItems(); track item.label) {
     <li class="layout-menu-item" (mouseenter)="onParentMouseEnter(item)" (mouseleave)="onParentMouseLeave(item)">
       @if (item.items?.length) {
         <button

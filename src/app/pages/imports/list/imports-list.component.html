@@ -23,21 +23,23 @@
           />
         </div>
 
-        <div class="flex flex-col gap-2">
-          <label id="clientLabel" class="font-semibold">Cliente</label>
-          <p-autocomplete
-            inputId="client"
-            ariaLabelledBy="clientLabel"
-            formControlName="client"
-            [suggestions]="clientSuggestions()"
-            optionLabel="name"
-            [dropdown]="true"
-            [forceSelection]="true"
-            placeholder="Buscar cliente"
-            (completeMethod)="onClientSearch($event)"
-            (onDropdownClick)="onClientDropdownClick()"
-          />
-        </div>
+        @if (canManageImports()) {
+          <div class="flex flex-col gap-2">
+            <label id="clientLabel" class="font-semibold">Cliente</label>
+            <p-autocomplete
+              inputId="client"
+              ariaLabelledBy="clientLabel"
+              formControlName="client"
+              [suggestions]="clientSuggestions()"
+              optionLabel="name"
+              [dropdown]="true"
+              [forceSelection]="true"
+              placeholder="Buscar cliente"
+              (completeMethod)="onClientSearch($event)"
+              (onDropdownClick)="onClientDropdownClick()"
+            />
+          </div>
+        }
 
         <div class="flex flex-col gap-2">
           <label id="statusIdLabel" class="font-semibold">Estado</label>
@@ -63,7 +65,9 @@
 
   <p-card>
     <div class="list-header">
-      <button type="button" pButton label="Nuevo" icon="pi pi-plus" styleClass="flat-button" (click)="onCreate()"></button>
+      @if (canManageImports()) {
+        <button type="button" pButton label="Nuevo" icon="pi pi-plus" styleClass="flat-button" (click)="onCreate()"></button>
+      }
     </div>
 
     <p-table

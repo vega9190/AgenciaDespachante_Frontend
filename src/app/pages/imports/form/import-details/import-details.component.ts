@@ -20,6 +20,8 @@ import { UiBlockService } from '@services/common/ui-block.service';
 import { isReadOnlyImportStatus } from '@services/imports/import-status.constants';
 import { ContainerTypeOption, CreateImportRequest, ImportDetailDto, UpdateImportRequest } from '@services/imports/imports.types';
 import { ImportsService } from '@services/imports/imports.service';
+import { AuthService } from '@core/auth/auth.service';
+import { RoleIds } from '@core/auth/role.constants';
 
 @Component({
   selector: 'app-import-details',
@@ -35,6 +37,7 @@ export class ImportDetailsComponent {
   private readonly router = inject(Router);
   private readonly appToastService = inject(AppToastService);
   private readonly uiBlockService = inject(UiBlockService);
+  private readonly authService = inject(AuthService);
 
   readonly importId = input<string | null>(null);
   readonly importItem = input<ImportDetailDto | null>(null);
@@ -48,7 +51,9 @@ export class ImportDetailsComponent {
   readonly isLoadingDrivers = signal(false);
   readonly clientSuggestions = signal<ClientOptionDto[]>([]);
   readonly driverSuggestions = signal<DriverOptionDto[]>([]);
-  readonly isReadOnly = computed(() => isReadOnlyImportStatus(this.importItem()?.statusId));
+  readonly isReadOnly = computed(
+    () => isReadOnlyImportStatus(this.importItem()?.statusId) || !this.authService.hasRole(RoleIds.Administrator, RoleIds.Manager)
+  );
 
   readonly importForm: FormGroup<ImportDetailsFormModel> = this.formBuilder.group({
     client: this.formBuilder.control<ClientOptionDto | null>(null, [Validators.required]),

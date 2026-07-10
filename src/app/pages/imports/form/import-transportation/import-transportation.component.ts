@@ -16,6 +16,8 @@ import { formatDateForBackend } from '../../../../functions/common.function';
 import { AppToastService } from '@services/common/app-toast.service';
 import { UiBlockService } from '@services/common/ui-block.service';
 import { isReadOnlyImportStatus } from '@services/imports/import-status.constants';
+import { AuthService } from '@core/auth/auth.service';
+import { RoleIds } from '@core/auth/role.constants';
 import {
   SaveTransportationRequest,
   SaveTransportationTrackingRequest,
@@ -66,6 +68,7 @@ export class ImportTransportationComponent {
   private readonly appToastService = inject(AppToastService);
   private readonly uiBlockService = inject(UiBlockService);
   private readonly sanitizer = inject(DomSanitizer);
+  private readonly authService = inject(AuthService);
 
   readonly importId = input.required<string>();
   readonly importStatusId = input.required<string>();
@@ -97,7 +100,8 @@ export class ImportTransportationComponent {
     const currentStatusId = this.savedTransportationStatusId().toLowerCase();
     return currentStatusId === TRANSPORTATION_STATUS_IDS.finalizado.toLowerCase();
   });
-  readonly isReadOnly = computed(() => isReadOnlyImportStatus(this.importStatusId()));
+  readonly canManageImports = computed(() => this.authService.hasRole(RoleIds.Administrator, RoleIds.Manager));
+  readonly isReadOnly = computed(() => isReadOnlyImportStatus(this.importStatusId()) || !this.canManageImports());
 
   readonly mapDialogVisible = signal(false);
   readonly mapDialogEmbedUrl = signal<SafeResourceUrl | null>(null);

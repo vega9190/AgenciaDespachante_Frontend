@@ -1,6 +1,10 @@
+import { inject } from '@angular/core';
 import { Routes } from '@angular/router';
 
+import { AuthService } from '@core/auth/auth.service';
 import { authGuard } from '@core/auth/auth.guard';
+import { roleGuard } from '@core/auth/role.guard';
+import { RoleIds } from '@core/auth/role.constants';
 import { AppLayoutComponent } from '@layout/app.layout.component';
 
 export const routes: Routes = [
@@ -16,14 +20,18 @@ export const routes: Routes = [
       {
         path: '',
         pathMatch: 'full',
-        redirectTo: 'dashboard'
+        redirectTo: () => inject(AuthService).getHomeRoute()
       },
       {
         path: 'dashboard',
+        canActivate: [roleGuard],
+        data: { roles: [RoleIds.Administrator] },
         loadComponent: () => import('@pages/dashboard/dashboard.component').then((m) => m.DashboardComponent)
       },
       {
         path: 'clients',
+        canActivate: [roleGuard],
+        data: { roles: [RoleIds.Administrator, RoleIds.Manager] },
         children: [
           {
             path: '',
@@ -48,6 +56,8 @@ export const routes: Routes = [
           },
           {
             path: 'create',
+            canActivate: [roleGuard],
+            data: { roles: [RoleIds.Administrator, RoleIds.Manager] },
             loadComponent: () => import('@pages/imports/form/import-form.component').then((m) => m.ImportFormComponent)
           },
           {
@@ -58,6 +68,8 @@ export const routes: Routes = [
       },
       {
         path: 'drivers',
+        canActivate: [roleGuard],
+        data: { roles: [RoleIds.Administrator, RoleIds.Manager] },
         children: [
           {
             path: '',
@@ -75,6 +87,8 @@ export const routes: Routes = [
       },      
       {
         path: 'tools',
+        canActivate: [roleGuard],
+        data: { roles: [RoleIds.Administrator, RoleIds.Manager] },
         children: [
           {
             path: 'quotation',
@@ -92,6 +106,8 @@ export const routes: Routes = [
       },
       {
         path: 'settings',
+        canActivate: [roleGuard],
+        data: { roles: [RoleIds.Administrator, RoleIds.Manager] },
         loadComponent: () => import('@pages/settings/settings.component').then((m) => m.SettingsComponent)
       }
     ]
