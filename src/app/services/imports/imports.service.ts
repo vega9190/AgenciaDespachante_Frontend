@@ -164,6 +164,10 @@ export class ImportsService {
     return this.httpClient.delete<ApiResultOf<null>>(`${this.importsUrl}/payments/${paymentId}`);
   }
 
+  deleteDispatchItem(dispatchItemId: string) {
+    return this.httpClient.delete<ApiResultOf<null>>(`${this.importsUrl}/dispatch-items/${dispatchItemId}`);
+  }
+
   getStatusOptionsByImportId(id: string) {
     return this.httpClient.get(`${this.importsUrl}/${id}/status-options`);
   }

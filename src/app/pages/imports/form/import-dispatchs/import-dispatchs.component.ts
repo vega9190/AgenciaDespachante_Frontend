@@ -1,4 +1,4 @@
-import { Component, HostListener, OnInit, computed, effect, inject, input, signal } from '@angular/core';
+import { Component, HostListener, OnInit, computed, effect, inject, input, output, signal } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CurrencyPipe } from '@angular/common';
 import { finalize } from 'rxjs';
@@ -9,7 +9,7 @@ import { InputGroup } from 'primeng/inputgroup';
 import { InputGroupAddonModule } from 'primeng/inputgroupaddon';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { InputTextModule } from 'primeng/inputtext';
-import { MessageService } from 'primeng/api';
+import { ConfirmationService, MessageService } from 'primeng/api';
 import { TooltipModule } from 'primeng/tooltip';
 
 import { DispatchCostItem, ImportDispatchFormModel, TractorItem } from '../../models/import-form.models';
@@ -47,11 +47,13 @@ export class ImportDispatchsComponent implements OnInit {
   private readonly importsService = inject(ImportsService);
   private readonly uiBlockService = inject(UiBlockService);
   private readonly messageService = inject(MessageService);
+  private readonly confirmationService = inject(ConfirmationService);
   private readonly borrowedNitsService = inject(BorrowedNitsService);
   private readonly tenantSettingsService = inject(TenantSettingsService);
   private readonly reportsService = inject(ReportsService);
 
   readonly importItem = input<ImportDetailDto | null>(null);
+  readonly logsChanged = output<void>();
   readonly isReadOnly = computed(() => isReadOnlyImportStatus(this.importItem()?.statusId));
 
   constructor() {
@@ -65,10 +67,10 @@ export class ImportDispatchsComponent implements OnInit {
   readonly maxCostAmount = MAX_COST_AMOUNT;
 
   readonly costs = signal<DispatchCostItem[]>([
-    { description: MAIN_CHARGE_DESCRIPTION, amount: null },
-    { description: 'Transp. Internacional', amount: null },
-    { description: 'Almacenaje', amount: null },
-    { description: 'Agencia', amount: null }
+    { id: null, description: MAIN_CHARGE_DESCRIPTION, amount: null },
+    { id: null, description: 'Transp. Internacional', amount: null },
+    { id: null, description: 'Almacenaje', amount: null },
+    { id: null, description: 'Agencia', amount: null }
   ]);
   readonly totalCosts = computed(() =>
     this.costs().reduce((sum, c) => sum + (c.amount ?? 0), 0)
@@ -141,11 +143,19 @@ export class ImportDispatchsComponent implements OnInit {
   }
 
   addCost(): void {
-    this.costs.update(list => [...list, { description: '', amount: null }]);
+    this.costs.update(list => [...list, { id: null, description: '', amount: null }]);
   }
 
   removeCost(index: number): void {
-    this.costs.update(list => list.filter((_, i) => i !== index));
+    const item = this.costs()[index];
+    if (!item) return;
+
+    if (!item.id) {
+      this.costs.update(list => list.filter((_, i) => i !== index));
+      return;
+    }
+
+    this.confirmDeleteDispatchItem(item.id, item.description);
   }
 
   updateCostDescription(index: number, value: string): void {
@@ -161,11 +171,19 @@ export class ImportDispatchsComponent implements OnInit {
   }
 
   addTractor(): void {
-    this.tractors.update(list => [...list, { description: '', dim: null, taxAmount: null, storageAmount: null }]);
+    this.tractors.update(list => [...list, { id: null, description: '', dim: null, taxAmount: null, storageAmount: null }]);
   }
 
   removeTractor(index: number): void {
-    this.tractors.update(list => list.filter((_, i) => i !== index));
+    const item = this.tractors()[index];
+    if (!item) return;
+
+    if (!item.id) {
+      this.tractors.update(list => list.filter((_, i) => i !== index));
+      return;
+    }
+
+    this.confirmDeleteDispatchItem(item.id, item.description);
   }
 
   updateTractorField(index: number, field: keyof TractorItem, value: string | number | null): void {
@@ -176,6 +194,7 @@ export class ImportDispatchsComponent implements OnInit {
 
   getDispatchItems() {
     const costs = this.costs().map((item, i) => ({
+      id: item.id,
       description: item.description,
       amount: item.amount ?? 0,
       isTractor: false,
@@ -186,6 +205,7 @@ export class ImportDispatchsComponent implements OnInit {
     }));
 
     const tractors = this.tractors().map(t => ({
+      id: t.id,
       description: t.description,
       amount: (t.taxAmount ?? 0) + (t.storageAmount ?? 0),
       isTractor: true,
@@ -240,9 +260,54 @@ export class ImportDispatchsComponent implements OnInit {
       .subscribe({
         next: () => {
           this.messageService.add({ severity: 'success', summary: 'Guardado', detail: 'Despacho guardado correctamente.' });
+          this.loadDispatchForm(importId);
+          this.logsChanged.emit();
         },
         error: () => {
           this.messageService.add({ severity: 'error', summary: 'Error', detail: 'No se pudo guardar el despacho.' });
+        }
+      });
+  }
+
+  private confirmDeleteDispatchItem(dispatchItemId: string, description: string): void {
+    const name = this.escapeHtml(description.trim()) || 'este item';
+
+    this.confirmationService.confirm({
+      header: 'Confirmar eliminación',
+      message: `¿Está seguro de eliminar <b>${name}</b> del despacho?`,
+      icon: 'pi pi-exclamation-triangle',
+      acceptLabel: 'Eliminar',
+      rejectLabel: 'Cancelar',
+      acceptButtonStyleClass: 'p-button-danger',
+      accept: () => this.deleteDispatchItem(dispatchItemId)
+    });
+  }
+
+  private escapeHtml(value: string): string {
+    return value
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  private deleteDispatchItem(dispatchItemId: string): void {
+    const importId = this.importItem()?.id;
+    if (!importId) return;
+
+    this.uiBlockService.block();
+
+    this.importsService.deleteDispatchItem(dispatchItemId)
+      .pipe(finalize(() => this.uiBlockService.unblock()))
+      .subscribe({
+        next: () => {
+          this.messageService.add({ severity: 'success', summary: 'Eliminado', detail: 'Item de despacho eliminado correctamente.' });
+          this.loadDispatchForm(importId);
+          this.logsChanged.emit();
+        },
+        error: () => {
+          this.messageService.add({ severity: 'error', summary: 'Error', detail: 'No se pudo eliminar el item de despacho.' });
         }
       });
   }
@@ -332,13 +397,13 @@ export class ImportDispatchsComponent implements OnInit {
 
         const costItems = dto.items
           .filter(i => !i.isTractor)
-          .map(i => ({ description: i.description, amount: i.amount }));
+          .map(i => ({ id: i.id, description: i.description, amount: i.amount }));
         if (costItems.length) this.costs.set(costItems);
 
         const tractorItems = dto.items
           .filter(i => i.isTractor)
-          .map(i => ({ description: i.description, dim: i.dim ?? null, taxAmount: i.taxAmount ?? null, storageAmount: i.storageAmount ?? null }));
-        if (tractorItems.length) this.tractors.set(tractorItems);
+          .map(i => ({ id: i.id, description: i.description, dim: i.dim ?? null, taxAmount: i.taxAmount ?? null, storageAmount: i.storageAmount ?? null }));
+        this.tractors.set(tractorItems);
       }
     });
   }

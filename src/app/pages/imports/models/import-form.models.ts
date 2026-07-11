@@ -21,11 +21,13 @@ export interface ImportDispatchFormModel {
 }
 
 export interface DispatchCostItem {
+  id: string | null;
   description: string;
   amount: number | null;
 }
 
 export interface TractorItem {
+  id: string | null;
   description: string;
   dim: string | null;
   taxAmount: number | null;

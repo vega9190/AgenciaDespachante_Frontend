@@ -1,5 +1,5 @@
 import { DatePipe } from '@angular/common';
-import { Component, computed, effect, inject, input, signal } from '@angular/core';
+import { Component, computed, effect, inject, input, signal, untracked } from '@angular/core';
 import { finalize } from 'rxjs';
 
 import { TableLazyLoadEvent, TableModule } from 'primeng/table';
@@ -32,6 +32,7 @@ export class ImportLogsComponent {
       this.importId();
       this.refreshVersion();
       this.page.set(1);
+      untracked(() => this.loadLogs());
     });
   }
 

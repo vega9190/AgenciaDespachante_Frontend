@@ -243,6 +243,7 @@ export interface SaveTransportationRequest {
 }
 
 export interface DispatchItemRequest {
+  id?: string | null;
   description: string;
   amount: number;
   isTractor: boolean;
