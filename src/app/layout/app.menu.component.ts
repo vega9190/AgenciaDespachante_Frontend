@@ -50,6 +50,12 @@ export class AppMenuComponent {
       roles: this.managerRoles
     },
     {
+      label: 'Trabajadores',
+      icon: 'pi pi-briefcase',
+      routerLink: ['/employees'],
+      roles: this.managerRoles
+    },
+    {
       label: 'Choferes',
       icon: 'pi pi-id-card',
       routerLink: ['/drivers'],

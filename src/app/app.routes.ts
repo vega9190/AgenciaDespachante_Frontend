@@ -48,6 +48,17 @@ export const routes: Routes = [
         ]
       },
       {
+        path: 'employees',
+        canActivate: [roleGuard],
+        data: { roles: [RoleIds.Administrator, RoleIds.Manager] },
+        children: [
+          {
+            path: '',
+            loadComponent: () => import('@pages/employees/list/employees-list.component').then((m) => m.EmployeesListComponent)
+          }
+        ]
+      },
+      {
         path: 'imports',
         children: [
           {
