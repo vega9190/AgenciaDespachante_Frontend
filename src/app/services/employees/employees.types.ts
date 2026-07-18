@@ -27,6 +27,7 @@ export interface EmployeeRequest {
 
 export interface EmployeeListItemDto {
   id: string;
+  employeeNumber: number;
   firstName: string;
   lastName: string;
   phone?: string | null;
@@ -37,6 +38,7 @@ export interface EmployeeListItemDto {
 
 export interface EmployeeDetailDto {
   id: string;
+  employeeNumber: number;
   firstName: string;
   lastName: string;
   address?: string | null;

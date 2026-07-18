@@ -1,0 +1,104 @@
+<div class="employee-form-page flex flex-col gap-12">
+  <div>
+    <div>
+      <h1 class="page-title">{{ pageTitle() }}</h1>
+    </div>
+  </div>
+
+  @if (employee(); as currentEmployee) {
+    <div class="employee-summary-grid">
+      <div class="employee-summary-card">
+        <div class="employee-summary-card__icon employee-summary-card__icon--id">
+          <i class="pi pi-id-card"></i>
+        </div>
+        <div class="employee-summary-card__content">
+          <span class="employee-summary-card__label">CÉDULA</span>
+          <strong class="employee-summary-card__value">{{ currentEmployee.nationalId || '-' }}</strong>
+        </div>
+      </div>
+
+      <div class="employee-summary-card">
+        <div class="employee-summary-card__icon employee-summary-card__icon--date">
+          <i class="pi pi-calendar"></i>
+        </div>
+        <div class="employee-summary-card__content">
+          <span class="employee-summary-card__label">TRABAJADOR DESDE</span>
+          <strong class="employee-summary-card__value">{{ currentEmployee.createdUtc | date: 'dd/MM/yyyy' }}</strong>
+        </div>
+      </div>
+
+      <div class="employee-summary-card employee-summary-card--status">
+        <div class="employee-summary-card__icon employee-summary-card__icon--status">
+          <i class="pi pi-shield"></i>
+        </div>
+        <div class="employee-summary-card__content employee-summary-card__content--status">
+          <span class="employee-summary-card__label">ESTADO</span>
+          <strong class="employee-summary-card__value">{{ employeeForm.controls.isActive.value ? 'Activo' : 'Inactivo' }}</strong>
+          <span class="employee-summary-card__help">Permitir que este trabajador opere en el sistema.</span>
+        </div>
+        <p-toggleswitch inputId="isActive" [formControl]="employeeForm.controls.isActive" />
+      </div>
+    </div>
+  }
+
+  <p-card class="employee-form-card">
+    <div class="form-grid" [formGroup]="employeeForm">
+      <div class="flex flex-col gap-2">
+        <label for="firstName" class="font-semibold">Nombre</label>
+        <input id="firstName" type="text" pInputText formControlName="firstName" maxlength="150" />
+        @if (getFieldError('firstName')) {
+          <small class="field-error">{{ getFieldError('firstName') }}</small>
+        }
+      </div>
+
+      <div class="flex flex-col gap-2">
+        <label for="lastName" class="font-semibold">Apellido</label>
+        <input id="lastName" type="text" pInputText formControlName="lastName" maxlength="150" />
+        @if (getFieldError('lastName')) {
+          <small class="field-error">{{ getFieldError('lastName') }}</small>
+        }
+      </div>
+
+      <div class="flex flex-col gap-2">
+        <label for="nationalId" class="font-semibold">Cédula</label>
+        <input id="nationalId" type="text" pInputText formControlName="nationalId" maxlength="20" />
+        @if (getFieldError('nationalId')) {
+          <small class="field-error">{{ getFieldError('nationalId') }}</small>
+        }
+      </div>
+
+      <div class="flex flex-col gap-2">
+        <label for="phone" class="font-semibold">Teléfono</label>
+        <app-phone-input inputId="phone" [control]="employeeForm.controls.phone" />
+        @if (getFieldError('phone')) {
+          <small class="field-error">{{ getFieldError('phone') }}</small>
+        }
+      </div>
+
+      <div class="flex flex-col gap-2 form-grid__full">
+        <label for="address" class="font-semibold">Dirección</label>
+        <input id="address" type="text" pInputText formControlName="address" maxlength="255" />
+        @if (getFieldError('address')) {
+          <small class="field-error">{{ getFieldError('address') }}</small>
+        }
+      </div>
+    </div>
+
+    @if (isLoading()) {
+      <div class="form-loading">Cargando trabajador...</div>
+    }
+
+    <div class="form-actions">
+      <button type="button" pButton label="Volver" severity="secondary" styleClass="flat-button" (click)="onCancel()"></button>
+      <button
+        type="button"
+        pButton
+        label="Guardar"
+        icon="pi pi-save"
+        styleClass="flat-button"
+        [disabled]="isLoading() || isSaving()"
+        (click)="onSubmit()"
+      ></button>
+    </div>
+  </p-card>
+</div>

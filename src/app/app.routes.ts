@@ -55,6 +55,14 @@ export const routes: Routes = [
           {
             path: '',
             loadComponent: () => import('@pages/employees/list/employees-list.component').then((m) => m.EmployeesListComponent)
+          },
+          {
+            path: 'create',
+            loadComponent: () => import('@pages/employees/form/employee-form.component').then((m) => m.EmployeeFormComponent)
+          },
+          {
+            path: ':id',
+            loadComponent: () => import('@pages/employees/form/employee-form.component').then((m) => m.EmployeeFormComponent)
           }
         ]
       },

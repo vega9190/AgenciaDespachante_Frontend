@@ -1,6 +1,7 @@
 import { DatePipe } from '@angular/common';
 import { Component, computed, inject, signal } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { finalize } from 'rxjs';
 
 import { ButtonModule } from 'primeng/button';
@@ -9,6 +10,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
 import { TableLazyLoadEvent, TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
+import { TooltipModule } from 'primeng/tooltip';
 
 import { EmployeeService } from '@services/employees/employee.service';
 import { EmployeeListItemDto, EmployeesListQuery } from '@services/employees/employees.types';
@@ -26,13 +28,14 @@ interface EmployeeStatusOption {
 
 @Component({
   selector: 'app-employees-list',
-  imports: [ReactiveFormsModule, DatePipe, ButtonModule, CardModule, InputTextModule, SelectModule, TableModule, TagModule],
+  imports: [ReactiveFormsModule, DatePipe, ButtonModule, CardModule, InputTextModule, SelectModule, TableModule, TagModule, TooltipModule],
   templateUrl: './employees-list.component.html',
   styleUrl: './employees-list.component.css'
 })
 export class EmployeesListComponent {
   private readonly formBuilder = inject(FormBuilder);
   private readonly employeeService = inject(EmployeeService);
+  private readonly router = inject(Router);
 
   readonly pageSizeOptions = [10, 20, 50];
   readonly statusOptions: EmployeeStatusOption[] = [
@@ -78,6 +81,14 @@ export class EmployeesListComponent {
     this.pageSize.set(rows);
     this.page.set(Math.floor(first / rows) + 1);
     this.loadEmployees();
+  }
+
+  onEdit(employee: EmployeeListItemDto): void {
+    void this.router.navigate(['/employees', employee.id]);
+  }
+
+  onCreate(): void {
+    void this.router.navigate(['/employees/create']);
   }
 
   getStatusLabel(isActive: boolean): string {
