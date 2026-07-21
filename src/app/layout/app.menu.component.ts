@@ -93,6 +93,12 @@ export class AppMenuComponent {
       icon: 'pi pi-cog',
       routerLink: ['/settings'],
       roles: this.managerRoles
+    },
+    {
+      label: 'Usuarios',
+      icon: 'pi pi-user-edit',
+      routerLink: ['/users'],
+      roles: [RoleIds.Administrator]
     }
   ];
 

@@ -1,0 +1,87 @@
+<p-dialog
+  [visible]="visible()"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [closable]="true"
+  [dismissableMask]="false"
+  [style]="{ width: 'min(520px, 96vw)' }"
+  header="Editar usuario"
+  styleClass="user-edit-dialog"
+  (onHide)="onHide()"
+>
+  @if (user(); as currentUser) {
+    <div class="user-edit-dialog__body" [formGroup]="userEditForm">
+      <div class="user-edit-dialog__person">
+        <div class="user-edit-dialog__avatar">{{ initials() }}</div>
+        <div class="user-edit-dialog__person-info">
+          <strong>{{ currentUser.displayName }}</strong>
+          <p-tag [value]="personTypeLabel()" severity="secondary" />
+        </div>
+      </div>
+
+      <div class="flex flex-col gap-2">
+        <label for="editUsername" class="font-semibold">Usuario</label>
+        <input id="editUsername" type="text" pInputText formControlName="username" maxlength="100" />
+        @if (getFieldError('username')) {
+          <small class="field-error">{{ getFieldError('username') }}</small>
+        }
+      </div>
+
+      <div class="flex flex-col gap-2">
+        <label for="editPassword" class="font-semibold">Contraseña</label>
+        <input
+          id="editPassword"
+          type="password"
+          pInputText
+          formControlName="password"
+          placeholder="Dejar en blanco para mantener la actual"
+        />
+        @if (getFieldError('password')) {
+          <small class="field-error">{{ getFieldError('password') }}</small>
+        }
+      </div>
+
+      <div class="flex flex-col gap-2">
+        <label id="editRoleLabel" class="font-semibold">Rol</label>
+        <p-select
+          inputId="editRoleId"
+          ariaLabelledBy="editRoleLabel"
+          formControlName="roleId"
+          [options]="availableRoleOptions()"
+          optionLabel="label"
+          optionValue="value"
+          placeholder="Seleccionar"
+        />
+        @if (getFieldError('roleId')) {
+          <small class="field-error">{{ getFieldError('roleId') }}</small>
+        }
+      </div>
+
+      <div class="user-status-card">
+        <div class="user-status-card__icon">
+          <i class="pi pi-shield"></i>
+        </div>
+        <div class="user-status-card__content">
+          <span class="user-status-card__label">ESTADO</span>
+          <strong class="user-status-card__value">{{ userEditForm.controls.isActive.value ? 'Activo' : 'Inactivo' }}</strong>
+          <span class="user-status-card__help">El usuario podrá iniciar sesión.</span>
+        </div>
+        <p-toggleswitch inputId="editIsActive" formControlName="isActive" />
+      </div>
+    </div>
+
+    <div class="user-edit-dialog__actions">
+      <button type="button" pButton label="Cancelar" severity="secondary" styleClass="flat-button" (click)="onCancel()"></button>
+      <button
+        type="button"
+        pButton
+        label="Guardar"
+        icon="pi pi-save"
+        styleClass="flat-button"
+        [disabled]="isSaving()"
+        (click)="onSave()"
+      ></button>
+    </div>
+  }
+</p-dialog>

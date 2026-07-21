@@ -1,0 +1,116 @@
+<div class="user-form-page flex flex-col gap-12">
+  <div>
+    <h1 class="page-title">Nuevo Usuario</h1>
+  </div>  
+
+  <p-card class="user-form-card">
+    <div class="person-type-toggle">
+      <button
+        type="button"
+        pButton
+        label="Trabajador"
+        [severity]="personType() === 'employee' ? undefined : 'secondary'"
+        styleClass="flat-button"
+        (click)="onPersonTypeChange('employee')"
+      ></button>
+      <button
+        type="button"
+        pButton
+        label="Cliente"
+        [severity]="personType() === 'client' ? undefined : 'secondary'"
+        styleClass="flat-button"
+        (click)="onPersonTypeChange('client')"
+      ></button>
+    </div>
+    <div class="form-grid pt-5" [formGroup]="userForm">
+      @if (personType() === 'employee') {
+        <div class="flex flex-col gap-2">
+          <label id="employeeLabel" class="font-semibold">Trabajador</label>
+          <p-autocomplete
+            inputId="employee"
+            ariaLabelledBy="employeeLabel"
+            formControlName="employee"
+            [suggestions]="employeeSuggestions()"
+            optionLabel="name"
+            [dropdown]="true"
+            [forceSelection]="true"
+            placeholder="Buscar por nombre"
+            (completeMethod)="onEmployeeSearch($event)"
+          />
+        </div>
+      } @else {
+        <div class="flex flex-col gap-2">
+          <label id="clientLabel" class="font-semibold">Cliente</label>
+          <p-autocomplete
+            inputId="client"
+            ariaLabelledBy="clientLabel"
+            formControlName="client"
+            [suggestions]="clientSuggestions()"
+            optionLabel="name"
+            [dropdown]="true"
+            [forceSelection]="true"
+            placeholder="Buscar por nombre o RUC"
+            (completeMethod)="onClientSearch($event)"
+          />
+        </div>
+      }
+
+      <div class="flex flex-col gap-2">
+        <label for="username" class="font-semibold">Usuario</label>
+        <input id="username" type="text" pInputText formControlName="username" maxlength="100" />
+        @if (getFieldError('username')) {
+          <small class="field-error">{{ getFieldError('username') }}</small>
+        }
+      </div>
+
+      <div class="flex flex-col gap-2">
+        <label for="password" class="font-semibold">Contraseña</label>
+        <input id="password" type="password" pInputText formControlName="password" />
+        @if (getFieldError('password')) {
+          <small class="field-error">{{ getFieldError('password') }}</small>
+        }
+      </div>
+
+      <div class="flex flex-col gap-2">
+        <label id="roleLabel" class="font-semibold">Rol</label>
+        <p-select
+          inputId="roleId"
+          ariaLabelledBy="roleLabel"
+          formControlName="roleId"
+          [options]="availableRoleOptions()"
+          optionLabel="label"
+          optionValue="value"
+          placeholder="Seleccionar"
+        />
+        @if (getFieldError('roleId')) {
+          <small class="field-error">{{ getFieldError('roleId') }}</small>
+        }
+      </div>
+
+      <div class="user-status-card form-grid__full">
+        <div class="user-status-card__icon">
+          <i class="pi pi-shield"></i>
+        </div>
+        <div class="user-status-card__content">
+          <span class="user-status-card__label">ESTADO</span>
+          <strong class="user-status-card__value">{{ userForm.controls.isActive.value ? 'Activo' : 'Inactivo' }}</strong>
+          <span class="user-status-card__help">Permite que el usuario inicie sesión.</span>
+        </div>
+        <p-toggleswitch inputId="isActive" formControlName="isActive" />
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button type="button" pButton label="Volver" severity="secondary" styleClass="flat-button" (click)="onCancel()"></button>
+      <button
+        type="button"
+        pButton
+        label="Guardar"
+        icon="pi pi-save"
+        styleClass="flat-button"
+        [disabled]="isSaving()"
+        (click)="onSubmit()"
+      ></button>
+    </div>
+  </p-card>
+</div>

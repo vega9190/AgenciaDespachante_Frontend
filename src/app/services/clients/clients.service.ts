@@ -42,9 +42,9 @@ export class ClientsService {
     });
   }
 
-  getOptions(search?: string) {
+  getOptions(search?: string, excludeUserAssigned?: boolean) {
     return this.httpClient.get<ApiResultOf<ClientOptionDto[]>>(`${this.clientsUrl}/options`, {
-      params: buildHttpParams({ search })
+      params: buildHttpParams({ search, excludeUserAssigned })
     });
   }
 }

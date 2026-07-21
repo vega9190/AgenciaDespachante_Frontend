@@ -41,9 +41,9 @@ export class EmployeeService {
     });
   }
 
-  getOptions(search?: string) {
+  getOptions(search?: string, excludeUserAssigned?: boolean) {
     return this.httpClient.get<ApiResultOf<EmployeeOptionDto[]>>(`${this.employeesUrl}/options`, {
-      params: buildHttpParams({ search })
+      params: buildHttpParams({ search, excludeUserAssigned })
     });
   }
 }

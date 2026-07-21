@@ -1,0 +1,122 @@
+<div class="users-page flex flex-col gap-6">
+  <div>
+    <h1 class="page-title">Gestión de Usuarios</h1>
+  </div>
+
+  <p-card>
+    <div class="filters-layout filters-content">
+      <form [formGroup]="filtersForm" class="filters-grid">
+        <div class="flex flex-col gap-2">
+          <label for="username" class="font-semibold">Usuario</label>
+          <input id="username" type="text" pInputText formControlName="username" placeholder="Buscar por usuario" />
+        </div>
+
+        <div class="flex flex-col gap-2">
+          <label id="roleLabel" class="font-semibold">Rol</label>
+          <p-select
+            inputId="roleId"
+            ariaLabelledBy="roleLabel"
+            formControlName="roleId"
+            [options]="roleFilterOptions"
+            optionLabel="label"
+            optionValue="value"
+            placeholder="Seleccionar"
+          />
+        </div>
+
+        <div class="flex flex-col gap-2">
+          <label id="isActiveLabel" class="font-semibold">Estado</label>
+          <p-select
+            inputId="isActive"
+            ariaLabelledBy="isActiveLabel"
+            formControlName="isActive"
+            [options]="statusOptions"
+            optionLabel="label"
+            optionValue="value"
+            placeholder="Seleccionar"
+          />
+        </div>
+      </form>
+
+      <div class="filter-actions">
+        <button type="button" pButton label="Buscar" icon="pi pi-search" styleClass="flat-button" (click)="onSearch()"></button>
+        <button type="button" pButton label="Limpiar" severity="secondary" icon="pi pi-eraser" styleClass="flat-button" (click)="onClear()"></button>
+      </div>
+    </div>
+  </p-card>
+
+  <p-card>
+    <div class="list-header">
+      <button type="button" pButton label="Nuevo" icon="pi pi-plus" styleClass="flat-button" (click)="onCreate()"></button>
+    </div>
+
+    <p-table
+      class="mt-4"
+      [value]="users()"
+      [lazy]="true"
+      [paginator]="true"
+      [rows]="pageSize()"
+      [first]="first()"
+      [totalRecords]="totalItems()"
+      [rowsPerPageOptions]="pageSizeOptions"
+      [loading]="isLoading()"
+      responsiveLayout="scroll"
+      currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} usuarios"
+      [showCurrentPageReport]="true"
+      (onLazyLoad)="onPageChange($event)"
+    >
+      <ng-template #header>
+        <tr>
+          <th>Usuario</th>
+          <th>Tipo</th>
+          <th>Rol</th>
+          <th>Estado</th>
+          <th>Fecha alta</th>
+          <th class="text-center">Acciones</th>
+        </tr>
+      </ng-template>
+
+      <ng-template #body let-user>
+        <tr>
+          <td>{{ user.displayName }}</td>
+          <td>
+            <p-tag [value]="getTypeLabel(user)" [severity]="getTypeSeverity(user)" />
+          </td>
+          <td>{{ user.roleName }}</td>
+          <td>
+            <p-tag [value]="getStatusLabel(user.isActive)" [severity]="getStatusSeverity(user.isActive)" />
+          </td>
+          <td>{{ user.createdUtc | date: 'dd/MM/yyyy' }}</td>
+          <td class="text-center">
+            <button
+              type="button"
+              pButton
+              icon="pi pi-pencil"
+              text
+              rounded
+              styleClass="flat-button"
+              [pTooltip]="'Editar'"
+              tooltipPosition="top"
+              ariaLabel="Editar usuario"
+              (click)="onEdit(user)"
+            ></button>
+          </td>
+        </tr>
+      </ng-template>
+
+      <ng-template #emptymessage>
+        <tr>
+          <td colspan="6" class="py-6 text-center text-surface-500">No se encontraron usuarios.</td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </p-card>
+</div>
+
+<app-user-edit-dialog
+  [visible]="editDialogVisible()"
+  [user]="editingUser()"
+  [isSaving]="isSavingEdit()"
+  (cancelled)="onEditDialogCancelled()"
+  (saved)="onEditDialogSaved($event)"
+/>

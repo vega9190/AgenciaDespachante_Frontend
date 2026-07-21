@@ -41,6 +41,8 @@ export interface UserListItemDto {
   isActive: boolean;
   displayName: string;
   createdUtc: string;
+  employeeId?: string | null;
+  clientId?: string | null;
 }
 
 export interface UserDetailDto {

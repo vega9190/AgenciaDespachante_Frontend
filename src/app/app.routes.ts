@@ -128,6 +128,21 @@ export const routes: Routes = [
         canActivate: [roleGuard],
         data: { roles: [RoleIds.Administrator, RoleIds.Manager] },
         loadComponent: () => import('@pages/settings/settings.component').then((m) => m.SettingsComponent)
+      },
+      {
+        path: 'users',
+        canActivate: [roleGuard],
+        data: { roles: [RoleIds.Administrator] },
+        children: [
+          {
+            path: '',
+            loadComponent: () => import('@pages/users/list/users-list.component').then((m) => m.UsersListComponent)
+          },
+          {
+            path: 'create',
+            loadComponent: () => import('@pages/users/form/user-form.component').then((m) => m.UserFormComponent)
+          }
+        ]
       }
     ]
   },
