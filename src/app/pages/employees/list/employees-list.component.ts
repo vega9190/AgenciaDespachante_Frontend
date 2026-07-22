@@ -14,6 +14,7 @@ import { TooltipModule } from 'primeng/tooltip';
 
 import { EmployeeService } from '@services/employees/employee.service';
 import { EmployeeListItemDto, EmployeesListQuery } from '@services/employees/employees.types';
+import { ResponsiveTableDirective } from '../../../common-components/responsive-table/responsive-table.directive';
 
 interface EmployeeFiltersForm {
   name: FormControl<string>;
@@ -28,7 +29,7 @@ interface EmployeeStatusOption {
 
 @Component({
   selector: 'app-employees-list',
-  imports: [ReactiveFormsModule, DatePipe, ButtonModule, CardModule, InputTextModule, SelectModule, TableModule, TagModule, TooltipModule],
+  imports: [ReactiveFormsModule, DatePipe, ButtonModule, CardModule, InputTextModule, SelectModule, TableModule, TagModule, TooltipModule, ResponsiveTableDirective],
   templateUrl: './employees-list.component.html',
   styleUrl: './employees-list.component.css'
 })

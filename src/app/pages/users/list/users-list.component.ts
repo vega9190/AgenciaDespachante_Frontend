@@ -18,6 +18,7 @@ import { AppToastService } from '@services/common/app-toast.service';
 import { UiBlockService } from '@services/common/ui-block.service';
 import { UserService } from '@services/users/user.service';
 import { UserDetailDto, UserListItemDto, UsersListQuery, UserUpdateRequest } from '@services/users/users.types';
+import { ResponsiveTableDirective } from '../../../common-components/responsive-table/responsive-table.directive';
 
 interface UserFiltersForm {
   username: FormControl<string>;
@@ -47,7 +48,8 @@ interface RoleFilterOption {
     TableModule,
     TagModule,
     TooltipModule,
-    UserEditDialogComponent
+    UserEditDialogComponent,
+    ResponsiveTableDirective
   ],
   templateUrl: './users-list.component.html',
   styleUrl: './users-list.component.css'

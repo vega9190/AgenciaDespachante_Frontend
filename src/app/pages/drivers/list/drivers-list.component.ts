@@ -15,6 +15,7 @@ import { TagModule } from 'primeng/tag';
 import { DriverService } from '@services/drivers/driver.service';
 import { DriverListItemDto, DriversListQuery } from '@services/drivers/drivers.types';
 import { TooltipModule } from 'primeng/tooltip';
+import { ResponsiveTableDirective } from '../../../common-components/responsive-table/responsive-table.directive';
 
 interface DriversFiltersForm {
   driverNumber: FormControl<number | null>;
@@ -30,7 +31,7 @@ interface SelectOption {
 
 @Component({
   selector: 'app-drivers-list',
-  imports: [ReactiveFormsModule, DatePipe, ButtonModule, CardModule, InputNumberModule, InputTextModule, SelectModule, TableModule, TagModule, TooltipModule],
+  imports: [ReactiveFormsModule, DatePipe, ButtonModule, CardModule, InputNumberModule, InputTextModule, SelectModule, TableModule, TagModule, TooltipModule, ResponsiveTableDirective],
   templateUrl: './drivers-list.component.html',
   styleUrl: './drivers-list.component.css'
 })

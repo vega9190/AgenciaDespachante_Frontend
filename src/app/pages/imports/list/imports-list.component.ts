@@ -24,6 +24,7 @@ import { UiBlockService } from '@services/common/ui-block.service';
 import { IMPORT_STATUS_IDS, isReadOnlyImportStatus } from '@services/imports/import-status.constants';
 import { ImportListItemDto, ImportsListQuery, ImportStatusOptionDto } from '@services/imports/imports.types';
 import { ImportsService } from '@services/imports/imports.service';
+import { ResponsiveTableDirective } from '../../../common-components/responsive-table/responsive-table.directive';
 
 interface ImportFiltersForm {
   importNumber: FormControl<string>;
@@ -39,7 +40,7 @@ interface SelectOption {
 
 @Component({
   selector: 'app-imports-list',
-  imports: [ReactiveFormsModule, DatePipe, CurrencyPipe, AutoCompleteModule, ButtonModule, CardModule, ConfirmDialogModule, InputTextModule, SelectModule, TableModule, TagModule, TooltipModule],
+  imports: [ReactiveFormsModule, DatePipe, CurrencyPipe, AutoCompleteModule, ButtonModule, CardModule, ConfirmDialogModule, InputTextModule, SelectModule, TableModule, TagModule, TooltipModule, ResponsiveTableDirective],
   templateUrl: './imports-list.component.html',
   styleUrl: './imports-list.component.css'
 })

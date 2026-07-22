@@ -13,6 +13,7 @@ import { TableModule } from 'primeng/table';
 import { TooltipModule } from 'primeng/tooltip';
 
 import { FileSelectorComponent } from '../../../../common-components/file-selector/file-selector.component';
+import { ResponsiveTableDirective } from '../../../../common-components/responsive-table/responsive-table.directive';
 import { formatDateForBackend } from '../../../../functions/common.function';
 import { ImportPaymentsFormModel } from '../../models/import-form.models';
 import { ApiResult, ApiResultOf } from '@models/api.types';
@@ -45,7 +46,8 @@ import { ImportsService } from '@services/imports/imports.service';
     InputTextModule,
     SelectModule,
     TableModule,
-    TooltipModule
+    TooltipModule,
+    ResponsiveTableDirective
   ],
   templateUrl: './import-payments.component.html',
   styleUrl: './import-payments.component.css'

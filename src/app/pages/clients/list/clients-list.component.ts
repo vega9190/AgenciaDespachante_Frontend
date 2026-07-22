@@ -12,6 +12,7 @@ import { TableLazyLoadEvent, TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
 
 import { AppPhoneInputComponent } from '../../../common-components/phone-input/phone-input.component';
+import { ResponsiveTableDirective } from '../../../common-components/responsive-table/responsive-table.directive';
 import { ClientsService } from '@services/clients/clients.service';
 import { ClientListItemDto, ClientsListQuery } from '@services/clients/clients.types';
 import { TooltipModule } from 'primeng/tooltip';
@@ -30,7 +31,7 @@ interface ClientStatusOption {
 
 @Component({
   selector: 'app-clients-list',
-  imports: [ReactiveFormsModule, DatePipe, ButtonModule, CardModule, InputTextModule, SelectModule, TableModule, TagModule, AppPhoneInputComponent, TooltipModule],
+  imports: [ReactiveFormsModule, DatePipe, ButtonModule, CardModule, InputTextModule, SelectModule, TableModule, TagModule, AppPhoneInputComponent, TooltipModule, ResponsiveTableDirective],
   templateUrl: './clients-list.component.html',
   styleUrl: './clients-list.component.css'
 })

@@ -525,3 +525,40 @@ body a {
     border-top-right-radius: 2rem;
   }
 }
+
+@media (max-width: 767px) {
+  .app-responsive-table .p-datatable-thead {
+    display: none;
+  }
+
+  .app-responsive-table .p-datatable-tbody > tr {
+    display: block;
+    margin-bottom: 0.75rem;
+    border: 1px solid var(--p-content-border-color, #e5e7eb);
+    border-radius: var(--p-content-border-radius, 6px);
+  }
+
+  .app-responsive-table .p-datatable-tbody > tr > td {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100% !important;
+    white-space: normal !important;
+    border: none;
+    border-bottom: 1px solid var(--p-content-border-color, #e5e7eb);
+  }
+
+  .app-responsive-table .p-datatable-tbody > tr > td:last-child {
+    border-bottom: none;
+  }
+
+  .app-responsive-table .p-datatable-tbody > tr > td[data-label]::before {
+    content: attr(data-label);
+    font-weight: 600;
+    margin-right: 1rem;
+  }
+
+  .app-responsive-table .p-datatable-tbody > tr > td:not([data-label]) {
+    justify-content: center;
+  }
+}

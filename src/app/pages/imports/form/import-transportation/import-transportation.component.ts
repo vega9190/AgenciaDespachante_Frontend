@@ -27,6 +27,7 @@ import {
 } from '@services/imports/imports.types';
 import { DriverDetailDto } from '@services/drivers/drivers.types';
 import { ImportsService } from '@services/imports/imports.service';
+import { ResponsiveTableDirective } from '../../../../common-components/responsive-table/responsive-table.directive';
 
 interface TransportationStatusOption {
   label: string;
@@ -57,7 +58,8 @@ interface TransportationTrackingFormModel {
     InputTextModule,
     SelectModule,
     TableModule,
-    TooltipModule
+    TooltipModule,
+    ResponsiveTableDirective
   ],
   templateUrl: './import-transportation.component.html',
   styleUrl: './import-transportation.component.css'

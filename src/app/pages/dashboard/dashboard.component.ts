@@ -15,6 +15,7 @@ import { IMPORT_PAYMENT_TYPE_OPTIONS } from '@services/imports/imports.types';
 
 import { AppKpiStatCardComponent } from '../../common-components/kpi-stat-card/kpi-stat-card.component';
 import { AppStatusBreakdownChartComponent } from '../../common-components/status-breakdown-chart/status-breakdown-chart.component';
+import { ResponsiveTableDirective } from '../../common-components/responsive-table/responsive-table.directive';
 
 interface RangeOption {
   label: string;
@@ -23,7 +24,7 @@ interface RangeOption {
 
 @Component({
   selector: 'app-dashboard',
-  imports: [CardModule, SelectModule, TableModule, TagModule, DatePipe, FormsModule, AppKpiStatCardComponent, AppStatusBreakdownChartComponent],
+  imports: [CardModule, SelectModule, TableModule, TagModule, DatePipe, FormsModule, AppKpiStatCardComponent, AppStatusBreakdownChartComponent, ResponsiveTableDirective],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css'
 })

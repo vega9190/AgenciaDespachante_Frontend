@@ -6,11 +6,12 @@ import { TableLazyLoadEvent, TableModule } from 'primeng/table';
 
 import { ImportLogListItemDto } from '@services/imports/imports.types';
 import { ImportsService } from '@services/imports/imports.service';
+import { ResponsiveTableDirective } from '../../../../common-components/responsive-table/responsive-table.directive';
 
 @Component({
   selector: 'app-import-logs',
   standalone: true,
-  imports: [DatePipe, TableModule],
+  imports: [DatePipe, TableModule, ResponsiveTableDirective],
   templateUrl: './import-logs.component.html'
 })
 export class ImportLogsComponent {

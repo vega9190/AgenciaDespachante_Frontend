@@ -21,6 +21,7 @@ import { AppToastService } from '@services/common/app-toast.service';
 import { UiBlockService } from '@services/common/ui-block.service';
 import { TenantSettingsService } from '@services/tenant/tenant-settings.service';
 import { DolarApiRateDto, UpdateTenantSettingsRequest } from '@services/tenant/tenant-settings.types';
+import { ResponsiveTableDirective } from '../../common-components/responsive-table/responsive-table.directive';
 
 interface SettingsForm {
   officialExchangeRate: FormControl<number | null>;
@@ -58,7 +59,8 @@ const MIN_POSITIVE_VALUE = 0;
     TableModule,
     TagModule,
     ToggleSwitchModule,
-    TooltipModule
+    TooltipModule,
+    ResponsiveTableDirective
   ],
   templateUrl: './settings.component.html',
   styleUrl: './settings.component.css'
